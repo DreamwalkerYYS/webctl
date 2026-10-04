@@ -105,7 +105,7 @@ def main() -> int:
         check("扫到 robots.txt", "/robots.txt" in out)
         check(".php 路径给真 404（不算命中）", "404" in out)
         check("标注了假 200", "假 200" in out)
-        check("命中 flask 规则", "▸ Flask / Werkzeug" in out)
+        check("命中 flask 规则", "Flask / Werkzeug" in out)
         check("命中客户端 session 规则", "客户端签名 session" in out)
         check("命中 lfi_ssrf 规则（?file=）", "文件包含 / SSRF 入口" in out)
         check("命中 sqli 规则（?id=/?keyword=）", "SQL 注入候选" in out)
@@ -194,6 +194,34 @@ def main() -> int:
             check("browser 通道：UA 经 CDP 覆盖后真送达", "UA=QuestionCTFExplorer/1.0" in r.stdout, r.stdout + r.stderr)
             r = cli("browser", BASE + "/submit", "--cdp", cdp, "-X", "POST", "-d", "q=hi", "-q")
             check("browser 通道：POST 表单", "ok form=" in r.stdout, r.stdout + r.stderr)
+
+        print("\n[14] export：录制导出")
+        r = cli("export", "script", "--last", "5")
+        check("script：是 bash + 有 curl", "#!/usr/bin/env bash" in r.stdout and "curl" in r.stdout, r.stdout[:400] + r.stderr)
+        check("script：带上了 cookie", "--cookie" in r.stdout, r.stdout[:400])
+        r = cli("export", "python", "--last", "3")
+        check("python：零依赖 urllib 脚本", "urllib.request" in r.stdout and "def put_cookies" in r.stdout, r.stdout[:400])
+        out = "/tmp/webctl_export.sh"
+        if os.path.exists(out):
+            os.remove(out)
+        r = cli("export", "script", "--last", "2", "-o", out)
+        check("script -o 落盘且带执行位", os.path.exists(out) and bool(os.stat(out).st_mode & 0o111),
+              r.stdout + r.stderr)   # 注意：/tmp 可能是 noexec 挂载，os.access(X_OK) 会假阴性
+        r = cli("export", "md", "--last", "3", "--title", "录制测试")
+        check("md：有标题与代码块", "## 录制测试" in r.stdout and "```bash" in r.stdout, r.stdout[:400])
+        check("md：默认打码（cookie 值变 ***）", "=***" in r.stdout, r.stdout[:600])
+        r = cli("export", "md", "--last", "3", "--no-redact")
+        check("md --no-redact 保留原值", "=***" not in r.stdout, r.stdout[:600])
+
+        print("\n[15] recon 自动联想（按证据打分 + 可直接粘贴）")
+        r = cli("recon", BASE, "--threads", "2")
+        out = r.stdout
+        check("有 ★ 最可能的排序段", "★ 最可能的" in out, out[-1500:])
+        check("给出了分数", "分]" in out, out[-1500:])
+        check("命令已替换成真地址（无 $U 占位）", f'"{BASE}/' in out or f'"{BASE}' in out, out[-1500:])
+        check("其余命中单独列出", "其余命中" in out, out[-1500:])
+        r = cli("recon", BASE, "--threads", "2", "--no-suggest")
+        check("--no-suggest 关掉联想", "★ 最可能的" not in r.stdout, r.stdout[-800:])
     finally:
         srv.terminate()
         try:

@@ -58,10 +58,66 @@ def match(ctx: dict, rules: list[dict] | None = None) -> list[dict]:
         conds = {k: w.get(k) for k in ("header_re", "body_re", "param_re", "file_re")}
         if not any(conds.values()) and r.get("id") not in forced:
             continue
-        if (_any(w.get("header_re"), ctx.get("headers", ""))
+        if r.get("id") in forced or (
+                _any(w.get("header_re"), ctx.get("headers", ""))
                 and _any(w.get("body_re"), ctx.get("body", ""))
                 and _any(w.get("param_re"), params)
-                and _any(w.get("file_re"), files)
-                or r.get("id") in forced):
+                and _any(w.get("file_re"), files)):
             out.append(r)
+    return out
+
+
+# ---------------------------------------------------------------- 排序与命令渲染
+#: 命中即高信号的证据（权重越高越"看得见"）：能直接利用的入口 > 泛泛的特征
+HIGH_SIGNAL_PARAMS = {"file", "path", "url", "src", "include", "page", "cmd", "exec", "system",
+                      "do", "run", "shell", "code", "eval", "id", "search", "q", "keyword", "name"}
+
+
+def _matched_condition_types(rule: dict, ctx: dict, params: str) -> set[str]:
+    """这条规则是靠哪几类证据命中的（证据越多越可信）。"""
+    w = rule.get("when", {})
+    hit = set()
+    if w.get("header_re") and _any(w.get("header_re"), ctx.get("headers", "")):
+        hit.add("header")
+    if w.get("body_re") and _any(w.get("body_re"), ctx.get("body", "")):
+        hit.add("body")
+    if w.get("param_re") and _any(w.get("param_re"), params):
+        hit.add("param")
+    if w.get("file_re") and _any(w.get("file_re"), " ".join(ctx.get("files", []))):
+        hit.add("file")
+    return hit
+
+
+def score(rule: dict, ctx: dict) -> int:
+    """给规则打分：证据类型数 + 高信号参数 + 真实文件命中 + 规则自带 weight。"""
+    params = " ".join(ctx.get("params", []))
+    files = ctx.get("files", [])
+    s = int(rule.get("weight", 1))
+    hit = _matched_condition_types(rule, ctx, params)
+    s += 2 * len(hit)
+    if "param" in hit:
+        low = params.lower()
+        s += sum(2 for p in HIGH_SIGNAL_PARAMS if re.search(rf"(^|[^\w]){re.escape(p)}([^\w]|$)", low))
+    if "file" in hit:
+        s += 3 + sum(1 for f in files if f not in ("FAKE",))
+    if "body" in hit:
+        s += 1
+    return s
+
+
+def rank(rules: list[dict], ctx: dict) -> list[tuple[int, dict]]:
+    """按可能性排序，返回 [(分数, 规则)]。"""
+    return sorted(((score(r, ctx), r) for r in rules), key=lambda t: -t[0])
+
+
+def render_cmds(rule: dict, base: str, subs: dict | None = None) -> list[str]:
+    """把规则里的命令模板变成**可直接粘贴**的版本：替换 $U / <host> / 令牌占位符。"""
+    subs = dict(subs or {})
+    host = base.split("://", 1)[-1].rstrip("/")
+    out = []
+    for cmd in rule.get("cmds", []):
+        c = cmd.replace("$U", base).replace("<host>", host).replace("<target>", host)
+        for k, v in subs.items():
+            c = c.replace(k, v)
+        out.append(c)
     return out

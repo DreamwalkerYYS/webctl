@@ -133,18 +133,49 @@ def run(args) -> int:
         hits = rules_mod.match(ctx)
 
     print(f"\n[下一步] 命中 {len(hits)} 条规则（webctl rules list 看全部）")
-    for r in hits:
-        print(f"\n  ▸ {r['name']}")
-        print(f"    {r['hint']}")
-        for c in r.get("cmds", []):
+    ranked = rules_mod.rank(hits, ctx)
+    subs = {}
+    for c in sess.jar:                       # 能用真值替换的就替换掉，命令直接可跑
+        if c.name == "session":
+            subs["<session 值>"] = c.value
+        elif c.name in ("token", "credential", "jwt"):
+            subs["$TOKEN"] = c.value
+        elif c.name == "sid":
+            subs["<你的sid>"] = c.value
+    top = [] if getattr(args, "no_suggest", False) else ranked[:3]
+    if top:
+        print("★ 最可能的 " + str(len(top)) + " 条（打分 = 规则权重 + 证据类型数 + 高信号参数 + 真实文件命中）")
+    for sc, r in top:
+        print(f"\n  [{sc}分] {r['name']}  —— 可直接粘贴：")
+        print(f"     {r['hint']}")
+        for c in rules_mod.render_cmds(r, base, subs):
             print(f"      {c}")
+    rest = ranked[len(top):]
+    if rest:
+        print("\n其余命中：" + "、".join(f"{r['name']}({sc})" for sc, r in rest))
+    if not top and ranked:
+        print("（--no-suggest 已关掉自动联想；`webctl rules list -v` 看全部规则）")
 
     # ---- 报告落盘 ----
     host = u.netloc or base
     rep = args.report or os.path.join(CACHE, f"recon-{host.replace(':', '_')}.md")
     lines = [f"# recon {base}", f"", f"- 基线：{home.summary()}",
              f"- 指纹：" + " / ".join(fingerprint(home, body)), ""]
-    lines += ["## 命中规则"] + [f"- **{r['name']}**：{r['hint']}" for r in hits]
+    if ranked:
+        lines += ["## 最可能的下一步（按证据打分）", ""]
+        for sc, r in ranked[:3]:
+            lines.append(f"### [{sc}分] {r['name']}")
+            lines.append("")
+            lines.append(r["hint"])
+            lines.append("")
+            lines.append("```bash")
+            lines += rules_mod.render_cmds(r, base, subs)
+            lines.append("```")
+            lines.append("")
+        if len(ranked) > 3:
+            lines.append("其余命中：" + "、".join(f"{r['name']}({sc})" for sc, r in ranked[3:]))
+            lines.append("")
+    lines += ["## 全部命中规则"] + [f"- **{r['name']}**（{sc}分）：{r['hint']}" for sc, r in ranked] or ["- （无）"]
     lines += ["", "## 真实存在的文件/路径"] + ([f"- {p}" for p in found] or ["- （无）"])
     lines += ["", "## 源码面"]
     for key, label in (("comments", "注释"), ("hidden_inputs", "隐藏字段"), ("data_attrs", "data-*"),
@@ -161,8 +192,9 @@ def run(args) -> int:
         print(f"[笔记] {p}")
     if args.json:
         print(json.dumps({"base": base, "baseline": home.status, "found": found,
-                          "rules": [r["id"] for r in hits], "params": surf["params"]},
-                         ensure_ascii=False, indent=1))
+                          "rules": [r["id"] for r in hits],
+                          "top": [r["id"] for _sc, r in ranked[:3]],
+                          "params": surf["params"]}, ensure_ascii=False, indent=1))
     return 0
 
 
@@ -179,6 +211,7 @@ def register(sub) -> None:
     p.add_argument("--delay", type=float, default=0.05, help="每个请求间隔秒数")
     p.add_argument("--report", help="报告落盘路径")
     p.add_argument("--note", action="store_true", help="报告同时写进 Obsidian vault 的 CTF/ 目录")
+    p.add_argument("--no-suggest", action="store_true", help="关掉自动联想（只列规则名）")
     p.add_argument("--json", action="store_true", help="额外输出 JSON 摘要")
     p.add_argument("--verbose", action="store_true")
     p.set_defaults(func=run)

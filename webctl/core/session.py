@@ -63,13 +63,24 @@ class Session:
                    "req_headers": {k: v for k, v in headers.items()},
                    "req_body": (body.decode("utf-8", "replace") if isinstance(body, (bytes, bytearray)) else (body or "")),
                    "status": resp.status, "size": resp.size, "ctype": resp.ctype,
-                   "sha": sha, "body_file": bpath}
+                   "sha": sha, "body_file": bpath,
+                   "cookies": self._cookies_for(url)}
             with open(self.hist_index, "a", encoding="utf-8") as f:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
         except Exception:                 # 历史只是副产品，任何异常都不能影响主流程
             pass
 
     # ---- 内部 ----
+    def _cookies_for(self, url: str) -> str:
+        """当前 jar 里对该 URL 生效的 cookie（导出脚本时要用它复现会话）。"""
+        host = urllib.parse.urlsplit(url).hostname or ""
+        out = []
+        for c in self.jar:
+            d = (c.domain or "").lstrip(".")
+            if d and (host == d or host.endswith("." + d)):
+                out.append(f"{c.name}={c.value}")
+        return "; ".join(out)
+
     def _full(self, url_or_path: str) -> str:
         if url_or_path.startswith(("http://", "https://")):
             return url_or_path

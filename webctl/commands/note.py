@@ -95,6 +95,21 @@ def add_to_vault(src_md: str, host: str, vault: str | None = None, dirname: str 
     return dst
 
 
+def add_to_vault_text(text: str, title: str, vault: str | None = None, dirname: str = "CTF") -> str:
+    """把一段 markdown 文本直接写成 vault 里的笔记（export md --note 用）。"""
+    v = vault or vault_path()
+    if not v:
+        raise SystemExit("[!] 找不到 vault（--vault 或 OBSIDIAN_VAULT_PATH）")
+    outdir = os.path.join(v, dirname)
+    os.makedirs(outdir, exist_ok=True)
+    stamp = _dt.date.today().isoformat()
+    fm = (f"---\ntags: [CTF, Web]\ntype: 录制\n日期: {stamp}\ncreated: {stamp}\nupdated: {stamp}\n---\n\n")
+    dst = os.path.join(outdir, f"{stamp}-{_slug(title)}.md")
+    with open(dst, "w", encoding="utf-8") as f:
+        f.write(fm + text)
+    return dst
+
+
 def register(sub) -> None:
     p = sub.add_parser("note", help="生成 writeup 骨架 / 把报告写进 vault")
     v = p.add_subparsers(dest="notecmd", required=True)
