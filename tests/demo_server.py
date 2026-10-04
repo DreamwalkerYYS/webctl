@@ -80,6 +80,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, APP_JS, "application/javascript")
         elif path == "/robots.txt":
             self._send(200, ROBOTS, "text/plain")
+        elif path == "/echo-ua":
+            self._send(200, "UA=" + (self.headers.get("User-Agent") or ""), "text/plain")
         elif path == "/api/v1/user":
             self._send(200, json.dumps({"id": q.get("id", [""])[0], "role": "user"}), "application/json")
         elif path == "/login":

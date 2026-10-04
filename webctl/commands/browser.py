@@ -16,12 +16,14 @@ from __future__ import annotations
 
 import base64
 import glob
+import json
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
+import urllib.parse
 
 from ..core.cdp import CDP, http_json, list_targets
 from ..core.response import Resp
@@ -70,48 +72,64 @@ def launch_browser(cdp_base: str, headless: bool = True) -> subprocess.Popen:
 
 
 def fetch_via_browser(cdp_base: str, url: str, method: str = "GET", headers: dict | None = None,
-                      body: str | None = None, timeout: float = 30) -> Resp:
+                      body: str | None = None, timeout: float = 30, tab_origin: bool = True) -> Resp:
+    """借浏览器发一次请求：先导航到目标同源站点，再在页面里注入 fetch 取回原始响应。
+
+    为什么不用 Fetch 域拦截：Page.navigate 的回复要等导航提交，边等回复边处理拦截事件会死锁
+    （实测在 Chrome 145 上必卡）。同源 fetch 更简单也更稳：
+      * 同源 → 没有跨域限制，能拿到状态码/响应头/原始字节
+      * UA 走 Network.setUserAgentOverride、Cookie 走 Network.setCookie（这两个是 fetch 的禁止改名单头）
+      * 出口 IP、TLS 指纹、代理设置都来自浏览器本身 —— 这就是这条通道存在的意义
+
+    副作用：会先对站点的 "/" 发一次 GET（导航用）。对 CTF 靶机无影响。
+    """
+    u = urllib.parse.urlsplit(url)
+    origin = f"{u.scheme}://{u.netloc}"
+    headers = dict(headers or {})
     cdp = CDP(cdp_base, timeout=timeout)
     try:
+        cdp.call("Network.enable")
         cdp.call("Page.enable")
-        cdp.call("Fetch.enable", {"patterns": [
-            {"urlPattern": "*", "requestStage": "Request"},
-            {"urlPattern": "*", "requestStage": "Response"},
-        ]})
-        cdp.call("Page.navigate", {"url": url})
-        target_rid = None
-        deadline = time.time() + timeout
-        while time.time() < deadline:
-            ev = cdp.next_event("Fetch.requestPaused", timeout=max(1.0, deadline - time.time()))
-            p = ev["params"]
-            rid = p["requestId"]
-            if p.get("responseStatusCode") is None:              # ---- 请求阶段
-                if target_rid is None and p["request"]["url"].startswith(url.split("?")[0][:60]):
-                    target_rid = rid
-                params = {"requestId": rid}
-                if rid == target_rid:
-                    if method and method.upper() != "GET":
-                        params["method"] = method.upper()
-                    if headers:
-                        params["headers"] = [{"name": str(k), "value": str(v)} for k, v in headers.items()]
-                    if body is not None:
-                        params["postData"] = base64.b64encode(body.encode()).decode()
-                cdp.call("Fetch.continueRequest", params)
-                continue
-            # ---- 响应阶段
-            status = p["responseStatusCode"]
-            if status in (301, 302, 303, 307, 308):
-                cdp.call("Fetch.continueRequest", {"requestId": rid})
-                continue
-            hdrs = {h["name"]: h["value"] for h in p.get("responseHeaders", [])}
-            got = cdp.call("Fetch.getResponseBody", {"requestId": rid})
-            raw = got.get("body", "")
-            data = base64.b64decode(raw) if got.get("base64Encoded") else raw.encode()
-            final_url = p["request"]["url"]
-            cdp.call("Fetch.continueRequest", {"requestId": rid})
-            cdp.call("Fetch.disable")
-            return Resp(status, hdrs, data, url, final_url)
-        raise TimeoutError("浏览器这条通道超时了（页面可能在等子资源/被拦截）")
+        # 禁止改名单头：交给 CDP 设置
+        ua = None
+        for k in list(headers):
+            if k.lower() == "user-agent":
+                ua = headers.pop(k)
+            elif k.lower() == "cookie":
+                for pair in headers.pop(k).split(";"):
+                    n, _, v = pair.strip().partition("=")
+                    if n:
+                        cdp.call("Network.setCookie", {"name": n, "value": v, "url": origin})
+        if ua:
+            cdp.call("Network.setUserAgentOverride", {"userAgent": ua})
+        if tab_origin:
+            cdp.ws.send_text(json.dumps({"id": 9001, "method": "Page.navigate",
+                                         "params": {"url": origin + "/"}}))
+            try:                                     # 等加载事件；超时也继续（有的站首页就卡）
+                cdp.next_event("Page.loadEventFired", timeout=min(10.0, timeout))
+            except Exception:
+                pass
+        js = """(async () => {
+  const init = {method: %s, headers: %s, credentials: 'include', redirect: 'follow'};
+  %s
+  const r = await fetch(%s, init);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  let s = ''; const chunk = 0x8000;
+  for (let i = 0; i < buf.length; i += chunk) s += String.fromCharCode.apply(null, buf.subarray(i, i + chunk));
+  return {status: r.status, url: r.url, ok: r.ok,
+          headers: Array.from(r.headers.entries()),
+          b64: btoa(s), size: buf.length};
+})()""" % (json.dumps(method.upper()), json.dumps(headers),
+           f"init.body = {json.dumps(body)};" if body is not None else "",
+           json.dumps(url))
+        try:
+            out = cdp.evaluate(js)
+        except RuntimeError as e:                     # 页面内异常（多为网络层失败）
+            raise RuntimeError(f"页面内 fetch 失败：{e}")
+        if not isinstance(out, dict) or "b64" not in out:
+            raise RuntimeError(f"浏览器没返回数据：{str(out)[:200]}")
+        return Resp(out.get("status", 0), dict(out.get("headers") or []),
+                    base64.b64decode(out["b64"]), url, out.get("url"))
     finally:
         try:
             cdp.close()
@@ -175,6 +193,7 @@ def register(sub) -> None:
     p.add_argument("--no-headless", action="store_true", help="配 --launch：起带界面的浏览器")
     p.add_argument("--discover", action="store_true", help="列出该调试端口上的目标")
     p.add_argument("--timeout", type=float, default=30)
+    p.add_argument("-v", "--verbose", action="store_true", help="打印响应头 + 终端提示")
     p.add_argument("--grep")
     p.add_argument("-q", "--quiet", action="store_true")
     p.add_argument("-o", "--out")

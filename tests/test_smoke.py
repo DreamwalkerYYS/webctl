@@ -187,6 +187,13 @@ def main() -> int:
         check("没开调试端口时给排查提示", r.returncode == 2 and "连不上" in (r.stdout + r.stderr), r.stdout + r.stderr)
         r = cli("browser", BASE + "/", "--cdp", "http" + "://" + "127" + "." + "0.0.1" + ":9" + "9" + "9")
         check("browser 通道失败时给三条排查线索", "排查" in (r.stdout + r.stderr), r.stdout + r.stderr)
+        # 有 CDP 端口时才做的端到端（容器里没浏览器 → 环境变量指定才跑）
+        if os.environ.get("WEBCTL_CDP"):
+            cdp = os.environ["WEBCTL_CDP"]
+            r = cli("browser", BASE + "/echo-ua", "--cdp", cdp, "--ua", "QuestionCTFExplorer/1.0", "-q")
+            check("browser 通道：UA 经 CDP 覆盖后真送达", "UA=QuestionCTFExplorer/1.0" in r.stdout, r.stdout + r.stderr)
+            r = cli("browser", BASE + "/submit", "--cdp", cdp, "-X", "POST", "-d", "q=hi", "-q")
+            check("browser 通道：POST 表单", "ok form=" in r.stdout, r.stdout + r.stderr)
     finally:
         srv.terminate()
         try:
