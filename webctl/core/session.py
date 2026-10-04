@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import http.cookiejar
+import json
 import os
 import sys
 import time
@@ -43,6 +44,30 @@ class Session:
         if proxy:
             handlers.append(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
         self._opener = urllib.request.build_opener(*handlers)
+        # 请求历史（replay/diff 的数据源）
+        self.host_key = key
+        self.hist_dir = os.path.join(CACHE, "history", key)
+        self.hist_index = os.path.join(self.hist_dir, "index.jsonl")
+
+    def _record(self, method: str, url: str, headers: dict, body, resp: Resp) -> None:
+        """落一条历史：请求要素 + 响应摘要 + 响应体文件（失败也不影响主流程）。"""
+        try:
+            import hashlib
+            os.makedirs(self.hist_dir, exist_ok=True)
+            sha = hashlib.sha256(resp.body).hexdigest()
+            ts = time.time()
+            bpath = os.path.join(self.hist_dir, f"{int(ts*1000)}-{sha[:8]}.body")
+            with open(bpath, "wb") as f:
+                f.write(resp.body)
+            rec = {"ts": ts, "method": method.upper(), "url": url,
+                   "req_headers": {k: v for k, v in headers.items()},
+                   "req_body": (body.decode("utf-8", "replace") if isinstance(body, (bytes, bytearray)) else (body or "")),
+                   "status": resp.status, "size": resp.size, "ctype": resp.ctype,
+                   "sha": sha, "body_file": bpath}
+            with open(self.hist_index, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        except Exception:                 # 历史只是副产品，任何异常都不能影响主流程
+            pass
 
     # ---- 内部 ----
     def _full(self, url_or_path: str) -> str:
@@ -99,6 +124,7 @@ class Session:
         except OSError:
             pass
         self.history.append((method.upper(), target, resp.status, resp.size))
+        self._record(method, target, hdrs, data, resp)
         if self.verbose:
             print(f"  [{time.time()-t0:.2f}s] {method.upper()} {target}", file=sys.stderr)
         return resp

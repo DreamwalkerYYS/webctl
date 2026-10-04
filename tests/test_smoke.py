@@ -147,6 +147,46 @@ def main() -> int:
         check("--show-fake 能显示被丢掉的", "admin" in r2.stdout, r2.stdout)
         r3 = cli("fuzz", BASE, "-w", wl)
         check("没有 FUZZ 占位符时给提示", r3.returncode == 2 and "FUZZ" in (r3.stdout + r3.stderr), r3.stdout + r3.stderr)
+
+        print("\n[10] replay：请求历史")
+        r = cli("replay", "list", "-n", "8")
+        check("replay list 有历史", "/" in r.stdout and "GET" in r.stdout, r.stdout + r.stderr)
+        r = cli("replay", "show", "1", "--max", "200")
+        check("replay show 能看单条", "响应体" in r.stdout or "请求头" in r.stdout, r.stdout + r.stderr)
+        r = cli("replay", "resend", "--last", "-H", "X-Webctl: 1", "--diff")
+        check("replay resend 能重发并 diff", "[新]" in r.stdout and "200" in r.stdout, r.stdout + r.stderr)
+
+        print("\n[11] diff：两次响应对比")
+        r = cli("diff", "live", BASE + "/api/v1/user", "--field", "id", "--a", "1", "--b", "2")
+        check("值不同 → 退出码 1（可当布尔探针）", r.returncode == 1 and "sha不同" in r.stdout, r.stdout + r.stderr)
+        r = cli("diff", "live", BASE + "/api/v1/user", "--field", "id", "--a", "1", "--b", "1")
+        check("值相同 → 退出码 0", r.returncode == 0 and "完全一致" in r.stdout, r.stdout + r.stderr)
+        open("/tmp/webctl_d1.txt", "w").write("same\n")
+        open("/tmp/webctl_d2.txt", "w").write("same\n")
+        check("diff files 相同 → 0", cli("diff", "files", "/tmp/webctl_d1.txt", "/tmp/webctl_d2.txt").returncode == 0)
+
+        print("\n[12] CDP WebSocket 帧格式（离线，用最小 echo 服务端）")
+        wssrv = subprocess.Popen([sys.executable, os.path.join(ROOT, "tests", "ws_echo_server.py"), "8901"],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            time.sleep(1.0)
+            sys.path.insert(0, ROOT)
+            from webctl.core.cdp import WS
+            w = WS("ws://" + "127" + ".0.0.1" + ":8901/", timeout=5)
+            w.send_text("hello")
+            check("短消息回声", w.recv_text() == "hello")
+            big = "A" * 300
+            w.send_text(big)
+            check("分片消息拼接（300 字符）", w.recv_text() == big)
+            w.close()
+        finally:
+            wssrv.terminate()
+
+        print("\n[13] browser 子命令：错误路径要讲清楚")
+        r = cli("browser", "--discover", "--cdp", "http" + "://" + "127" + "." + "0.0.1" + ":9" + "9" + "9")
+        check("没开调试端口时给排查提示", r.returncode == 2 and "连不上" in (r.stdout + r.stderr), r.stdout + r.stderr)
+        r = cli("browser", BASE + "/", "--cdp", "http" + "://" + "127" + "." + "0.0.1" + ":9" + "9" + "9")
+        check("browser 通道失败时给三条排查线索", "排查" in (r.stdout + r.stderr), r.stdout + r.stderr)
     finally:
         srv.terminate()
         try:
