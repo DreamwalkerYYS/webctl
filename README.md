@@ -3,7 +3,7 @@
 把"做题 SOP"压成命令：**侦察 → 联想下一步 → 打 → 记录 → 导出成 writeup**。
 纯标准库、零依赖，Python 3.9+ 直接跑（系统 python 3.14 和容器里的 3.11 都验证过）。
 
-`MIT License` · 仓库 https://github.com/DreamwalkerYYS/webctl · 目录 `~/项目/ctf-tool` · 启动器 `~/.local/bin/webctl`
+`MIT License` · 仓库 https://github.com/Phirisyyds/webctl （镜像：https://github.com/DreamwalkerYYS/webctl ）· 目录 `~/项目/ctf-tool` · 启动器 `~/.local/bin/webctl`
 
 ```
 webctl --help                 # 所有子命令（cli.py 用 pkgutil 自动发现 commands/，加功能不用改入口）
@@ -22,7 +22,7 @@ webctl --help
 
 # ③ 正经装成包（可选）
 pipx install -e ~/项目/ctf-tool                  # 本地开发式安装
-pipx install git+https://github.com/DreamwalkerYYS/webctl     # 或直接从仓库装
+pipx install git+https://github.com/Phirisyyds/webctl     # 或直接从仓库装
 # （用 pip 的话加 --break-system-packages）
 ```
 
@@ -289,7 +289,7 @@ ctf-tool/
 
 ## 11. 变更日志
 
-- **0.5** — 开源发布（https://github.com/DreamwalkerYYS/webctl，MIT）；`fuzz --safe`（并发≤5 / 间隔≥0.2s / 字典超上限拦下）；README 增加"比赛时怎么用（合规）"一节
+- **0.5** — 开源发布（https://github.com/Phirisyyds/webctl，MIT；镜像 DreamwalkerYYS/webctl）；`fuzz --safe`（并发≤5 / 间隔≥0.2s / 字典超上限拦下）；README 增加"比赛时怎么用（合规）"一节
 - **0.4.1** — 历史记录加 `tag` 来源；`export --tag/--no-probes`；md 导出命令加 shell 引号、脱敏打掉全部 cookie 值；测试改用独立 cache
 - **0.4** — `export`（script/python/md 三种录制导出，md 默认脱敏 + 可写进 vault）；recon **自动联想**（按证据打分、命令替换真地址与真 cookie 值）；README 重写为完整手册
 - **0.3.1** — `browser` 通道改「同源 fetch」（避开 `Page.navigate` 死锁）；demo 加 `/echo-ua`
