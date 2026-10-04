@@ -1,0 +1,19 @@
+{
+  "_comment": "recon 用的两条清单：先扫泄露文件，再扫常见路径。全部走「字节数 + Content-Type」判定，不看状态码。",
+  "leak": [
+    "robots.txt", "index.php.bak", ".git/HEAD", ".env", ".DS_Store", "flag.php", "flag.txt", "flag",
+    "index.php~", "index.phps", "index.php.swp", "index.php.save", ".index.php.swp", ".index.php.swo",
+    ".index.php.swn", ".index.php.un~", ".index.php.un", ".viminfo", ".bash_history",
+    "www.zip", "web.zip", "source.zip", "backup.zip", "www.tar.gz",
+    "www.rar", "src.zip", ".git/config", ".git/index", ".git/logs/HEAD", ".svn/entries",
+    "sitemap.xml", "composer.json", "config.php", "wp-config.php", ".htaccess"
+  ],
+  "paths": [
+    "/", "/index.php", "/index.html", "/login", "/admin", "/api", "/api/v1", "/debug",
+    "/health", "/healthz", "/metrics", "/status", "/console", "/src", "/source", "/app.py",
+    "/main.go", "/server.go", "/go.mod", "/requirements.txt", "/package.json", "/config.php",
+    "/docker-compose.yml", "/.well-known/security.txt", "/debug/pprof/", "/static/js/app.js",
+    "/assets/app.js"
+  ],
+  "html_ct": ["text/html", "application/xhtml"]
+}
