@@ -21,6 +21,7 @@ pipx install -e ~/项目/ctf-tool        # 或 pip install -e . --break-system-p
 ```
 webctl req    get|post|req   发请求：cookie 按 host 自动持久化、任意方法/头/体、自动捞 flag
 webctl recon  URL            一把跑完侦察：指纹 / 源码面 / 泄露文件 / 常见路径 + 下一步建议
+webctl fuzz   URL(含 FUZZ)   爆破：有 ffuf 就用 ffuf（命令原文打出来），没有用内置引擎；都自动过滤假 200
 webctl cookie list|set|del|raw|flask-unsign|flask-sign   cookie jar + Flask session 爆破伪造
 webctl jwt    decode|sign|crack      解码 / 改字段重签 / 爆破密钥（可从 jar 取令牌）
 webctl codec  b64|b64d|url|urld|hex|hexd|guess        编解码（不给参数读 stdin）
@@ -146,5 +147,5 @@ cd ~/项目/ctf-tool && python3 tests/test_smoke.py
 - HTTP/2、WebSocket、非文本协议不支持；文件上传只给了模板命令。
 - 目前只有"本机出口"一种执行器。403+空响应时手动 `--proxy` 或改用浏览器 fetch
   （容器出口和主机出口 IP 不同，这是踩过的坑）。
-- 想加的：`webctl fuzz`（把 ffuf 包一层，自动带首页字节数做过滤）、`webctl replay`（从历史里重放改包）、
-  `webctl browser`（CDP 通道，专治出口被拒）、diff 模式（两次响应逐字段对比，用来做盲注/布尔判断）。
+- 想加的：`webctl replay`（从历史里重放改包）、`webctl browser`（CDP 通道，专治出口被拒）、
+  `webctl diff`（两次响应逐字段对比，盲注/布尔判断用）。

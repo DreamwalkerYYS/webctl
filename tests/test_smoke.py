@@ -131,7 +131,22 @@ def main() -> int:
         check("索引追加一行", "QuestionCTF" in idx and "QCTF{x}" in idx, idx)
 
         print("\n[8] 规则表")
-        check("rules list 能列出规则", "flask" in cli("rules", "list").stdout or True)
+        check("rules list 能列出规则", "flask" in cli("rules", "list").stdout)
+
+        print("\n[9] fuzz：内置引擎 + 假 200 过滤")
+        wl = "/tmp/webctl_wl.txt"
+        open(wl, "w").write("index.php.bak\nrobots.txt\nlogin\nadmin\nnope\nstatic/js/app.js\n")
+        r = cli("fuzz", BASE + "/FUZZ", "-w", wl, "--engine", "builtin", "-t", "4")
+        out = r.stdout
+        check("命中真实文件 index.php.bak", "/index.php.bak" in out, out)
+        check("命中 robots.txt", "/robots.txt" in out, out)
+        check("命中 js", "static/js/app.js" in out, out)
+        check("假 200（admin/nope）被过滤", "\n   admin" not in out and "\n   nope" not in out, out)
+        check("报告了被过滤的假 200 条数", "假 200" in out, out)
+        r2 = cli("fuzz", BASE + "/FUZZ", "-w", wl, "--engine", "builtin", "-t", "4", "--show-fake")
+        check("--show-fake 能显示被丢掉的", "admin" in r2.stdout, r2.stdout)
+        r3 = cli("fuzz", BASE, "-w", wl)
+        check("没有 FUZZ 占位符时给提示", r3.returncode == 2 and "FUZZ" in (r3.stdout + r3.stderr), r3.stdout + r3.stderr)
     finally:
         srv.terminate()
         try:

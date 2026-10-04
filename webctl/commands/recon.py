@@ -19,29 +19,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 from ..core import rules as rules_mod
 from ..core.config import CACHE, DATA, ensure_dirs
+from ..core.detect import classify
 from ..core.session import Session, emit
 
 
 def _load(name: str) -> dict:
     with open(os.path.join(DATA, f"{name}.json"), encoding="utf-8") as f:
         return json.load(f)
-
-
-def classify(resp, base_size: int, base_ctype: str, html_ct: list[str]) -> str:
-    """真假 200 判定：状态码不算数，看 字节数 + Content-Type。"""
-    if resp.status in (404, 410, 403, 401) and resp.size == 0:
-        return "拒绝"
-    if resp.status == 404:
-        return "404"
-    if resp.status == 200:
-        if resp.ctype in html_ct and resp.size == base_size and resp.ctype == base_ctype:
-            return "FAKE"                      # nginx try_files 回退首页
-        if resp.size == 0:
-            return "EMPTY(存在但无输出)"
-        if resp.ctype and resp.ctype not in html_ct:
-            return "REAL"
-        return "200?"                          # 200 且是 HTML 但字节数不同 → 可疑，值得看
-    return str(resp.status)
 
 
 def scan(sess: Session, cands: list[str], base_size: int, base_ctype: str, html_ct: list[str],
