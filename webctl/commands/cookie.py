@@ -7,7 +7,6 @@ Flask session cookie 结构（三段）：
 
 ⚠️ 伪造时时间戳要回拨（默认 -60s）：Flask 会校验 max_age，时间戳比服务端新会被
    判 "Signature age is in the future" 而整块 cookie 被丢弃（表现为 500，不是没权限）。
-这部分是从你 NSSCTF-session伪造 那篇笔记的踩坑里搬进来的。
 """
 from __future__ import annotations
 

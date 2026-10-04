@@ -151,6 +151,11 @@ def main() -> int:
         check("--show-fake 能显示被丢掉的", "admin" in r2.stdout, r2.stdout)
         r3 = cli("fuzz", BASE, "-w", wl)
         check("没有 FUZZ 占位符时给提示", r3.returncode == 2 and "FUZZ" in (r3.stdout + r3.stderr), r3.stdout + r3.stderr)
+        r = cli("fuzz", BASE + "/FUZZ", "-w", wl, "--engine", "builtin", "-t", "20", "--safe")
+        check("--safe：并发被压到 ≤5 且有合规提示", "5 线程" in r.stderr and "/index.php.bak" in r.stdout,
+              r.stdout + r.stderr)
+        r = cli("fuzz", BASE + "/FUZZ", "-w", wl, "--engine", "builtin", "--safe", "--max-words", "2")
+        check("--safe：字典超上限直接拦下", r.returncode == 2 and "上限" in (r.stdout + r.stderr), r.stdout + r.stderr)
 
         print("\n[10] replay：请求历史")
         r = cli("replay", "list", "-n", "8")

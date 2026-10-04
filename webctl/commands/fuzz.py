@@ -176,6 +176,28 @@ def _report(rows: list[dict], args, secs: float, engine: str, all_rows: list[dic
         print(f"[json] {out}")
 
 
+def _apply_safe_mode(args, word_count: int) -> int:
+    """--safe：把"重型扫描"的形态压回合规区间（共享靶机/比赛现场用）。
+
+    - 并发压到 ≤5、每个请求间隔 ≥0.2s（很多赛事明文禁"重型扫描工具"）
+    - 字典超过 --max-words（默认 2000）就拒绝跑，逼你换小字典或显式放宽
+    - 打印一条自我约束提醒（这条是要写进 writeup / 自证材料的）
+    """
+    if not getattr(args, "safe", False):
+        return 0
+    args.threads = min(args.threads, 5)
+    args.delay = max(args.delay, 0.2)
+    cap = args.max_words
+    if word_count > cap:
+        print(f"[!] --safe 模式下字典有 {word_count} 条 > 上限 {cap}。\n"
+              f"    换小字典（seclists 的 Discovery/Web-Content/common.txt ≈ 4.7k 也算大），\n"
+              f"    或确认要跑就显式放宽：--max-words {word_count}", file=sys.stderr)
+        return 2
+    print(f"[safe] 低并发模式：{args.threads} 线程 / 间隔 {args.delay}s / 字典 {word_count} 条\n"
+          f"       别对比赛平台或非题目目标发请求；共享实例上命中即停。", file=sys.stderr)
+    return 0
+
+
 def run(args) -> int:
     if "FUZZ" not in args.url and not (args.data and "FUZZ" in args.data):
         print("[!] 得有个 FUZZ 占位符，告诉工具往哪儿塞词：webctl fuzz \"http://host/FUZZ\"", file=sys.stderr)
@@ -184,6 +206,10 @@ def run(args) -> int:
     if not wordlist and args.engine != "builtin":
         print("[!] 没找到字典（给 -w，或 --engine builtin 用内置小清单）", file=sys.stderr)
         return 2
+    n_words = (len(_expand(wordlist, args.ext)) if wordlist else len(BUILTIN_FALLBACK))
+    rc = _apply_safe_mode(args, n_words)
+    if rc:
+        return rc
     base_size, base_ctype = -1, ""
     if not args.show_fake:
         sess = Session(base=args.url.split("FUZZ")[0], jar_name=args.jar, proxy=args.proxy,
@@ -216,6 +242,9 @@ def register(sub) -> None:
     p.add_argument("--show-fake", action="store_true", help="连假 200 一起显示（排查用）")
     p.add_argument("--engine", choices=["auto", "ffuf", "builtin"], default="auto")
     p.add_argument("-t", "--threads", type=int, default=20, help="并发（默认 20；共享靶机别拉满）")
+    p.add_argument("--safe", action="store_true",
+                   help="合规模式：并发≤5 + 间隔≥0.2s + 字典超上限就拦（比赛/共享靶机用）")
+    p.add_argument("--max-words", type=int, default=2000, help="--safe 下的字典条数上限（默认 2000）")
     p.add_argument("--delay", type=float, default=0, help="每个请求间隔（秒）")
     p.add_argument("--save", help="把命中的响应体存到这个目录")
     p.add_argument("--json", action="store_true", help="结果另存 JSON")

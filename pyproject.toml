@@ -4,10 +4,27 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "webctl"
-version = "0.1.0"
-description = "Web 题通用工具：会话化的请求 + 侦察报告 + 高频单点操作（JWT/编码/Cookie/笔记）"
+version = "0.5.0"
+description = "Web CTF 通用工具：会话化请求 / 侦察 / 爆破 / 请求历史 / 重放 / 对比 / 录制导出（纯标准库，零依赖）"
+readme = "README.md"
 requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Phirisyyds" }]
+keywords = ["ctf", "web", "security", "pentest", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+]
 dependencies = []          # 刻意零依赖，只用标准库
+
+[project.urls]
+Homepage = "https://github.com/Phirisyyds/webctl"
+Repository = "https://github.com/Phirisyyds/webctl"
+Issues = "https://github.com/Phirisyyds/webctl/issues"
 
 [project.scripts]
 webctl = "webctl.cli:main"

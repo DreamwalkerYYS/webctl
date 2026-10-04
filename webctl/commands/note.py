@@ -1,7 +1,7 @@
 """note —— 按你的九段模板生成 writeup 骨架，直接落到 Obsidian vault 的 CTF/ 目录。
 
-    webctl note new --title 买不到的FLAG --platform QuestionCTF --kps 源码泄露/重复键 \\
-        --url http://host --flag 'QCTF{...}' --index
+    webctl note new --title 示例题-重复键 --platform ExampleCTF --kps 源码泄露/重复键 \
+        --url http://host --flag 'FLAG{...}' --index
 
 --index 会在 CTF/00-索引.md 的第一张表格末尾追加一行（找不到表格就只提示）。
 """

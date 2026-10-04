@@ -1,8 +1,9 @@
 # webctl —— Web 题通用工具包
 
 把"做题 SOP"压成命令：**侦察 → 联想下一步 → 打 → 记录 → 导出成 writeup**。
-纯标准库、零依赖，Python 3.9+ 直接跑（你的系统 python 3.14 和 Hermes 容器里的 3.11 都能用）。
-目录：`~/项目/ctf-tool`   启动器：`~/.local/bin/webctl`
+纯标准库、零依赖，Python 3.9+ 直接跑（系统 python 3.14 和容器里的 3.11 都验证过）。
+
+`MIT License` · 仓库 https://github.com/Phirisyyds/webctl · 目录 `~/项目/ctf-tool` · 启动器 `~/.local/bin/webctl`
 
 ```
 webctl --help                 # 所有子命令（cli.py 用 pkgutil 自动发现 commands/，加功能不用改入口）
@@ -70,10 +71,12 @@ webctl recon URL [--full] [--threads 4] [--delay 0.05] [--report F] [--note]
 webctl fuzz "URL/FUZZ" [-w WORDLIST] [-e php,html,bak] [-X POST] [-d 'k=FUZZ'] [-H 'K: FUZZ']
                        [-mc 200,301,302,401,403] [--fs N] [--show-fake]
                        [--engine auto|ffuf|builtin] [-t 20] [--delay S] [--save DIR] [--json]
+                       [--safe] [--max-words 2000]
 ```
 - `auto`：有 ffuf 就调 ffuf（**把完整命令原文打出来**，兼当 ffuf flag 教学），没有就用内置引擎
 - 两条路都按「**字节数 == 首页字节数**」过滤 `try_files` 回退产生的假 200（对应 ffuf 的 `-fs`）
 - `--show-fake` 把被丢掉的也显示出来；首页连不上时**自动关闭过滤**（否则会把连接错误当首页大小）
+- **`--safe`（比赛/共享靶机建议加）**：并发压到 ≤5、请求间隔 ≥0.2s、字典条数超上限（默认 2000，`--max-words` 可调）直接拒绝跑，并打印一条自我约束说明。很多赛事明文禁"重型扫描工具"，低并发 + 小字典是"用手"与"用炮"的分界线
 
 ### replay —— 请求历史
 ```
@@ -255,7 +258,23 @@ ctf-tool/
 
 ---
 
-## 9. 已知边界 / 路线
+## 9. 比赛时怎么用（合规）
+
+工具本身几乎不是问题 —— 这套等价于 curl + Burp + ffuf 的组合。真正踩线的是**用法强度**和**AI 参与**：
+
+| 用法 | 风险 | 建议 |
+|---|---|---|
+| `req` / `diff` / `jwt` / `cookie` / `replay` / `export` | 无 | 随便用，请求数和你手打一样 |
+| `recon` | 低 | 默认约 40 个请求、10 秒内结束；共享实例上别反复 `--full` |
+| `fuzz` 大字典 + 高并发 | **高** | 加 `--safe`（≤5 并发、≥0.2s 间隔、字典上限 2000），命中即停 |
+| 对比赛平台/记分板/非题目目标发请求 | **必禁** | 工具只发你给的 URL，但 base 别写错 |
+| 让 AI/LLM 替你解题 | 看规则 | 有的赛事专门设"必须由 AI 完成"的赛道，有的直接视为作弊 —— **先读规则再动手** |
+
+常见被禁行为（多数赛事规则里都有）：攻击比赛平台或基础设施、DoS/把靶机打挂、扫描整个网段、
+爆破 flag 本身、赛后公开题解或共享 flag。
+自查材料：`replay` + `export` 的历史就是"我只对哪些 URL 发过请求"的证据链。
+
+## 10. 已知边界 / 路线
 
 - HTTP/2、WebSocket、非文本协议不支持；文件上传只给了命令模板。
 - `browser` 通道目前只覆盖 `webctl browser` 自己，`req/recon/fuzz` 还走本机出口
@@ -266,8 +285,10 @@ ctf-tool/
 
 ---
 
-## 10. 变更日志
+## 11. 变更日志
 
+- **0.5** — `fuzz --safe`（并发≤5 / 间隔≥0.2s / 字典超上限拦下）；README 增加"比赛时怎么用（合规）"一节
+- **0.4.1** — 历史记录加 `tag` 来源；`export --tag/--no-probes`；md 导出命令加 shell 引号、脱敏打掉全部 cookie 值；测试改用独立 cache
 - **0.4** — `export`（script/python/md 三种录制导出，md 默认脱敏 + 可写进 vault）；recon **自动联想**（按证据打分、命令替换真地址与真 cookie 值）；README 重写为完整手册
 - **0.3.1** — `browser` 通道改「同源 fetch」（避开 `Page.navigate` 死锁）；demo 加 `/echo-ua`
 - **0.3** — `replay`（请求历史 + 重放改包 + diff）、`diff`（盲注/布尔探针）、`browser`（CDP 第二出口）

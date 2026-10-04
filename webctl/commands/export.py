@@ -3,7 +3,7 @@
     webctl export script --last 10            # 生成一串 curl（可直接跑）
     webctl export script --range 3-9 -o replay.sh
     webctl export python --indices 1,4,7      # 生成 urllib 脚本（零依赖）
-    webctl export md --last 8 --title "QuestionCTF 多阶段 Web lab"   # 直接当 writeup 的"分步过程"
+    webctl export md --last 8 --title "某题的解题过程"   # 直接当 writeup 的"分步过程"
     webctl export md --last 8 --note          # 顺手写进 vault 的 CTF/ 目录
 
 脱敏：`md` 模式默认打码（cookie 值 → `***`、"http://主机" → `http://<target>`），因为笔记要进 vault。
