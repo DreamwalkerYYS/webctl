@@ -15,7 +15,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORT = 8849
 BASE = f"http://127.0.0.1:{PORT}"
-CACHE = os.path.expanduser("~/.cache/webctl")
+# 测试用独立 cache：不污染 ~/.cache/webctl，也保证每次都是干净状态（历史里有旧记录会让断言飘）
+CACHE = "/tmp/webctl-test-cache"
 
 FAILED: list[str] = []
 
@@ -44,6 +45,9 @@ def wait_up(timeout: float = 10) -> bool:
 
 
 def main() -> int:
+    import shutil as _sh
+    _sh.rmtree(CACHE, ignore_errors=True)          # 每次从干净 cache 开始
+    os.makedirs(CACHE, exist_ok=True)
     srv = subprocess.Popen([sys.executable, os.path.join(ROOT, "tests", "demo_server.py"), str(PORT)],
                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     try:
