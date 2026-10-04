@@ -78,6 +78,7 @@ def run(args) -> int:
     base = f"{u.scheme}://{u.netloc}" if u.scheme else url
     sess = Session(base=base, jar_name=args.jar, new=args.new, proxy=args.proxy,
                    timeout=args.timeout, ua=args.ua, verbose=args.verbose)
+    sess.tag = "recon"                       # 历史里标来源：导出时可用 --no-probes 过滤掉
 
     print(f"=== webctl recon  {base} ===")
     home = sess.request("GET", "/")

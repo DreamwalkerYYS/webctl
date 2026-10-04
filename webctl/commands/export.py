@@ -27,6 +27,10 @@ SKIP_HEADERS = {"host", "content-length", "accept-encoding", "connection", "cook
 
 
 def _pick(args, recs: list[dict]) -> list[dict]:
+    if getattr(args, "tag", None):
+        recs = [r for r in recs if r.get("tag", "req") == args.tag]
+    elif getattr(args, "no_probes", False):
+        recs = [r for r in recs if r.get("tag", "req") not in ("recon", "fuzz", "diff")]
     if getattr(args, "indices", None):
         idx = [int(x) for x in re.split(r"[,\s]+", args.indices.strip()) if x.strip().isdigit()]
     elif getattr(args, "range", None):
@@ -45,8 +49,12 @@ def _pick(args, recs: list[dict]) -> list[dict]:
 
 
 def _redact(text: str, host: str) -> str:
+    """打码：主机 → <target>；**所有** cookie 对的值 → ***（不只第一个）。"""
     text = text.replace(host, "<target>")
-    text = re.sub(r"\b(sid|credential|session|token|auth|jwt)=([^;\s'\"]+)", r"\1=***", text)
+    # --cookie 'a=1; b=2' → --cookie 'a=***; b=***'
+    text = re.sub(r"(?<![\w-])([A-Za-z0-9_.\-]{1,40})=([^;\s'\"]+)", r"\1=***", text)
+    # 兜底：报头形式的 Cookie: a=1; b=2
+    text = re.sub(r"(?i)(cookie:\s*)([^\n]+)", lambda m: m.group(1) + re.sub(r"=([^;\s]+)", "=***", m.group(2)), text)
     return text
 
 
@@ -86,7 +94,7 @@ def emit_script(recs: list[dict], args) -> str:
         elif (rec.get("method") or "GET").upper() != "GET":
             cmd += ["-X", rec["method"]]
         cmd.append(url)
-        line = " ".join(shlex.quote(c) if (set(c) & set(" \t'\"$&|;<>*?!\\")) else c for c in cmd)
+        line = " ".join(shlex.quote(c) for c in cmd)
         if args.redact:
             line = _redact(line, host)
         lines.append(line)
@@ -161,7 +169,7 @@ def emit_md(recs: list[dict], args) -> str:
         if rec.get("req_body"):
             cmd += ["-X", rec.get("method", "POST"), "--data", rec["req_body"]]
         cmd.append(url)
-        line = " ".join(cmd)
+        line = " ".join(shlex.quote(c) for c in cmd)
         host = re.sub(r"^https?://[^/]+", "", url)
         if args.redact:
             from urllib.parse import urlsplit
@@ -221,6 +229,8 @@ def register(sub) -> None:
         sp.add_argument("--range", help="序号区间，如 3-9")
         sp.add_argument("--indices", help="指定序号，如 1,4,7")
         sp.add_argument("-o", "--out", help="写到文件（不给就打到 stdout）")
+        sp.add_argument("--tag", help="只导出某种来源：req / recon / fuzz / diff / replay")
+        sp.add_argument("--no-probes", action="store_true", help="排除 recon/fuzz/diff 产生的探测请求")
         if name == "md":
             sp.add_argument("--redact", action="store_true", default=True,
                             help="打码（cookie 值 → ***、主机 → <target>）—— md 默认就开")

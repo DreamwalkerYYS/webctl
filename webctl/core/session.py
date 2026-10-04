@@ -48,6 +48,7 @@ class Session:
         self.host_key = key
         self.hist_dir = os.path.join(CACHE, "history", key)
         self.hist_index = os.path.join(self.hist_dir, "index.jsonl")
+        self.tag = "req"          # 记录来源：req/recon/fuzz/diff/replay（导出时可过滤）
 
     def _record(self, method: str, url: str, headers: dict, body, resp: Resp) -> None:
         """落一条历史：请求要素 + 响应摘要 + 响应体文件（失败也不影响主流程）。"""
@@ -64,6 +65,7 @@ class Session:
                    "req_body": (body.decode("utf-8", "replace") if isinstance(body, (bytes, bytearray)) else (body or "")),
                    "status": resp.status, "size": resp.size, "ctype": resp.ctype,
                    "sha": sha, "body_file": bpath,
+                   "tag": getattr(self, "tag", "req"),
                    "cookies": self._cookies_for(url)}
             with open(self.hist_index, "a", encoding="utf-8") as f:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")

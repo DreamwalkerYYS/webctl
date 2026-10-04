@@ -87,6 +87,7 @@ def run_resend(args) -> int:
         pairs = [kv.partition("=")[::2] for kv in body.split("&")]
         body = urllib.parse.urlencode(pairs)
     sess = Session(base="", jar_name=args.jar, proxy=args.proxy, timeout=args.timeout, ua=args.ua)
+    sess.tag = "replay"
     resp = sess.request(method, rec["url"], data=body, headers=headers, follow=not args.no_follow)
     old = history.body_of(rec)
     print(f"[原] {rec.get('status')} {len(old)}B sha={rec.get('sha','')[:12]}")

@@ -124,6 +124,7 @@ def run_ffuf(args, wordlist: str, base_size: int) -> int:
 def run_builtin(args, words: list[str], base_size: int, base_ctype: str) -> int:
     sess = Session(base=args.url.split("FUZZ")[0], jar_name=args.jar, proxy=args.proxy,
                    timeout=args.timeout, ua=args.ua)
+    sess.tag = "fuzz"
     codes = {int(c) for c in args.mc.split(",") if c.strip().isdigit()}
     print(f"[引擎] 内置（{len(words)} 个词，{args.threads} 并发）"
           f"{'  [自动过滤假 200：字节数==' + str(base_size) + ']' if base_size >= 0 and not args.show_fake else ''}")

@@ -212,6 +212,18 @@ def main() -> int:
         check("md：默认打码（cookie 值变 ***）", "=***" in r.stdout, r.stdout[:600])
         r = cli("export", "md", "--last", "3", "--no-redact")
         check("md --no-redact 保留原值", "=***" not in r.stdout, r.stdout[:600])
+        # md 模式的命令要带引号（cookie 里有分号，不加引号粘出去就是坏的）
+        r = cli("export", "md", "--last", "5", "--no-redact")
+        check("md：命令带 shell 引号", "--cookie 'session=" in r.stdout, r.stdout[:900])
+        # 脱敏要把整个 cookie 串都打掉，而不是只吃第一个值
+        r = cli("export", "md", "--last", "5")
+        line = next((l for l in r.stdout.splitlines() if "--cookie" in l), "")
+        check("md：脱敏吃掉所有 cookie 值", "=***" in line and "role=admin" not in line, line)
+        # 来源过滤：recon/fuzz 的探测请求不该混进录音
+        r = cli("export", "md", "--last", "50", "--tag", "req", "--title", "只看手动请求")
+        check("--tag req 只留手动请求", "/src" not in r.stdout and "/source" not in r.stdout, r.stdout[:400])
+        r = cli("export", "md", "--last", "50", "--no-probes", "--title", "去探测")
+        check("--no-probes 排除探测", "共" in r.stdout and "条" in r.stdout, r.stdout[:300])
 
         print("\n[15] recon 自动联想（按证据打分 + 可直接粘贴）")
         r = cli("recon", BASE, "--threads", "2")

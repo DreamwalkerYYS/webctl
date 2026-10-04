@@ -108,14 +108,18 @@ webctl browser URL [-X POST] [-d 'a=b'] [-H 'K: V'] [--ua UA]
 
 ### export —— 录制导出（把历史变成能复现的东西）
 ```
-webctl export script [--last 10 | --range 3-9 | --indices 1,4,7] [-o replay.sh] [--redact]
+webctl export script [--last 10 | --range 3-9 | --indices 1,4,7] [--tag req|recon|fuzz] [--no-probes]
+                     [-o replay.sh] [--redact]
 webctl export python [...]           # 零依赖 urllib 脚本
 webctl export md     [...] [--title T] [--lines 12] [--max-chars N] [--note] [--no-redact]
 ```
-- `script`：一串 `curl`（带 cookie、头、body、方法），可直接跑
+- `script`：一串 `curl`（带 cookie、头、body、方法，参数都加了 shell 引号），可直接跑
 - `python`：零依赖 urllib 脚本，自带 `put_cookies()` 复现会话
 - `md`：直接当 writeup 的"分步过程"（每条：命令 + 当时的状态/字节数 + 响应开头），`--note` 写进 vault
-- **脱敏**：`md` 默认打码（cookie 值 → `***`、主机 → `<target>`），笔记进 vault 不怕泄；脚本/py 默认原样（要真复现），要打码加 `--redact`
+- **来源过滤**：每条历史都带 `tag`（req / recon / fuzz / diff / replay）。`--tag req` 只留你手动发的；
+  `--no-probes` 排除 recon/fuzz/diff 的探测请求 —— 否则一次 recon 的几十条探测会把录音淹掉
+- **脱敏**：`md` 默认打码（**所有** cookie 的值 → `***`、主机 → `<target>`），笔记进 vault 不怕泄；
+  脚本/py 默认原样（要真复现），要打码加 `--redact`
 - ⚠️ 历史里的 cookie 是**当时那一次会话**的值，靶机重启/会话过期后要重新拿
 
 ### cookie / jwt / codec / note / rules

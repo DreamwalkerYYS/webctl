@@ -56,6 +56,7 @@ def run_live(args) -> int:
         a_val, b_val = f"{args.field}={a_val}", f"{args.field}={b_val}"
     sess = Session(base=args.url.split("?")[0] if args.url.startswith("http") else "",
                    jar_name=args.jar, proxy=args.proxy, timeout=args.timeout, ua=args.ua)
+    sess.tag = "diff"
     headers = {}
     for h in args.header or []:
         k, _, v = h.partition(":")
