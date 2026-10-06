@@ -155,14 +155,18 @@ def caesar(s: str, shift: int) -> str:
 
 
 def atbash(s: str) -> str:
+    """Atbash：字母镜像（a↔z）。**非字母原样保留** —— 旧实现按任意字符算，遇到 CJK/emoji 直接
+    `chr() arg not in range` 崩掉（喂整个文件文本时会炸）。"""
     out = []
     for c in s:
-        if c.isalpha():
-            base = ord("A") if c.isupper() else ord("a")
-            out.append(chr(base + 25 - (ord(c) - base)))
+        if "a" <= c <= "z":
+            out.append(chr(ord("z") - (ord(c) - ord("a"))))
+        elif "A" <= c <= "Z":
+            out.append(chr(ord("Z") - (ord(c) - ord("A"))))
         else:
             out.append(c)
     return "".join(out)
+
 
 
 def _vig(s: str, key: str, decrypt: bool) -> str:
@@ -259,7 +263,10 @@ def bacon(s: str, decrypt: bool) -> str:
         letters = [_BACON[c] for c in s]
         out = ""
         for i in range(0, len(letters) - 4, 5):
-            out += string.ascii_uppercase[int("".join(letters[i:i + 5]), 2)]
+            idx = int("".join(letters[i:i + 5]), 2)
+        # 5 位组的取值范围是 0..31，而字母表只有 26 个 —— 直接索引会 IndexError
+        # （实测：任意二进制/乱码文本喂进来就崩）。超范围的组用 '?' 占位，不影响合法密文。
+        out += string.ascii_uppercase[idx] if idx < 26 else "?"
         return out
     s = re.sub(r"[^A-Za-z]", "", s).upper()
     return "".join("".join("ab"[int(b)] for b in f"{ord(c) - 65:05b}") for c in s)

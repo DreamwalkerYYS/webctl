@@ -207,7 +207,10 @@ def classical_sweep(text: str, budget_s: float = 25.0) -> list[dict]:
         cands.append((f"caesar-{k}", C.caesar(s, k)))
         if time.time() - t0 > budget_s:
             break
-    cands.append(("atbash", C.atbash(s)))
+    try:
+        cands.append(("atbash", C.atbash(s)))
+    except Exception:
+        pass
     for a in (1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25):
         for b in range(26):
             cands.append((f"affine-{a}-{b}", C.affine(s, a, b, True)))
@@ -215,14 +218,20 @@ def classical_sweep(text: str, budget_s: float = 25.0) -> list[dict]:
                 break
     for r in range(2, 11):
         cands.append((f"railfence-{r}", C._railfence_decrypt(s, r)))
-    if re.fullmatch(r"[abAB\s]{4,}", s):
-        cands.append(("bacon", C.bacon(s, True)))
-    if re.fullmatch(r"[1-5\s]{4,}", s):
-        cands.append(("polybius", C.polybius(s, True)))
+    try:
+        if re.fullmatch(r"[abAB\s]{4,}", s):
+            cands.append(("bacon", C.bacon(s, True)))
+        if re.fullmatch(r"[1-5\s]{4,}", s):
+            cands.append(("polybius", C.polybius(s, True)))
+    except Exception:
+        pass
 
     out = []
     for name, val in cands:
-        if not val or val == s:            # 没变过的不算（"原文可读"不是答案）
+        try:
+            if not val or val == s:        # 没变过的不算（"原文可读"不是答案）
+                continue
+        except Exception:
             continue
         results = O.judge_all(val)
         hit, why = O.is_hit(results)
@@ -303,8 +312,10 @@ def archive_auto(path: str, depth: int = 2, budget_s: float = 90.0) -> list[dict
                 infos = z.infolist()
                 encrypted = any(i.flag_bits & 0x1 for i in infos)
                 if not encrypted:
-                    steps.append(_step("archive", f"ZIP（{len(infos)} 条目，未加密）", "HIT", 3,
-                                       "不需要口令，直接可读", "",
+                    # 能列条目 ≠ 解出题：降级为中证据（要配合内层 flag 才算闭合）
+                    steps.append(_step("archive", f"ZIP（{len(infos)} 条目，未加密）", "UNKNOWN", 2,
+                                       "不需要口令，已解包 → 继续看内层文件（内层出 flag 才算闭合）",
+                                       ", ".join(i.filename for i in infos[:6]),
                                        [f"ctfctl file {path}"]))
                     target_dir = _unzip_here(path, None, steps)
                 else:
@@ -369,7 +380,7 @@ def _unzip_here(path: str, pwd: str | None, steps: list[dict]) -> str | None:
         os.makedirs(out, exist_ok=True)
         with zipfile.ZipFile(path) as z:
             z.extractall(out, pwd=pwd.encode() if pwd else None)
-        steps.append(_step("archive", "ZIP 解包", "HIT", 2, f"已解到 {out}", out))
+        steps.append(_step("archive", "ZIP 解包", "UNKNOWN", 2, f"已解到 {out}（继续看内层文件才有结论）", out))
         return out
     except Exception as e:
         steps.append(_step("archive", "ZIP 解包失败", "ERROR", 1, f"{type(e).__name__}: {e}"))
@@ -430,14 +441,22 @@ def meta_auto(path: str, extract: bool = False) -> list[dict]:
     ex, bw, fm = _have("exiftool"), _have("binwalk"), _have("foremost")
     if ex:
         rc, out = _run([ex, "-a", "-u", "-g1", path], timeout=60)
-        results = O.judge_all(out)
-        hit, why = O.is_hit(results)
-        steps.append(_step("meta", "exiftool 全字段", "HIT" if hit else "UNKNOWN",
-                           3 if hit else 1, why or "字段里没有 flag 样式", out[:1500] if hit else ""))
+        # exiftool 的输出**本来就是可读文本**，"可读"绝不能当命中（实测假阳性）：
+        # 只认硬证据（flag 样式 / 容器结构）或中证据≥2
+        flags_here = O.flags_in(out)
+        results = O.judge_tool_output(out)
+        hard = [r for r in results if r["verdict"] == "HIT" and r["conf"] >= 3]
+        if flags_here or hard:
+            steps.append(_step("meta", "exiftool 全字段", "HIT", 3,
+                               (f"字段里有 flag：{flags_here[0]}" if flags_here else hard[0]["reason"]),
+                               "\n".join(l for l in out.splitlines() if "flag" in l.lower())[:600] or out[:600]))
+        else:
+            steps.append(_step("meta", "exiftool 全字段（无命中）", "UNKNOWN", 1,
+                               "元数据里没有 flag 样式（输出可读不代表解出）"))
     if bw:
         rc, out = _run([bw, path], timeout=120)
         sigs = re.findall(r"^\s*\d+\s+0x[0-9A-F]+.*$", out, re.M)[:12]
-        results = O.judge_all(out)
+        results = O.judge_tool_output(out)     # 工具输出只认硬证据
         hit, why = O.is_hit(results)
         steps.append(_step("meta", f"binwalk（{len(sigs)} 个签名）", "HIT" if hit else "UNKNOWN",
                            3 if hit else 1, why or "签名里有嵌东西的迹象（见结果）",
@@ -649,6 +668,12 @@ def auto_file(path: str, depth: int = 2, budget_s: float = 90.0, extract: bool =
     if data[:4] == b"\x7fELF" or data[:2] == b"MZ":
         from . import revauto as R          # rev（逆向）有它自己的分档闭环
         steps += R.rev_auto(path, budget_s=budget_s)
+    # 「一把梭」层：QR / pyc 反编译 / pcap / SQLite(SQLCipher) 等，认出来就直接调现成工具
+    try:
+        from . import oneshot as _os
+        steps += _os.dispatch(path)
+    except Exception as e:
+        steps.append(_step("oneshot", "一把梭层异常（已跳过）", "ERROR", 1, f"{type(e).__name__}: {e}"))
     if findings or kind in ("file", "?", "binary"):
         steps += meta_auto(path, extract=extract)
     return steps

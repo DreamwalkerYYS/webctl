@@ -295,6 +295,20 @@ def structure_parity(text: str) -> dict:
     return _res("structure_parity", "MISS", 1, "不是已知结构")
 
 
+def judge_tool_output(out: str) -> list[dict]:
+    """判定**外部工具的输出**（binwalk/exiftool/tshark 等）。
+
+    这类输出本来就是可读文本 → `text_readable` 必然命中，绝不能拿它当证据
+    （实测：binwalk 打一行 "0 signatures" 就被判成"闭合"）。只保留硬证据类判定器。
+    """
+    keep = []
+    for r in judge_all(out or ""):
+        if r["oracle"].startswith("text_readable") or r["oracle"] == "structure_parity":
+            continue
+        keep.append(r)
+    return keep
+
+
 def judge_all(data, as_bytes: bool = False) -> list[dict]:
     """对一块数据跑全部适用判定器，按置信降序返回。"""
     out = []
