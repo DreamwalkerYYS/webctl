@@ -30,6 +30,10 @@ ROOT = os.path.dirname(HERE)
 UA = "ctfctl-build/1.0 (+catalog)"
 BLACKARCH_URL = "https://blackarch.org/tools.html"
 KALI_URL = "https://www.kali.org/tools/all-tools/"
+#: 权威来源（比抓 HTML 靠谱）：Kali 的分类元包定义 + BlackArch 的 pacman 库
+KALI_META_URL = "https://gitlab.com/kalilinux/packages/kali-meta/-/raw/kali/master/debian/control"
+KALI_PAGES_URL = "https://www.kali.org/tools/pages.json"
+BLACKARCH_DB_URL = "https://blackarch.org/blackarch/blackarch/os/x86_64/blackarch.db"
 
 # ---------------------------------------------------------------- CTF 方向（本工具的顶层分类）
 
@@ -79,9 +83,9 @@ KALI_MAP = {
     "reverse-engineering": ["rev"], "hardware-hacking": ["hardware"], "database-assessment": ["web"],
     "windows-resources": ["rev", "pwn"], "identify": ["forensics", "misc"], "respond": ["forensics"],
     "crypto-stego": ["crypto", "misc"], "mobile": ["mobile"], "cloud": ["web"],
-    "top10": ["web", "recon", "hash", "pwn", "rev", "crypto", "misc", "forensics", "net", "wireless"],
-    "default": ["web", "recon", "hash", "pwn", "rev", "crypto", "misc", "forensics", "net"],
-    "everything": [], "large": [], "headless": [],
+    # 伞形元包（装了等于装一堆）不参与 CTF 分类映射，否则 wireshark 会被塞进十几个类
+    "top10": [], "default": [], "everything": [], "large": [], "headless": [],
+    "identify": ["forensics", "misc"],
 }
 
 #: Kali 页面里是「元包」不是工具，别当工具收进来
@@ -121,6 +125,53 @@ def parse_blackarch(h: str) -> list[dict]:
     return out
 
 
+def parse_kali_meta(control: str) -> tuple[dict[str, list[str]], list[str]]:
+    """解析 kali-meta 的 debian/control：kali-tools-<类> 的 Depends 就是该类工具全集。
+
+    返回 ({分类名: [包名…]}, [分类名…])。分类名 = 元包名去掉 kali-tools- 前缀。
+    """
+    cats: dict[str, list[str]] = {}
+    for stanza in control.split("\n\n"):
+        m = re.search(r"^Package:\s*(kali-tools-([a-z0-9\-]+))\s*$", stanza, re.M)
+        if not m:
+            continue
+        d = re.search(r"^Depends:\s*(.+?)(?=\n[A-Z][A-Za-z\-]*:|\Z)", stanza, re.M | re.S)
+        pkgs = []
+        if d:
+            for item in d.group(1).replace("\n", " ").split(","):
+                name = re.sub(r"\(.*?\)", "", item).strip().split(" ")[0].strip()
+                if name and name != "kali-tools-" + m.group(2):
+                    pkgs.append(name)
+        cats[m.group(2)] = pkgs
+    return cats, sorted(cats)
+
+
+def parse_blackarch_db(path: str) -> dict[str, dict]:
+    """读 blackarch.db（gzip tar）：每包的 desc 里有 %GROUPS%（blackarch-* 即分类，权威）。"""
+    out: dict[str, dict] = {}
+    if not os.path.exists(path):
+        return out
+    import tarfile
+    try:
+        with tarfile.open(path, "r:gz") as t:
+            for m in t:
+                if not m.name.endswith("/desc"):
+                    continue
+                txt = t.extractfile(m).read().decode("utf-8", "replace")
+                def field(tag):
+                    mm = re.search(rf"%{tag}%\n(.*?)(?=\n%|\Z)", txt, re.S)
+                    return mm.group(1).strip() if mm else ""
+                name = field("NAME")
+                if not name:
+                    continue
+                groups = [g.strip() for g in field("GROUPS").splitlines() if g.strip()]
+                out[name.lower()] = {"desc": field("DESC"), "url": field("URL"),
+                                     "groups": groups, "version": field("VERSION")}
+    except (OSError, tarfile.TarError):
+        return out
+    return out
+
+
 def parse_kali(h: str) -> tuple[list[str], set[str]]:
     """返回（官方分类元包名, 页面上出现的工具名集合）。"""
     metas = sorted(set(re.findall(r"#(kali-tools-[a-z0-9\-]+)", h)))
@@ -141,6 +192,18 @@ def build(research: str, out_path: str) -> int:
     ka = _get(KALI_URL, os.path.join(research, "kali-all-tools.html"))
     ba_tools = parse_blackarch(ba)
     kali_metas, kali_names = parse_kali(ka)
+    # 权威来源：Kali 分类元包（分类→工具全集）+ BlackArch pacman 库（每包的 groups）
+    meta_cats = {}
+    try:
+        meta_cats, _ = parse_kali_meta(_get(KALI_META_URL, os.path.join(research, "control")))
+    except Exception as e:
+        print(f"[!] kali-meta 读不了：{e}", file=sys.stderr)
+    ba_db = parse_blackarch_db(os.path.join(research, "blackarch.db"))
+    # 反查：工具 → 它属于哪些 kali 分类 / blackarch 组
+    tool_kali_cats: dict[str, list[str]] = {}
+    for cat, pkgs in meta_cats.items():
+        for pkg in pkgs:
+            tool_kali_cats.setdefault(pkg.lower(), []).append(cat)
 
     overlay_path = os.path.join(ROOT, "ctfctl", "data", "ctf-tools.json")
     overlay = {}
@@ -152,6 +215,19 @@ def build(research: str, out_path: str) -> int:
         by_name.setdefault(t["name"].lower(), t)
         if t["name"].lower() in {k.lower() for k in kali_names}:
             t["src"].append("kali")
+
+    # 用 kali-meta 的分类把工具补进来（Depends 里的包名就是权威分类）
+    for cat, pkgs in meta_cats.items():
+        for pkg in pkgs:
+            key = pkg.lower()
+            t = by_name.get(key)
+            if t:
+                continue
+            if not overlay.get(pkg):
+                continue                          # 同上：只有人工点过名的才收，避免噪音
+            db = ba_db.get(key, {})
+            by_name[key] = {"name": pkg, "desc_en": db.get("desc", ""),
+                            "cats": KALI_MAP.get(cat, []), "url": db.get("url", ""), "src": ["kali-meta"]}
 
     # 只出现在 Kali 表里、BlackArch 没有的工具（挑有名气的一批，避免把 Kali 元包/杂包全收）
     for n in sorted(kali_names):
@@ -178,6 +254,23 @@ def build(research: str, out_path: str) -> int:
 
     tools = []
     for t in by_name.values():
+        # 权威分类挂上去：blackarch_groups（来自 .db）+ kali_cats（来自 kali-meta）
+        db = ba_db.get(t["name"].lower())
+        if db:
+            t["blackarch_groups"] = db["groups"]
+            if not t.get("desc_en"):
+                t["desc_en"] = db.get("desc", "")
+            if not t.get("url"):
+                t["url"] = db.get("url", "")
+            mapped = [c for g in db["groups"] for c in BA_MAP.get(g.replace("blackarch-", ""), [])]
+            if mapped:
+                t["cats"] = list(dict.fromkeys((t.get("cats") or []) + mapped))
+        kc = tool_kali_cats.get(t["name"].lower())
+        if kc:
+            t["kali_cats"] = kc
+            mapped = [c for x in kc for c in KALI_MAP.get(x, [])]
+            if mapped:
+                t["cats"] = list(dict.fromkeys((t.get("cats") or []) + mapped))
         t.setdefault("cats", [])
         if not t["cats"]:
             t["cats"] = ["misc"]
@@ -192,11 +285,12 @@ def build(research: str, out_path: str) -> int:
     doc = {
         "_comment": "工具目录：BlackArch 官方表 + Kali 官方工具表（分类元包 kali-tools-*）机器生成，人工字段（desc/install/usage/ctf_use）来自 ctf-tools.json 覆盖。重新生成：python3 scripts/build_catalog.py",
         "sources": [
-            {"id": "blackarch", "name": "BlackArch 工具表", "url": BLACKARCH_URL,
-             "snapshot": "research/blackarch-tools.html", "tools": len(ba_tools), "cats": 48},
-            {"id": "kali", "name": "Kali 官方工具表 + kali-meta 分类元包", "url": KALI_URL,
-             "snapshot": "research/kali-all-tools.html", "tools": len(kali_names),
-             "cats": len(kali_metas), "metas": kali_metas},
+            {"id": "blackarch", "name": "BlackArch 工具表 + pacman 库 blackarch.db", "url": BLACKARCH_URL,
+             "snapshot": "research/blackarch-tools.html + research/blackarch.db",
+             "tools": len(ba_tools), "cats": 48, "db_pkgs": len(ba_db)},
+            {"id": "kali", "name": "Kali 官方工具表 + kali-meta 分类元包（Depends 即分类全集）", "url": KALI_META_URL,
+             "snapshot": "research/kali-all-tools.html + research/control", "tools": len(kali_names),
+             "cats": len(kali_metas), "metas": kali_metas, "meta_cats": len(meta_cats)},
             {"id": "curated", "name": "人工维护的 CTF 常用工具（中文说明/安装/用法）",
              "file": "ctfctl/data/ctf-tools.json", "tools": len(overlay)},
         ],

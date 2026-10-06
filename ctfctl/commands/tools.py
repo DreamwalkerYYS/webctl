@@ -176,9 +176,11 @@ def run_list(args) -> int:
     width = max(len(t.get("name", "")) for t in tools)
     for t in tools:
         mark = "✓" if installed_state(t, pacman) != "no" else " "
+        star = "★" if t.get("curated") else " "
+        dup = "≠" if t.get("dup_of") else " "
         catstr = ",".join(t.get("cats", []))
-        print(f" {mark} {t.get('name',''):<{width}}  {catstr:<12} {t.get('desc','')}")
-    print(f"\n共 {len(tools)} 个（✓ = 本机已装；install 命令见 ctfctl tools show <name>）")
+        print(f" {mark}{star}{dup} {t.get('name',''):<{width}}  {catstr:<12} {t.get('desc','')}")
+    print(f"\n共 {len(tools)} 个（✓ = 本机已装 · ★ = 人工中文条目 · ≠ = 有同功能替代）")
     return 0
 
 
@@ -190,7 +192,9 @@ def run_search(args) -> int:
     for t in _all_tools(cat):
         blob = " ".join([t.get("name", ""), t.get("desc", ""), t.get("url", ""),
                          " ".join(t.get("aliases", [])), " ".join(t.get("tags", [])),
-                         t.get("ctf_use", "")]).lower()
+                         t.get("ctf_use", ""), t.get("note", ""),
+                         " ".join(t.get("kali_cats", []) or []),
+                         " ".join(t.get("blackarch_groups", []) or [])]).lower()
         if kw in blob:
             hits.append(t)
     if not hits:
@@ -213,6 +217,14 @@ def run_show(args) -> int:
     print(f"# {t.get('name')}   [{'/'.join(t.get('cats', []))}]")
     if t.get("aliases"):
         print(f"别名：{', '.join(t['aliases'])}")
+    if t.get("dup_of"):
+        print(f"功能重复：{t['dup_of']}（二选一，别都装）")
+    if t.get("curated"):
+        print("来源：人工维护条目（说明/用法是手写的）")
+    if t.get("blackarch_groups"):
+        print(f"BlackArch 分类：{'、'.join(g.replace('blackarch-', '') for g in t['blackarch_groups'] if g != 'blackarch')}")
+    if t.get("kali_cats"):
+        print(f"Kali 官方分类（kali-tools-*）：{'、'.join(t['kali_cats'])}")
     print(f"状态：{'已装（PATH 里能找到）' if state == 'path' else '已装（包管理器）' if state == 'pkg' else '未装'}")
     print(f"说明：{t.get('desc','')}")
     if t.get("ctf_use"):

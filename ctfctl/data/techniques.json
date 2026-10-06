@@ -10,7 +10,14 @@
     "报错注入",
     "布尔盲注",
     "时间盲注",
-    "sqlmap"
+    "sqlmap",
+    "extractvalue",
+    "updatexml",
+    "information_schema",
+    "宽字节",
+    "%df",
+    "二次注入",
+    "堆叠注入"
    ]
   },
   "ssti": {
@@ -33,7 +40,12 @@
     "文件包含",
     "path traversal",
     "目录穿越",
-    "../.."
+    "../..",
+    "日志包含",
+    "session 包含",
+    "临时文件包含",
+    "/proc/self",
+    "php://filter"
    ]
   },
   "rce": {
@@ -52,7 +64,13 @@
    "aliases": [
     "ssrf",
     "server-side request forgery",
-    "服务端请求伪造"
+    "服务端请求伪造",
+    "gopher://",
+    "dict://",
+    "fastcgi",
+    "redis 未授权",
+    "dns rebinding",
+    "打内网"
    ]
   },
   "xxe": {
@@ -60,7 +78,12 @@
    "aliases": [
     "xxe",
     "xml external entity",
-    "外部实体"
+    "外部实体",
+    "<!doctype",
+    "<!entity",
+    "xml 外部实体",
+    "blind xxe",
+    "oob"
    ]
   },
   "deser": {
@@ -73,7 +96,12 @@
     "__destruct",
     "pickle",
     "ysoserial",
-    "phpggc"
+    "phpggc",
+    "pop 链",
+    "pop chain",
+    "字符逃逸",
+    "魔术方法",
+    "soapclient"
    ]
   },
   "jwt": {
@@ -105,7 +133,12 @@
     "webshell",
     "一句话木马",
     ".phtml",
-    "getimagesize"
+    "getimagesize",
+    "图片马",
+    "二次渲染",
+    "%00 截断",
+    ".user.ini",
+    "解析漏洞"
    ]
   },
   "php_magic": {
@@ -128,7 +161,8 @@
     "php://input",
     "data://",
     "伪协议",
-    "convert.base64-encode"
+    "convert.base64-encode",
+    "expect://"
    ]
   },
   "audit": {
@@ -154,7 +188,10 @@
     "弱口令",
     "爆破密码",
     "admin=true",
-    "role=admin"
+    "role=admin",
+    "未授权",
+    "水平越权",
+    "垂直越权"
    ]
   },
   "xss": {
@@ -176,7 +213,8 @@
    "name": "条件竞争",
    "aliases": [
     "race condition",
-    "条件竞争"
+    "条件竞争",
+    "竞态"
    ]
   },
   "prototype": {
@@ -234,7 +272,12 @@
     "pwntools",
     "one_gadget",
     "ret2libc",
-    "canary"
+    "canary",
+    "ret2text",
+    "栈迁移",
+    "srop",
+    "格式化字符串",
+    "fmt"
    ]
   },
   "heap": {
@@ -245,7 +288,10 @@
     "fastbin",
     "unsorted bin",
     "堆利用",
-    "uaf"
+    "uaf",
+    "double free",
+    "house of",
+    "off-by-one"
    ]
   },
   "rev_java": {
@@ -267,7 +313,10 @@
     "radare2",
     "rizin",
     "angr",
-    "z3"
+    "z3",
+    "ollvm",
+    "反编译",
+    "jadx"
    ]
   },
   "crypto_rsa": {
@@ -281,7 +330,12 @@
     "factordb",
     "小明文",
     "e=3",
-    "e=65537"
+    "e=65537",
+    "低加密指数",
+    "dp 泄露",
+    "已知 p",
+    "yafu",
+    "小公钥指数"
    ]
   },
   "crypto_aes": {
@@ -309,7 +363,13 @@
     "bacon",
     "摩斯",
     "morse",
-    "rot13"
+    "rot13",
+    "playfair",
+    "polybius",
+    "affine",
+    "atbash",
+    "beaufort",
+    "rail fence"
    ]
   },
   "crypto_prng": {
@@ -349,7 +409,9 @@
     "伪加密",
     "zip 加密",
     "rar 加密",
-    "zipcrypto"
+    "zipcrypto",
+    "明文攻击",
+    "压缩包"
    ]
   },
   "stego_img": {
@@ -361,7 +423,12 @@
     "lsb",
     "隐写",
     "outguess",
-    "图片附加数据"
+    "图片附加数据",
+    "盲水印",
+    "宽高爆破",
+    "crc 爆破",
+    "ihdr",
+    "图片隐写"
    ]
   },
   "stego_audio": {
@@ -372,7 +439,11 @@
     "audacity",
     "音频隐写",
     "dtmf",
-    "sox"
+    "sox",
+    "波形",
+    "sstv",
+    "mp3stego",
+    "silenteye"
    ]
   },
   "pcap": {
@@ -383,7 +454,9 @@
     "tshark",
     "流量分析",
     "tcp stream",
-    "usb 流量"
+    "usb 流量",
+    "dns 隧道",
+    "ttl 隐写"
    ]
   },
   "forensics_fs": {
@@ -410,7 +483,13 @@
     "jjencode",
     "brainfuck",
     "ook",
-    "cyberchef"
+    "cyberchef",
+    "base58",
+    "核心价值观",
+    "html 实体",
+    "rot13",
+    "rot47",
+    "uudecode"
    ]
   },
   "osint": {
@@ -477,6 +556,176 @@
     "提示注入",
     "prompt injection",
     "大模型"
+   ]
+  },
+  "java_deser": {
+   "name": "Java 反序列化",
+   "aliases": [
+    "ysoserial",
+    "commonscollections",
+    "commonsbeanutils",
+    "fastjson",
+    "jackson",
+    "snakeyaml",
+    "xstream",
+    "shiro",
+    "weblogic",
+    "readobject",
+    "java 反序列化",
+    "gadget"
+   ]
+  },
+  "jndi_expr": {
+   "name": "JNDI / 表达式注入",
+   "aliases": [
+    "jndi:",
+    "ldap://",
+    "rmi://",
+    "log4j",
+    "log4shell",
+    "ognl",
+    "spel",
+    "struts2",
+    "表达式注入",
+    "表达式注入"
+   ]
+  },
+  "python_pickle": {
+   "name": "Python 反序列化(pickle/YAML)",
+   "aliases": [
+    "pickle",
+    "__reduce__",
+    "yaml.load",
+    "unsafe_load",
+    "cPickle",
+    "__reduce_ex__"
+   ]
+  },
+  "node_proto": {
+   "name": "Node/原型链污染",
+   "aliases": [
+    "__proto__",
+    "prototype pollution",
+    "原型链",
+    "nodejs",
+    "vm2",
+    "child_process",
+    "require(",
+    "constructor.constructor"
+   ]
+  },
+  "php_phar": {
+   "name": "phar 反序列化",
+   "aliases": [
+    "phar://",
+    "phar 反序列化",
+    "phar反序列化"
+   ]
+  },
+  "rce_noalnum": {
+   "name": "无字母数字 RCE",
+   "aliases": [
+    "无字母数字",
+    "无字母",
+    "异或",
+    "取反",
+    "自增",
+    "~$_"
+   ]
+  },
+  "disable_functions": {
+   "name": "disable_functions 绕过",
+   "aliases": [
+    "disable_functions",
+    "LD_PRELOAD",
+    "shellshock",
+    "mod_cgi",
+    "bypass disable"
+   ]
+  },
+  "prng": {
+   "name": "伪随机数预测",
+   "aliases": [
+    "mt_rand",
+    "srand",
+    "mt19937",
+    "random.seed",
+    "伪随机",
+    "随机数预测",
+    "lcg",
+    "预测随机"
+   ]
+  },
+  "length_ext": {
+   "name": "哈希长度扩展",
+   "aliases": [
+    "长度扩展",
+    "length extension",
+    "hashpump",
+    "hash_extender"
+   ]
+  },
+  "priv_esc": {
+   "name": "提权",
+   "aliases": [
+    "提权",
+    "sudo",
+    "suid",
+    "cron",
+    "capabilit",
+    "内核提权"
+   ]
+  },
+  "sandbox_escape": {
+   "name": "沙箱/容器逃逸",
+   "aliases": [
+    "沙箱逃逸",
+    "逃逸",
+    "seccomp",
+    "ptrace",
+    "docker 逃逸",
+    "容器逃逸"
+   ]
+  },
+  "usb_traffic": {
+   "name": "USB/键鼠流量",
+   "aliases": [
+    "usb 流量",
+    "usb键盘",
+    "hid",
+    "usbhid",
+    "鼠标流量",
+    "键鼠流量"
+   ]
+  },
+  "memory_forensics": {
+   "name": "内存取证",
+   "aliases": [
+    "volatility",
+    "内存镜像",
+    "mem.raw",
+    "内存取证",
+    "vol.py"
+   ]
+  },
+  "stego_archive": {
+   "name": "压缩包/隐写混杂",
+   "aliases": [
+    "零宽字符",
+    "零宽",
+    "压缩包显示密码",
+    "明文攻击"
+   ]
+  },
+  "web_logic": {
+   "name": "逻辑漏洞/越权",
+   "aliases": [
+    "逻辑漏洞",
+    "越权",
+    "idor",
+    "未授权",
+    "水平越权",
+    "垂直越权"
    ]
   }
  }

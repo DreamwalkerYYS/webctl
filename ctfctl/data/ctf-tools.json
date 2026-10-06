@@ -1,99 +1,1937 @@
 {
-  "_comment": "人工维护的 CTF 常用工具（叠加在机器生成的 tools.json 上，这里的字段优先）。cats 见 build_catalog.py 的 CATEGORIES。install 键即安装器：pacman/pip/pipx/go/git/gem/npm/cargo。",
-  "tools": [
-    {"name": "ffuf", "aliases": ["ffuf"], "cats": ["web", "recon"], "desc": "目录/参数/虚拟主机爆破（Go，快）", "install": {"pacman": "ffuf", "go": "github.com/ffuf/ffuf/v2@latest"}, "usage": ["ffuf -w wl.txt -u \"$U/FUZZ\" -fs 4112 -mc all -t 20", "ffuf -w wl.txt -u \"$U/api?FUZZ=1\" -fs 0"], "ctf_use": "目录与参数爆破首选；-fs 按字节数过滤假 200（ctfctl fuzz 会自动带上）", "note": "共享靶机加 -t 5 且命中即停", "url": "https://github.com/ffuf/ffuf"},
-    {"name": "feroxbuster", "aliases": ["ferox"], "cats": ["web", "recon"], "desc": "递归式目录爆破（Rust）", "install": {"pacman": "feroxbuster", "cargo": "feroxbuster"}, "usage": ["feroxbuster -u \"$U\" -w wl.txt -d 2 --filter-size 4112"], "ctf_use": "要递归进目录时比 ffuf 顺手", "url": "https://github.com/epi052/feroxbuster"},
-    {"name": "gobuster", "aliases": [], "cats": ["web", "recon"], "desc": "目录/DNS/vhost 爆破（Go）", "install": {"pacman": "gobuster"}, "usage": ["gobuster dir -u \"$U\" -w wl.txt -x php,bak,zip"], "ctf_use": "老牌；-x 直接带后缀", "url": "https://github.com/OJ/gobuster"},
-    {"name": "dirsearch", "aliases": [], "cats": ["web", "recon"], "desc": "目录扫描（Python，字典细）", "install": {"pacman": "dirsearch", "pip": "dirsearch"}, "usage": ["dirsearch -u \"$U\" -e php,html,bak -t 20"], "ctf_use": "默认字典对 PHP 题命中率不错", "url": "https://github.com/maurosoria/dirsearch"},
-    {"name": "sqlmap", "aliases": [], "cats": ["web"], "desc": "SQL 注入自动化", "install": {"pacman": "sqlmap", "pip": "sqlmap"}, "usage": ["sqlmap -u \"$U/?id=1\" --batch --dbs --level 3", "sqlmap -u \"$U/?id=1\" -r req.txt --batch --dump"], "ctf_use": "只当兜底：先手工确认注入点与闭合方式，再用它省时间", "url": "https://sqlmap.org/"},
-    {"name": "nuclei", "aliases": [], "cats": ["web", "recon"], "desc": "模板化漏洞扫描（CVE/配置/暴露面）", "install": {"pacman": "nuclei", "go": "github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest"}, "usage": ["nuclei -u \"$U\" -severity medium,high,critical -stats", "nuclei -u \"$U\" -t http/misconfiguration/"], "ctf_use": "先跑一遍已知 CVE/暴露文件模板，常有白捡", "note": "第一次跑会自动下模板；共享靶机别开高并发", "url": "https://github.com/projectdiscovery/nuclei"},
-    {"name": "nikto", "aliases": [], "cats": ["web", "recon"], "desc": "Web 服务器配置/文件扫描", "install": {"pacman": "nikto"}, "usage": ["nikto -h \"$U\" -maxtime 120"], "ctf_use": "老派但偶尔能翻出备份文件与默认页", "url": "https://github.com/sullo/nikto"},
-    {"name": "whatweb", "aliases": [], "cats": ["web", "recon"], "desc": "指纹识别（框架/中间件/CMS）", "install": {"pacman": "whatweb"}, "usage": ["whatweb -a 3 \"$U\""], "ctf_use": "快速确认栈（Flask/ThinkPHP/…”）", "url": "https://github.com/urbanadventurer/WhatWeb"},
-    {"name": "httpx", "aliases": ["httpx-toolkit"], "cats": ["web", "recon"], "desc": "批量 HTTP 探测（取标题/状态/技术栈）", "install": {"pacman": "httpx-toolkit", "go": "github.com/projectdiscovery/httpx/cmd/httpx@latest"}, "usage": ["httpx -u \"$U\" -title -status-code -tech-detect"], "ctf_use": "多端口/多域名时先批量看一遍", "url": "https://github.com/projectdiscovery/httpx"},
-    {"name": "arjun", "aliases": [], "cats": ["web"], "desc": "HTTP 参数发现（藏起来的参数名）", "install": {"pacman": "arjun", "pip": "arjun"}, "usage": ["arjun -u \"$U/index.php\" -m GET"], "ctf_use": "页面没有表单但后端吃参数时用（如 op=cmd）", "url": "https://github.com/s0md3v/Arjun"},
-    {"name": "jwt_tool", "aliases": ["jwt-tool"], "cats": ["web"], "desc": "JWT 解码/爆破/伪造/算法混淆", "install": {"pip": "jwt_tool", "git": "https://github.com/ticarpi/jwt_tool"}, "usage": ["python3 jwt_tool.py \"$TOKEN\" -M at -t \"$U\"", "python3 jwt_tool.py \"$TOKEN\" -C -d wl.txt"], "ctf_use": "比手撸 JWT 快：-M 把所有玩法跑一遍", "url": "https://github.com/ticarpi/jwt_tool"},
-    {"name": "flask-unsign", "aliases": [], "cats": ["web"], "desc": "Flask session 爆破/伪造", "install": {"pip": "flask-unsign"}, "usage": ["flask-unsign --unsign --cookie '<session>' -w wl.txt", "flask-unsign --sign --cookie \"{'role':'admin'}\" --secret SECRET"], "ctf_use": "Werkzeug 三段式 session 的标准打法", "url": "https://github.com/Paradoxis/Flask-Unsign"},
-    {"name": "php_filter_chain_generator", "aliases": ["php-filter-chain"], "cats": ["web"], "desc": "php://filter 链式 RCE 生成器", "install": {"git": "https://github.com/synacktiv/php_filter_chain_generator"}, "usage": ["python3 php_filter_chain_generator.py --chain '<?php system($_GET[0]);?>'"], "ctf_use": "LFI 只给一个 file 参数、能读文件但不能包含文件时的打法（PHP 8+）", "url": "https://github.com/synacktiv/php_filter_chain_generator"},
-    {"name": "lfimap", "aliases": [], "cats": ["web"], "desc": "LFI 自动化利用", "install": {"pip": "lfimap", "git": "https://github.com/hansmach1ne/LFImap"}, "usage": ["lfimap -u \"$U/?file=index.php\" -a", "lfimap -u \"$U/?file=FUZZ\" -w lfi_wordlist.txt"], "ctf_use": "把 LFI 的读源码/日志投毒/伪协议一把试完", "url": "https://github.com/hunters-sec/LFImap"},
-    {"name": "tplmap", "aliases": [], "cats": ["web"], "desc": "SSTI 检测与利用（Jinja/Twig/Freemarker…）", "install": {"pip": "tplmap", "git": "https://github.com/epinna/tplmap"}, "usage": ["python2 tplmap.py -u \"$U/?name=*\" --os-shell"], "ctf_use": "确认 SSTI 后可试它的 payload 库；py2 工具，优先手打 {{7*7}}", "url": "https://github.com/epinna/tplmap"},
-    {"name": "commix", "aliases": [], "cats": ["web"], "desc": "命令注入自动化", "install": {"pacman": "commix", "pip": "commix"}, "usage": ["commix -u \"$U/?cmd=1\" --batch"], "ctf_use": "确认执行点后用来试分隔符与绕过", "url": "https://github.com/commixproject/commix"},
-    {"name": "dalfox", "aliases": [], "cats": ["web"], "desc": "XSS 扫描（Go）", "install": {"go": "github.com/hahwul/dalfox/v2@latest", "pacman": "dalfox"}, "usage": ["dalfox url \"$U/?q=test\""], "ctf_use": "有反射点先跑一遍", "url": "https://github.com/hahwul/dalfox"},
-    {"name": "xsstrike", "aliases": [], "cats": ["web"], "desc": "XSS 检测套件（含上下文分析）", "install": {"git": "https://github.com/s0md3v/XSStrike"}, "usage": ["python3 xsstrike.py -u \"$U/?q=test\""], "ctf_use": "上下文判断比盲目 payload 强", "url": "https://github.com/s0md3v/XSStrike"},
-    {"name": "ysoserial", "aliases": [], "cats": ["web", "pwn"], "desc": "Java 反序列化 payload 生成", "install": {"git": "https://github.com/frohoff/ysoserial", "pacman": "ysoserial"}, "usage": ["java -jar ysoserial.jar CommonsCollections6 'id' | base64 -w0"], "ctf_use": "Java 反序列化题（CommonsCollections / URLDNS 探测）", "url": "https://github.com/frohoff/ysoserial"},
-    {"name": "phpggc", "aliases": [], "cats": ["web"], "desc": "PHP 反序列化链生成（Gadget 库）", "install": {"git": "https://github.com/ambionics/phpggc", "pacman": "phpggc"}, "usage": ["./phpggc -l", "./phpggc Laravel/RCE1 system id"], "ctf_use": "框架反序列化题的现成链；先 -l 看有哪些", "url": "https://github.com/ambionics/phpggc"},
-    {"name": "mitmproxy", "aliases": [], "cats": ["web", "net"], "desc": "可编程中间人代理（抓改 HTTPS）", "install": {"pacman": "mitmproxy", "pip": "mitmproxy"}, "usage": ["mitmproxy -p 8080", "ctfctl req get \"$U/\" --proxy 127.0.0.1:8080"], "ctf_use": "桌面版 Burp 的替代；配合 ctfctl --proxy 用", "url": "https://mitmproxy.org/"},
-    {"name": "requests", "aliases": [], "cats": ["web"], "desc": "Python HTTP 客户端（写利用脚本用）", "install": {"pip": "requests"}, "usage": ["python3 -c \"import requests;print(requests.get('$U').status_code)\""], "ctf_use": "会话/重试/编码都要手写时的首选", "url": "https://requests.readthedocs.io/"},
-    {"name": "pwntools", "aliases": [], "cats": ["pwn"], "desc": "pwn 全家桶（tube/ELF/ROP/组装 shellcode）", "install": {"pip": "pwntools", "pacman": "python-pwntools"}, "usage": ["python3 -c \"from pwn import *;p=process('./chal');p.recvline()\"", "cyclic 200 | ./chal"], "ctf_use": "exp 脚本骨架：remote()/sendlineafter()/p64() 一条龙", "url": "https://github.com/Gallopsled/pwntools"},
-    {"name": "pwndbg", "aliases": ["gef"], "cats": ["pwn"], "desc": "GDB 增强（堆/栈/寄存器可视化）", "install": {"git": "https://github.com/pwndbg/pwndbg"}, "usage": ["gdb -q ./chal   # 进去后 vmmap / heap / telescope"], "ctf_use": "看堆布局与泄漏指令的唯一现实选择", "note": "gef 二选一（pip install gef 也可）", "url": "https://github.com/pwndbg/pwndbg"},
-    {"name": "checksec", "aliases": [], "cats": ["pwn"], "desc": "看二进制保护机制（NX/PIE/Canary/RELRO）", "install": {"pacman": "checksec", "pip": "pwntools"}, "usage": ["checksec --file=./chal", "pwn checksec ./chal"], "ctf_use": "pwn 第一步；也可用 ctfctl file ./chal 直接看", "url": "https://github.com/slimm609/checksec.sh"},
-    {"name": "ROPgadget", "aliases": [], "cats": ["pwn"], "desc": "ROP gadget 搜索", "install": {"pip": "ROPgadget", "pacman": "ropgadget"}, "usage": ["ROPgadget --binary ./chal --only 'pop|ret' | grep rdi"], "ctf_use": "ret2libc / 传参构造", "url": "https://github.com/JonathanSalwan/ROPgadget"},
-    {"name": "ropper", "aliases": [], "cats": ["pwn"], "desc": "Gadget 搜索（比 ROPgadget 会找链）", "install": {"pip": "ropper"}, "usage": ["ropper --file ./chal --search 'pop rdi; ret'"], "ctf_use": "找带副作用少的 gadget", "url": "https://github.com/sashs/Ropper"},
-    {"name": "one_gadget", "aliases": [], "cats": ["pwn"], "desc": "libc 里的 one-gadget（直接 execve）", "install": {"gem": "one_gadget", "pacman": "one_gadget"}, "usage": ["one_gadget ./libc.so.6"], "ctf_use": "写不出 ROP 链时试它（注意约束条件）", "url": "https://github.com/david942j/one_gadget"},
-    {"name": "patchelf", "aliases": [], "cats": ["pwn"], "desc": "改 ELF 的 interpreter/rpath（换 libc）", "install": {"pacman": "patchelf"}, "usage": ["patchelf --set-interpreter ./ld.so --set-rpath . ./chal"], "ctf_use": "题目给 libc 时用它让本地跑同一版 libc", "url": "https://github.com/NixOS/patchelf"},
-    {"name": "seccomp-tools", "aliases": [], "cats": ["pwn"], "desc": "反编译 seccomp 沙箱规则", "install": {"gem": "seccomp-tools", "pacman": "seccomp-tools"}, "usage": ["seccomp-tools dump ./chal"], "ctf_use": "沙箱题（只能 open/read/write）第一步", "url": "https://github.com/david942j/seccomp-tools"},
-    {"name": "angr", "aliases": [], "cats": ["pwn", "rev"], "desc": "符号执行（自动找满足条件的输入）", "install": {"pip": "angr"}, "usage": ["python3 -c \"import angr;p=angr.Project('./chal');print(p.arch)\""], "ctf_use": "逆向里「找到让 check 通过的输入」最省事的暴力解", "url": "https://angr.io/"},
-    {"name": "z3-solver", "aliases": ["z3"], "cats": ["crypto", "rev", "pwn"], "desc": "SMT 求解器（约束求解）", "install": {"pip": "z3-solver", "pacman": "z3"}, "usage": ["python3 -c \"from z3 import *;x=Int('x');solve(x*x==49,x>0)\""], "ctf_use": "逆向/密码里的方程组、位运算约束", "url": "https://github.com/Z3Prover/z3"},
-    {"name": "glibc-all-in-one", "aliases": [], "cats": ["pwn"], "desc": "各版本 libc/ld 打包下载", "install": {"git": "https://github.com/matrix1001/glibc-all-in-one"}, "usage": ["./update_list && ./download 2.31-0ubuntu9.9"], "ctf_use": "题目没给 libc 时按泄漏地址去反查版本", "url": "https://github.com/matrix1001/glibc-all-in-one"},
-    {"name": "libc-database", "aliases": [], "cats": ["pwn"], "desc": "按函数地址反查 libc 版本", "install": {"git": "https://github.com/niklasb/libc-database"}, "usage": ["./find puts 0x7f... 0x7f... 0x7f..."], "ctf_use": "有两个已知符号地址就能定版本", "url": "https://github.com/niklasb/libc-database"},
-    {"name": "ghidra", "aliases": [], "cats": ["rev"], "desc": "反编译/反汇编（NSA 开源，免费）", "install": {"pacman": "ghidra", "git": "https://github.com/NationalSecurityAgency/ghidra"}, "usage": ["ghidraRun   # 新建工程 → 拖入二进制 → 双击进 Decompiler"], "ctf_use": "逆向主力：反编译伪代码 + 交叉引用；也可 headless 批跑脚本", "url": "https://ghidra-sre.org/"},
-    {"name": "radare2", "aliases": ["r2"], "cats": ["rev"], "desc": "命令行逆向框架", "install": {"pacman": "radare2", "git": "https://github.com/radareorg/radare2"}, "usage": ["r2 -A ./chal -c 'afl; s main; pdf'", "r2 -A -q -c 'izz~flag' ./chal"], "ctf_use": "无 GUI 环境（SSH/容器）里的逆向主力", "url": "https://rada.re/n/"},
-    {"name": "rizin", "aliases": ["cutter"], "cats": ["rev"], "desc": "radare2 的 fork（含 Cutter GUI）", "install": {"pacman": "rizin", "git": "https://github.com/rizinorg/rizin"}, "usage": ["rizin -A ./chal -c 'afl'"], "ctf_use": "喜欢现代 CLI 与 GUI 的用这个", "url": "https://rizin.re/"},
-    {"name": "jadx", "aliases": ["jadx-gui"], "cats": ["rev", "mobile"], "desc": "Android APK/DEX 反编译到 Java", "install": {"pacman": "jadx", "git": "https://github.com/skylot/jadx"}, "usage": ["jadx -d out/ app.apk", "jadx-gui app.apk"], "ctf_use": "安卓逆向第一刀；看 MainActivity 与校验函数", "url": "https://github.com/skylot/jadx"},
-    {"name": "apktool", "aliases": [], "cats": ["rev", "mobile"], "desc": "APK 拆包/回编译（资源与 smali）", "install": {"pacman": "apktool"}, "usage": ["apktool d app.apk -o app_src", "apktool b app_src -o patched.apk"], "ctf_use": "改 smali/资源后重打包（配合签名）", "url": "https://github.com/iBotPeaches/Apktool"},
-    {"name": "dex2jar", "aliases": [], "cats": ["rev", "mobile"], "desc": "dex → jar（再上 jd-gui 看）", "install": {"pacman": "dex2jar", "git": "https://github.com/pxb1988/dex2jar"}, "usage": ["d2j-dex2jar.sh classes.dex", "jd-gui classes-dex2jar.jar"], "ctf_use": "jadx 反编译失败（混淆重）时的兜底", "url": "https://github.com/pxb1988/dex2jar"},
-    {"name": "frida", "aliases": ["frida-tools"], "cats": ["rev", "mobile"], "desc": "运行时插桩（hook 函数/改内存）", "install": {"pip": "frida-tools"}, "usage": ["frida -U -f com.example.app -l hook.js", "frida-trace -U -i 'strcmp' com.example.app"], "ctf_use": "安卓/原生程序动态改判定的利器（也可附加到桌面进程）", "url": "https://frida.re/"},
-    {"name": "uncompyle6", "aliases": ["pycdc", "decompyle3"], "cats": ["rev"], "desc": "Python 字节码反编译（.pyc → 源码）", "install": {"pip": "uncompyle6", "git": "https://github.com/zrax/pycdc"}, "usage": ["uncompyle6 chal.pyc", "pycdc chal.pyc"], "ctf_use": "pyc 题第一步；版本太新就换 pycdc", "url": "https://github.com/rocky/python-uncompyle6"},
-    {"name": "pyinstxtractor", "aliases": [], "cats": ["rev"], "desc": "PyInstaller 打包程序解包", "install": {"git": "https://github.com/extremecoders-re/pyinstxtractor"}, "usage": ["python3 pyinstxtractor.py chal.exe"], "ctf_use": "exe/elf 是 PyInstaller 打的先解包再反编译", "url": "https://github.com/extremecoders-re/pyinstxtractor"},
-    {"name": "upx", "aliases": [], "cats": ["rev"], "desc": "可执行压缩/脱壳", "install": {"pacman": "upx"}, "usage": ["upx -d ./chal -o ./chal.unpacked"], "ctf_use": "IDA/Ghidra 看不到正常代码时先看是不是 UPX", "url": "https://upx.github.io/"},
-    {"name": "binwalk", "aliases": [], "cats": ["misc", "forensics"], "desc": "固件/文件内嵌结构扫描与提取", "install": {"pacman": "binwalk"}, "usage": ["binwalk -Me chal.bin", "binwalk chal.png"], "ctf_use": "图片/固件里藏文件的标准工具（-e 直接切出来）", "url": "https://github.com/ReFirmLabs/binwalk"},
-    {"name": "foremost", "aliases": ["scalpel"], "cats": ["forensics", "misc"], "desc": "按文件头恢复被删/内嵌文件", "install": {"pacman": "foremost"}, "usage": ["foremost -i disk.img -o out/", "foremost -t png,jpg,zip -i chal.png -o out/"], "ctf_use": "附加数据/磁盘镜像里捞文件", "url": "https://foremost.sourceforge.net/"},
-    {"name": "zsteg", "aliases": [], "cats": ["misc"], "desc": "PNG/BMP LSB 隐写扫描", "install": {"gem": "zsteg", "pacman": "zsteg"}, "usage": ["zsteg -a a.png", "zsteg -E 'b1,rgb,lsb,xy' a.png > out.bin"], "ctf_use": "图片题必跑；-a 全通道扫", "url": "https://github.com/zed-0xff/zsteg"},
-    {"name": "stegsolve", "aliases": [], "cats": ["misc"], "desc": "位平面/通道可视化（Java GUI）", "install": {"pacman": "stegsolve", "git": "https://github.com/zardus/ctf-tools"}, "usage": ["java -jar stegsolve.jar"], "ctf_use": "LSB 里画出来的二维码/文字靠肉眼比位平面", "url": "https://github.com/Giotino/stegsolve"},
-    {"name": "steghide", "aliases": ["outguess", "stegseek"], "cats": ["misc"], "desc": "JPEG/BMP/WAV 隐写（带口令）", "install": {"pacman": "steghide", "git": "https://github.com/RickdeJager/stegseek"}, "usage": ["steghide extract -sf a.jpg -p ''", "stegseek a.jpg wl.txt"], "ctf_use": "有口令的隐写；stegseek 用字典自动试（快得多）", "url": "https://github.com/RickdeJager/stegseek"},
-    {"name": "exiftool", "aliases": [], "cats": ["misc", "forensics"], "desc": "读写图片/音频/文档元数据", "install": {"pacman": "perl-image-exiftool"}, "usage": ["exiftool a.jpg", "exiftool -Comment=hi a.jpg"], "ctf_use": "元数据里藏 flag/提示是常见设计", "url": "https://exiftool.org/"},
-    {"name": "pngcheck", "aliases": [], "cats": ["misc"], "desc": "PNG 结构校验（损坏的块/CRC）", "install": {"pacman": "pngcheck"}, "usage": ["pngcheck -v a.png"], "ctf_use": "尺寸被改/CRC 不对时看它报哪一块错", "url": "http://www.libpng.org/pub/png/apps/pngcheck.html"},
-    {"name": "bkcrack", "aliases": [], "cats": ["misc"], "desc": "ZipCrypto 已知明文攻击（破 zip 密码）", "install": {"pacman": "bkcrack", "git": "https://github.com/kimci86/bkcrack"}, "usage": ["bkcrack -C f.zip -c inner.txt -p known.txt", "bkcrack -C f.zip -k <key> -U unlocked.zip newpass"], "ctf_use": "有 12 字节已知明文即可秒破 zip（比字典快几个数量级）", "url": "https://github.com/kimci86/bkcrack"},
-    {"name": "john", "aliases": ["john-the-ripper"], "cats": ["hash", "misc"], "desc": "John the Ripper（含 *2john 系列）", "install": {"pacman": "john"}, "usage": ["zip2john f.zip > h.txt && john --wordlist=wl.txt h.txt", "john --show h.txt"], "ctf_use": "压缩包/文档/影子文件的口令爆破统一入口", "url": "https://www.openwall.com/john/"},
-    {"name": "hashcat", "aliases": [], "cats": ["hash"], "desc": "GPU 哈希爆破（模式丰富）", "install": {"pacman": "hashcat"}, "usage": ["hashcat -m 0 -a 0 h.txt wl.txt -O", "hashcat -m 11600 h.txt wl.txt   # 7z"], "ctf_use": "有 GPU 时比 john 快；-m 用错模式=白跑，先 hashid", "note": "题目环境下别忘加 --force 之外的限速选项", "url": "https://hashcat.net/hashcat/"},
-    {"name": "hashid", "aliases": ["hash-identifier"], "cats": ["hash"], "desc": "哈希类型识别", "install": {"pip": "hashid", "pacman": "hash-identifier"}, "usage": ["hashid e10adc3949ba59abbe56e057f20f883e"], "ctf_use": "先认类型再选 hashcat -m", "url": "https://github.com/psypanda/hashID"},
-    {"name": "hydra", "aliases": [], "cats": ["hash", "net"], "desc": "在线口令爆破（http/ssh/ftp…）", "install": {"pacman": "hydra"}, "usage": ["hydra -l admin -P wl.txt \"$U\" http-post-form \"/login:u=^USER^&p=^PASS^:F=invalid\""], "ctf_use": "有登录点且允许爆破时；优先试题目主题词小字典", "url": "https://github.com/vanhauser-thc/thc-hydra"},
-    {"name": "wireshark", "aliases": ["tshark"], "cats": ["forensics", "net"], "desc": "流量分析（GUI + tshark CLI）", "install": {"pacman": "wireshark-qt"}, "usage": ["tshark -r a.pcap -q -z conv,tcp", "tshark -r a.pcap --export-objects http,./out"], "ctf_use": "流量题主力：追流/导出对象/看协议字段", "url": "https://www.wireshark.org/"},
-    {"name": "volatility3", "aliases": ["vol", "volatility"], "cats": ["forensics"], "desc": "内存镜像取证", "install": {"pip": "volatility3", "pacman": "volatility3"}, "usage": ["vol -f mem.raw windows.pslist", "vol -f mem.raw windows.filescan | grep -i flag"], "ctf_use": "内存镜像题：先 imageinfo → pslist/filescan/strings", "url": "https://github.com/volatilityfoundation/volatility3"},
-    {"name": "sleuthkit", "aliases": ["autopsy"], "cats": ["forensics"], "desc": "磁盘镜像取证（分区/文件系统/恢复）", "install": {"pacman": "sleuthkit"}, "usage": ["fls -r disk.img", "icat disk.img <inode> > out.bin", "mmls disk.img"], "ctf_use": "磁盘镜像题：分区 → 列文件 → 导出 inode", "url": "https://www.sleuthkit.org/"},
-    {"name": "testdisk", "aliases": ["photorec"], "cats": ["forensics"], "desc": "分区恢复/删除文件恢复", "install": {"pacman": "testdisk"}, "usage": ["testdisk disk.img", "photorec disk.img"], "ctf_use": "被删文件/坏分区表题的兜底", "url": "https://www.cgsecurity.org/wiki/TestDisk"},
-    {"name": "bulk_extractor", "aliases": [], "cats": ["forensics"], "desc": "批量特征提取（信用卡/邮箱/URL…）", "install": {"pacman": "bulk-extractor", "git": "https://github.com/simsong/bulk_extractor"}, "usage": ["bulk_extractor -o out/ disk.img"], "ctf_use": "大镜像里捞 flag 样式串比 strings 聪明", "url": "https://github.com/simsong/bulk_extractor"},
-    {"name": "audacity", "aliases": [], "cats": ["misc"], "desc": "音频编辑 + 频谱图", "install": {"pacman": "audacity"}, "usage": ["audacity a.wav   # Analyze → Plot Spectrum"], "ctf_use": "音频隐写第一步：看频谱里有没有画字/二维码", "url": "https://www.audacityteam.org/"},
-    {"name": "sox", "aliases": ["ffmpeg"], "cats": ["misc"], "desc": "音频命令行处理（生成频谱图）", "install": {"pacman": "sox"}, "usage": ["sox a.wav -n spectrogram -o spec.png"], "ctf_use": "无 GUI 环境也能出频谱图", "url": "https://sox.sourceforge.net/"},
-    {"name": "sqlitebrowser", "aliases": ["sqlcipher", "sqlite3"], "cats": ["misc", "web"], "desc": "SQLite 查看/查询（含加密变体）", "install": {"pacman": "sqlitebrowser"}, "usage": ["sqlite3 a.db '.tables'", "sqlcipher a.db \"PRAGMA key='x'; .tables\""], "ctf_use": ".db 附件直接查表；打不开就考虑 SQLCipher/WAL", "url": "https://sqlitebrowser.org/"},
-    {"name": "7zip", "aliases": ["p7zip", "unar"], "cats": ["misc"], "desc": "压缩包解压（格式最全）", "install": {"pacman": "7zip"}, "usage": ["7z l a.zip", "7z x a.zip -oout/ -y"], "ctf_use": "嵌套/伪加密/怪后缀都先交给它试", "url": "https://www.7-zip.org/"},
-    {"name": "CyberChef", "aliases": ["cyberchef"], "cats": ["data", "online"], "desc": "编码/加密/数据变换瑞士军刀", "install": {"pacman": "cyberchef", "git": "https://github.com/gchq/CyberChef"}, "usage": ["# 本地版：cyberchef --serve 或直接用官网；魔法棒自动识别多层编码"], "ctf_use": "编码题的默认答案（也可离线部署，题目敏感时别用在线版）", "url": "https://gchq.github.io/CyberChef/"},
-    {"name": "ciphey", "aliases": [], "cats": ["data"], "desc": "自动多层解码（AI 猜编码）", "install": {"pip": "ciphey"}, "usage": ["ciphey -t '5L2g5aW9'", "ciphey -f enc.txt"], "ctf_use": "拿到一串不知道是什么，先让它猜一遍", "url": "https://github.com/Ciphey/Ciphey"},
-    {"name": "sage", "aliases": ["sagemath"], "cats": ["crypto"], "desc": "数学计算环境（格/数论/椭圆曲线）", "install": {"pacman": "sagemath"}, "usage": ["sage -c 'print(factor(2^64+1))'", "sage -c 'M=Matrix(ZZ,[[1,2],[3,4]]);print(M.LLL())'"], "ctf_use": "格攻击/复杂数论题绕不开；小题目用 python+gmpy2 就够", "note": "包很大（几个 G），不常用就先别装", "url": "https://www.sagemath.org/"},
-    {"name": "RsaCtfTool", "aliases": ["rsactftool"], "cats": ["crypto"], "desc": "RSA 攻击自动化（十几种攻击全试）", "install": {"git": "https://github.com/RsaCtfTool/RsaCtfTool", "pip": "RsaCtfTool"}, "usage": ["python3 RsaCtfTool.py --publickey pub.pem --uncipherfile c.txt"], "ctf_use": "不知道是哪种 RSA 攻击时的第一条命令", "url": "https://github.com/RsaCtfTool/RsaCtfTool"},
-    {"name": "gmpy2", "aliases": ["pycryptodome"], "cats": ["crypto"], "desc": "大整数/数论运算（写攻击脚本用）", "install": {"pip": "gmpy2"}, "usage": ["python3 -c \"import gmpy2;print(gmpy2.iroot(27,3))\""], "ctf_use": "开方/求逆/素数判定；配合 pycryptodome 处理 AES/RSA", "url": "https://github.com/aleaxit/gmpy2"},
-    {"name": "yafu", "aliases": ["msieve"], "cats": ["crypto"], "desc": "整数分解（比纯 Python 快）", "install": {"pacman": "yafu", "git": "https://github.com/bbuhrow/yafu"}, "usage": ["yafu \"factor(0x1234...)\"", "yafu -batchfile n.txt"], "ctf_use": "n 不大但 Fermat/Pollard 都不行时的分解工具", "url": "https://github.com/bbuhrow/yafu"},
-    {"name": "factordb", "aliases": ["factordb-pycli"], "cats": ["crypto"], "desc": "在线大数分解库（查已知分解）", "install": {"pip": "factordb-python"}, "usage": ["python3 -c \"from factordb.factordb import FactorDB;f=FactorDB(n);f.connect();print(f.get_factor_list())\""], "ctf_use": "题目用公开大数时的第一步（秒出）", "url": "http://factordb.com/"},
-    {"name": "nmap", "aliases": [], "cats": ["recon", "net"], "desc": "端口/服务/版本扫描", "install": {"pacman": "nmap"}, "usage": ["nmap -sV -Pn -p- --min-rate 1000 host", "nmap -sV -p 80,8080 --script http-title host"], "ctf_use": "给 IP/多端口靶机时先看清有哪些服务", "note": "多数比赛禁全网段扫描；只打题目给的目标", "url": "https://nmap.org/"},
-    {"name": "masscan", "aliases": [], "cats": ["recon", "net"], "desc": "超高速端口扫描", "install": {"pacman": "masscan"}, "usage": ["masscan -p1-65535 --rate 1000 host"], "ctf_use": "大范围端口确认（注意合规与限速）", "url": "https://github.com/robertdavidgraham/masscan"},
-    {"name": "netcat", "aliases": ["nc", "ncat", "socat"], "cats": ["net", "pwn"], "desc": "网络瑞士军刀（连靶机/起监听）", "install": {"pacman": "openbsd-netcat"}, "usage": ["nc -v host 1337", "ncat -lvnp 4444", "socat TCP-LISTEN:1337,reuseaddr,fork EXEC:./chal"], "ctf_use": "手动交互 pwn 服务/搭本地起服务用 socat", "url": "https://github.com/nmap/ncat"},
-    {"name": "proxychains-ng", "aliases": ["proxychains"], "cats": ["net"], "desc": "让任意命令走代理", "install": {"pacman": "proxychains-ng"}, "usage": ["proxychains4 -q ctfctl req get \"$U/\""], "ctf_use": "换出口/进内网时的通用包装", "url": "https://github.com/rofl0r/proxychains-ng"},
-    {"name": "chisel", "aliases": ["ligolo-ng"], "cats": ["net", "post"], "desc": "隧道/端口转发（穿透内网）", "install": {"go": "github.com/jpillora/chisel@latest"}, "usage": ["chisel server -p 8000 --reverse", "chisel client host:8000 R:8080:127.0.0.1:80"], "ctf_use": "拿到跳板后把内网端口拉出来", "url": "https://github.com/jpillora/chisel"},
-    {"name": "aircrack-ng", "aliases": [], "cats": ["wireless"], "desc": "WiFi 抓包与破解（WPA 握手）", "install": {"pacman": "aircrack-ng"}, "usage": ["aircrack-ng -w wl.txt cap.cap"], "ctf_use": "无线题：看有什么网 → 抓包 → 爆破握手", "note": "多数比赛不许真攻击无线；题目给的是抓包文件就只用离线部分", "url": "https://www.aircrack-ng.org/"},
-    {"name": "bettercap", "aliases": [], "cats": ["net", "wireless"], "desc": "网络嗅探/ARP/MITM 框架", "install": {"pacman": "bettercap"}, "usage": ["bettercap -iface eth0 -eval \"net.probe on; net.show\""], "ctf_use": "内网嗅探与中间人（需授权环境）", "url": "https://www.bettercap.org/"},
-    {"name": "gnuradio", "aliases": ["gqrx", "urh", "rtl-sdr"], "cats": ["wireless"], "desc": "软件无线电（SDR 信号处理）", "install": {"pacman": "gnuradio"}, "usage": ["gqrx   # 扫频 + 解调（IQ 文件题常用 Universal Radio Hacker）"], "ctf_use": "SDR/IQ 文件题：先看瀑布图，再解调制", "url": "https://www.gnuradio.org/"},
-    {"name": "frida-android", "aliases": ["objection"], "cats": ["mobile", "rev"], "desc": "安卓运行时 hook/绕过检测", "install": {"pip": "objection"}, "usage": ["objection -g com.app explore", "frida -U -f com.app -l bypass.js"], "ctf_use": "APK 有 root 检测/校验在 native 层时用", "url": "https://github.com/sensepost/objection"},
-    {"name": "adb", "aliases": ["android-tools"], "cats": ["mobile"], "desc": "安卓调试桥（装包/拉文件/看日志）", "install": {"pacman": "android-tools"}, "usage": ["adb devices", "adb install app.apk", "adb shell pm list packages"], "ctf_use": "连模拟器/真机：装 APK、拉数据库、模拟输入", "url": "https://developer.android.com/tools/adb"},
-    {"name": "amass", "aliases": ["subfinder", "assetfinder"], "cats": ["osint", "recon"], "desc": "子域名/资产发现", "install": {"pacman": "amass", "go": "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"}, "usage": ["subfinder -d example.com -silent", "amass enum -passive -d example.com"], "ctf_use": "OSINT 题找隐藏子域/资产", "url": "https://github.com/owasp-amass/amass"},
-    {"name": "theHarvester", "aliases": [], "cats": ["osint"], "desc": "邮箱/主机/泄露信息收集", "install": {"pacman": "theharvester", "pip": "theHarvester"}, "usage": ["theHarvester -d example.com -b duckduckgo,bing -l 200"], "ctf_use": "人肉/情报题的起点", "url": "https://github.com/laramies/theHarvester"},
-    {"name": "sherlock", "aliases": ["maigret", "holehe"], "cats": ["osint"], "desc": "跨站点用户名/邮箱画像", "install": {"pip": "sherlock-project"}, "usage": ["sherlock username", "holehe mail@example.com"], "ctf_use": "给了用户名/邮箱要查踪迹", "url": "https://github.com/sherlock-project/sherlock"},
-    {"name": "gitleaks", "aliases": ["trufflehog"], "cats": ["web", "osint"], "desc": "从 git 仓库历史里捞密钥", "install": {"pacman": "gitleaks", "go": "github.com/gitleaks/gitleaks/v8@latest"}, "usage": ["gitleaks detect -v --source ./repo"], "ctf_use": "拿到 .git 或公开仓库时先扫密钥与历史提交", "url": "https://github.com/gitleaks/gitleaks"},
-    {"name": "git-dumper", "aliases": [], "cats": ["web", "recon"], "desc": "从网站把 .git 整个拉下来", "install": {"pip": "git-dumper"}, "usage": ["git-dumper \"$U/.git/\" ./dump && cd dump && git log --all --oneline"], "ctf_use": ".git 泄露题的标准打法（再看 stash/悬空对象）", "url": "https://github.com/arthaud/git-dumper"},
-    {"name": "PayloadsAllTheThings", "aliases": ["payloads"], "cats": ["web", "data"], "desc": "各类 payload 与绕过速查（离线仓库）", "install": {"git": "https://github.com/swisskyrepo/PayloadsAllTheThings"}, "usage": ["grep -ri \"file upload\" PayloadsAllTheThings/ | head"], "ctf_use": "当手册查，不当炮台用（判断仍在人这边）", "url": "https://github.com/swisskyrepo/PayloadsAllTheThings"},
-    {"name": "ctf-tools", "aliases": ["zardus-ctf-tools"], "cats": ["misc"], "desc": "CTF 工具安装脚本合集（zardus）", "install": {"git": "https://github.com/zardus/ctf-tools"}, "usage": ["./install stegsolve && ./install pwn && ls bin/"], "ctf_use": "一次性把 misc/rev/crypto 常用工具装齐（每个工具落 bin/）", "url": "https://github.com/zardus/ctf-tools"},
-    {"name": "pwninit", "aliases": [], "cats": ["pwn"], "desc": "自动配好题目给的 libc/ld 与 patch", "install": {"cargo": "pwninit"}, "usage": ["pwninit --bin ./chal --libc ./libc.so.6"], "ctf_use": "省掉手写 patchelf 与拷贝 ld 的功夫", "url": "https://github.com/io12/pwninit"},
-    {"name": "one_gadget+libc-database", "aliases": [], "cats": ["pwn"], "desc": "（见 one_gadget / libc-database 两条）", "install": {}, "usage": [], "ctf_use": "占位说明，无需安装", "url": ""},
-    {"name": "x64dbg", "aliases": ["dnspy", "ilspy"], "cats": ["rev"], "desc": "Windows 动态调试/.NET 反编译", "install": {"git": "https://github.com/dnSpy/dnSpy"}, "usage": ["# Windows 侧：x64dbg 调 PE，dnSpy 直接反编译 .NET 并改 IL"], "ctf_use": "PE/.NET 逆向题（.NET 题常直接 dnSpy 改判定）", "url": "https://github.com/x64dbg/x64dbg"},
-    {"name": "qemu-user", "aliases": ["qemu"], "cats": ["pwn", "rev"], "desc": "异构架构运行/调试（mips/arm…）", "install": {"pacman": "qemu-user"}, "usage": ["qemu-mipsel -L /usr/mipsel-linux-gnu ./chal", "qemu-arm -g 1234 ./chal"], "ctf_use": "非 x86 二进制题的运行与调试（配合 -g 上 gdb-multiarch）", "url": "https://www.qemu.org/"},
-    {"name": "ropstar", "aliases": [], "cats": ["pwn"], "desc": "自动生成 ROP 链（省手写）", "install": {"pip": "ropstar"}, "usage": ["python3 -c \"from ropstar import *;print(chain)\""], "ctf_use": "x86_64 自动 ROP；先手工理解再省事", "url": "https://github.com/CptGibbon/ropstar"}
-  ]
+ "_comment": "人工维护的 CTF 常用工具（叠加在机器生成的 tools.json 上，这里的字段优先）。cats 见 build_catalog.py 的 CATEGORIES。install 键即安装器：pacman/pip/pipx/go/git/gem/npm/cargo。 人工条目含 dup_of（同功能二选一提示）与 note（许可/坑）。",
+ "tools": [
+  {
+   "name": "ffuf",
+   "aliases": [
+    "ffuf"
+   ],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "目录/参数/虚拟主机爆破（Go，快）",
+   "install": {
+    "pacman": "ffuf",
+    "go": "github.com/ffuf/ffuf/v2@latest"
+   },
+   "usage": [
+    "ffuf -w wl.txt -u \"$U/FUZZ\" -fs 4112 -mc all -t 20",
+    "ffuf -w wl.txt -u \"$U/api?FUZZ=1\" -fs 0"
+   ],
+   "ctf_use": "目录与参数爆破首选；-fs 按字节数过滤假 200（ctfctl fuzz 会自动带上）",
+   "note": "共享靶机加 -t 5 且命中即停",
+   "url": "https://github.com/ffuf/ffuf"
+  },
+  {
+   "name": "feroxbuster",
+   "aliases": [
+    "ferox"
+   ],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "递归式目录爆破（Rust）",
+   "install": {
+    "pacman": "feroxbuster",
+    "cargo": "feroxbuster"
+   },
+   "usage": [
+    "feroxbuster -u \"$U\" -w wl.txt -d 2 --filter-size 4112"
+   ],
+   "ctf_use": "要递归进目录时比 ffuf 顺手",
+   "url": "https://github.com/epi052/feroxbuster"
+  },
+  {
+   "name": "gobuster",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "目录/DNS/vhost 爆破（Go）",
+   "install": {
+    "pacman": "gobuster"
+   },
+   "usage": [
+    "gobuster dir -u \"$U\" -w wl.txt -x php,bak,zip"
+   ],
+   "ctf_use": "老牌；-x 直接带后缀",
+   "url": "https://github.com/OJ/gobuster",
+   "dup_of": "ffuf"
+  },
+  {
+   "name": "dirsearch",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "目录扫描（Python，字典细）",
+   "install": {
+    "pacman": "dirsearch",
+    "pip": "dirsearch"
+   },
+   "usage": [
+    "dirsearch -u \"$U\" -e php,html,bak -t 20"
+   ],
+   "ctf_use": "默认字典对 PHP 题命中率不错",
+   "url": "https://github.com/maurosoria/dirsearch",
+   "dup_of": "ffuf/feroxbuster"
+  },
+  {
+   "name": "sqlmap",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "SQL 注入自动化",
+   "install": {
+    "pacman": "sqlmap",
+    "pip": "sqlmap"
+   },
+   "usage": [
+    "sqlmap -u \"$U/?id=1\" --batch --dbs --level 3",
+    "sqlmap -u \"$U/?id=1\" -r req.txt --batch --dump"
+   ],
+   "ctf_use": "只当兜底：先手工确认注入点与闭合方式，再用它省时间",
+   "url": "https://sqlmap.org/"
+  },
+  {
+   "name": "nuclei",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "模板化漏洞扫描（CVE/配置/暴露面）",
+   "install": {
+    "pacman": "nuclei",
+    "go": "github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest"
+   },
+   "usage": [
+    "nuclei -u \"$U\" -severity medium,high,critical -stats",
+    "nuclei -u \"$U\" -t http/misconfiguration/"
+   ],
+   "ctf_use": "先跑一遍已知 CVE/暴露文件模板，常有白捡",
+   "note": "第一次跑会自动下模板；共享靶机别开高并发",
+   "url": "https://github.com/projectdiscovery/nuclei"
+  },
+  {
+   "name": "nikto",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "Web 服务器配置/文件扫描",
+   "install": {
+    "pacman": "nikto"
+   },
+   "usage": [
+    "nikto -h \"$U\" -maxtime 120"
+   ],
+   "ctf_use": "老派但偶尔能翻出备份文件与默认页",
+   "url": "https://github.com/sullo/nikto"
+  },
+  {
+   "name": "whatweb",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "指纹识别（框架/中间件/CMS）",
+   "install": {
+    "pacman": "whatweb"
+   },
+   "usage": [
+    "whatweb -a 3 \"$U\""
+   ],
+   "ctf_use": "快速确认栈（Flask/ThinkPHP/…”）",
+   "url": "https://github.com/urbanadventurer/WhatWeb"
+  },
+  {
+   "name": "httpx",
+   "aliases": [
+    "httpx-toolkit"
+   ],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "批量 HTTP 探测（取标题/状态/技术栈）",
+   "install": {
+    "pacman": "httpx-toolkit",
+    "go": "github.com/projectdiscovery/httpx/cmd/httpx@latest"
+   },
+   "usage": [
+    "httpx -u \"$U\" -title -status-code -tech-detect"
+   ],
+   "ctf_use": "多端口/多域名时先批量看一遍",
+   "url": "https://github.com/projectdiscovery/httpx"
+  },
+  {
+   "name": "arjun",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "HTTP 参数发现（藏起来的参数名）",
+   "install": {
+    "pacman": "arjun",
+    "pip": "arjun"
+   },
+   "usage": [
+    "arjun -u \"$U/index.php\" -m GET"
+   ],
+   "ctf_use": "页面没有表单但后端吃参数时用（如 op=cmd）",
+   "url": "https://github.com/s0md3v/Arjun"
+  },
+  {
+   "name": "jwt_tool",
+   "aliases": [
+    "jwt-tool"
+   ],
+   "cats": [
+    "web"
+   ],
+   "desc": "JWT 解码/爆破/伪造/算法混淆",
+   "install": {
+    "pip": "jwt_tool",
+    "git": "https://github.com/ticarpi/jwt_tool"
+   },
+   "usage": [
+    "python3 jwt_tool.py \"$TOKEN\" -M at -t \"$U\"",
+    "python3 jwt_tool.py \"$TOKEN\" -C -d wl.txt"
+   ],
+   "ctf_use": "比手撸 JWT 快：-M 把所有玩法跑一遍",
+   "url": "https://github.com/ticarpi/jwt_tool"
+  },
+  {
+   "name": "flask-unsign",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "Flask session 爆破/伪造",
+   "install": {
+    "pip": "flask-unsign"
+   },
+   "usage": [
+    "flask-unsign --unsign --cookie '<session>' -w wl.txt",
+    "flask-unsign --sign --cookie \"{'role':'admin'}\" --secret SECRET"
+   ],
+   "ctf_use": "Werkzeug 三段式 session 的标准打法",
+   "url": "https://github.com/Paradoxis/Flask-Unsign"
+  },
+  {
+   "name": "php_filter_chain_generator",
+   "aliases": [
+    "php-filter-chain"
+   ],
+   "cats": [
+    "web"
+   ],
+   "desc": "php://filter 链式 RCE 生成器",
+   "install": {
+    "git": "https://github.com/synacktiv/php_filter_chain_generator"
+   },
+   "usage": [
+    "python3 php_filter_chain_generator.py --chain '<?php system($_GET[0]);?>'"
+   ],
+   "ctf_use": "LFI 只给一个 file 参数、能读文件但不能包含文件时的打法（PHP 8+）",
+   "url": "https://github.com/synacktiv/php_filter_chain_generator"
+  },
+  {
+   "name": "lfimap",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "LFI 自动化利用",
+   "install": {
+    "pip": "lfimap",
+    "git": "https://github.com/hansmach1ne/LFImap"
+   },
+   "usage": [
+    "lfimap -u \"$U/?file=index.php\" -a",
+    "lfimap -u \"$U/?file=FUZZ\" -w lfi_wordlist.txt"
+   ],
+   "ctf_use": "把 LFI 的读源码/日志投毒/伪协议一把试完",
+   "url": "https://github.com/hunters-sec/LFImap"
+  },
+  {
+   "name": "tplmap",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "SSTI 检测与利用（Jinja/Twig/Freemarker…）",
+   "install": {
+    "pip": "tplmap",
+    "git": "https://github.com/epinna/tplmap"
+   },
+   "usage": [
+    "python2 tplmap.py -u \"$U/?name=*\" --os-shell"
+   ],
+   "ctf_use": "确认 SSTI 后可试它的 payload 库；py2 工具，优先手打 {{7*7}}",
+   "url": "https://github.com/epinna/tplmap"
+  },
+  {
+   "name": "commix",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "命令注入自动化",
+   "install": {
+    "pacman": "commix",
+    "pip": "commix"
+   },
+   "usage": [
+    "commix -u \"$U/?cmd=1\" --batch"
+   ],
+   "ctf_use": "确认执行点后用来试分隔符与绕过",
+   "url": "https://github.com/commixproject/commix"
+  },
+  {
+   "name": "dalfox",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "XSS 扫描（Go）",
+   "install": {
+    "go": "github.com/hahwul/dalfox/v2@latest",
+    "pacman": "dalfox"
+   },
+   "usage": [
+    "dalfox url \"$U/?q=test\""
+   ],
+   "ctf_use": "有反射点先跑一遍",
+   "url": "https://github.com/hahwul/dalfox"
+  },
+  {
+   "name": "xsstrike",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "XSS 检测套件（含上下文分析）",
+   "install": {
+    "git": "https://github.com/s0md3v/XSStrike"
+   },
+   "usage": [
+    "python3 xsstrike.py -u \"$U/?q=test\""
+   ],
+   "ctf_use": "上下文判断比盲目 payload 强",
+   "url": "https://github.com/s0md3v/XSStrike"
+  },
+  {
+   "name": "ysoserial",
+   "aliases": [],
+   "cats": [
+    "web",
+    "pwn"
+   ],
+   "desc": "Java 反序列化 payload 生成",
+   "install": {
+    "git": "https://github.com/frohoff/ysoserial",
+    "pacman": "ysoserial"
+   },
+   "usage": [
+    "java -jar ysoserial.jar CommonsCollections6 'id' | base64 -w0"
+   ],
+   "ctf_use": "Java 反序列化题（CommonsCollections / URLDNS 探测）",
+   "url": "https://github.com/frohoff/ysoserial"
+  },
+  {
+   "name": "phpggc",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "PHP 反序列化链生成（Gadget 库）",
+   "install": {
+    "git": "https://github.com/ambionics/phpggc",
+    "pacman": "phpggc"
+   },
+   "usage": [
+    "./phpggc -l",
+    "./phpggc Laravel/RCE1 system id"
+   ],
+   "ctf_use": "框架反序列化题的现成链；先 -l 看有哪些",
+   "url": "https://github.com/ambionics/phpggc"
+  },
+  {
+   "name": "mitmproxy",
+   "aliases": [],
+   "cats": [
+    "web",
+    "net"
+   ],
+   "desc": "可编程中间人代理（抓改 HTTPS）",
+   "install": {
+    "pacman": "mitmproxy",
+    "pip": "mitmproxy"
+   },
+   "usage": [
+    "mitmproxy -p 8080",
+    "ctfctl req get \"$U/\" --proxy 127.0.0.1:8080"
+   ],
+   "ctf_use": "桌面版 Burp 的替代；配合 ctfctl --proxy 用",
+   "url": "https://mitmproxy.org/"
+  },
+  {
+   "name": "requests",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "Python HTTP 客户端（写利用脚本用）",
+   "install": {
+    "pip": "requests"
+   },
+   "usage": [
+    "python3 -c \"import requests;print(requests.get('$U').status_code)\""
+   ],
+   "ctf_use": "会话/重试/编码都要手写时的首选",
+   "url": "https://requests.readthedocs.io/"
+  },
+  {
+   "name": "pwntools",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "pwn 全家桶（tube/ELF/ROP/组装 shellcode）",
+   "install": {
+    "pip": "pwntools",
+    "pacman": "python-pwntools"
+   },
+   "usage": [
+    "python3 -c \"from pwn import *;p=process('./chal');p.recvline()\"",
+    "cyclic 200 | ./chal"
+   ],
+   "ctf_use": "exp 脚本骨架：remote()/sendlineafter()/p64() 一条龙",
+   "url": "https://github.com/Gallopsled/pwntools"
+  },
+  {
+   "name": "pwndbg",
+   "aliases": [
+    "gef"
+   ],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "GDB 增强（堆/栈/寄存器可视化）",
+   "install": {
+    "git": "https://github.com/pwndbg/pwndbg"
+   },
+   "usage": [
+    "gdb -q ./chal   # 进去后 vmmap / heap / telescope"
+   ],
+   "ctf_use": "看堆布局与泄漏指令的唯一现实选择",
+   "note": "gef 二选一（pip install gef 也可）",
+   "url": "https://github.com/pwndbg/pwndbg"
+  },
+  {
+   "name": "checksec",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "看二进制保护机制（NX/PIE/Canary/RELRO）",
+   "install": {
+    "pacman": "checksec",
+    "pip": "pwntools"
+   },
+   "usage": [
+    "checksec --file=./chal",
+    "pwn checksec ./chal"
+   ],
+   "ctf_use": "pwn 第一步；也可用 ctfctl file ./chal 直接看",
+   "url": "https://github.com/slimm609/checksec.sh"
+  },
+  {
+   "name": "ROPgadget",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "ROP gadget 搜索",
+   "install": {
+    "pip": "ROPgadget",
+    "pacman": "ropgadget"
+   },
+   "usage": [
+    "ROPgadget --binary ./chal --only 'pop|ret' | grep rdi"
+   ],
+   "ctf_use": "ret2libc / 传参构造",
+   "url": "https://github.com/JonathanSalwan/ROPgadget"
+  },
+  {
+   "name": "ropper",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "Gadget 搜索（比 ROPgadget 会找链）",
+   "install": {
+    "pip": "ropper"
+   },
+   "usage": [
+    "ropper --file ./chal --search 'pop rdi; ret'"
+   ],
+   "ctf_use": "找带副作用少的 gadget",
+   "url": "https://github.com/sashs/Ropper",
+   "dup_of": "ROPgadget（二选一；ropper 更会找链）"
+  },
+  {
+   "name": "one_gadget",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "libc 里的 one-gadget（直接 execve）",
+   "install": {
+    "gem": "one_gadget",
+    "pacman": "one_gadget"
+   },
+   "usage": [
+    "one_gadget ./libc.so.6"
+   ],
+   "ctf_use": "写不出 ROP 链时试它（注意约束条件）",
+   "url": "https://github.com/david942j/one_gadget"
+  },
+  {
+   "name": "patchelf",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "改 ELF 的 interpreter/rpath（换 libc）",
+   "install": {
+    "pacman": "patchelf"
+   },
+   "usage": [
+    "patchelf --set-interpreter ./ld.so --set-rpath . ./chal"
+   ],
+   "ctf_use": "题目给 libc 时用它让本地跑同一版 libc",
+   "url": "https://github.com/NixOS/patchelf"
+  },
+  {
+   "name": "seccomp-tools",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "反编译 seccomp 沙箱规则",
+   "install": {
+    "gem": "seccomp-tools",
+    "pacman": "seccomp-tools"
+   },
+   "usage": [
+    "seccomp-tools dump ./chal"
+   ],
+   "ctf_use": "沙箱题（只能 open/read/write）第一步",
+   "url": "https://github.com/david942j/seccomp-tools"
+  },
+  {
+   "name": "angr",
+   "aliases": [],
+   "cats": [
+    "pwn",
+    "rev"
+   ],
+   "desc": "符号执行（自动找满足条件的输入）",
+   "install": {
+    "pip": "angr"
+   },
+   "usage": [
+    "python3 -c \"import angr;p=angr.Project('./chal');print(p.arch)\""
+   ],
+   "ctf_use": "逆向里「找到让 check 通过的输入」最省事的暴力解",
+   "url": "https://angr.io/"
+  },
+  {
+   "name": "z3-solver",
+   "aliases": [
+    "z3"
+   ],
+   "cats": [
+    "crypto",
+    "rev",
+    "pwn"
+   ],
+   "desc": "SMT 求解器（约束求解）",
+   "install": {
+    "pip": "z3-solver",
+    "pacman": "z3"
+   },
+   "usage": [
+    "python3 -c \"from z3 import *;x=Int('x');solve(x*x==49,x>0)\""
+   ],
+   "ctf_use": "逆向/密码里的方程组、位运算约束",
+   "url": "https://github.com/Z3Prover/z3"
+  },
+  {
+   "name": "glibc-all-in-one",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "各版本 libc/ld 打包下载",
+   "install": {
+    "git": "https://github.com/matrix1001/glibc-all-in-one"
+   },
+   "usage": [
+    "./update_list && ./download 2.31-0ubuntu9.9"
+   ],
+   "ctf_use": "题目没给 libc 时按泄漏地址去反查版本",
+   "url": "https://github.com/matrix1001/glibc-all-in-one"
+  },
+  {
+   "name": "libc-database",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "按函数地址反查 libc 版本",
+   "install": {
+    "git": "https://github.com/niklasb/libc-database"
+   },
+   "usage": [
+    "./find puts 0x7f... 0x7f... 0x7f..."
+   ],
+   "ctf_use": "有两个已知符号地址就能定版本",
+   "url": "https://github.com/niklasb/libc-database"
+  },
+  {
+   "name": "ghidra",
+   "aliases": [],
+   "cats": [
+    "rev"
+   ],
+   "desc": "反编译/反汇编（NSA 开源，免费）",
+   "install": {
+    "pacman": "ghidra",
+    "git": "https://github.com/NationalSecurityAgency/ghidra"
+   },
+   "usage": [
+    "ghidraRun   # 新建工程 → 拖入二进制 → 双击进 Decompiler"
+   ],
+   "ctf_use": "逆向主力：反编译伪代码 + 交叉引用；也可 headless 批跑脚本",
+   "url": "https://ghidra-sre.org/"
+  },
+  {
+   "name": "radare2",
+   "aliases": [
+    "r2"
+   ],
+   "cats": [
+    "rev"
+   ],
+   "desc": "命令行逆向框架",
+   "install": {
+    "pacman": "radare2",
+    "git": "https://github.com/radareorg/radare2"
+   },
+   "usage": [
+    "r2 -A ./chal -c 'afl; s main; pdf'",
+    "r2 -A -q -c 'izz~flag' ./chal"
+   ],
+   "ctf_use": "无 GUI 环境（SSH/容器）里的逆向主力",
+   "url": "https://rada.re/n/"
+  },
+  {
+   "name": "rizin",
+   "aliases": [
+    "cutter"
+   ],
+   "cats": [
+    "rev"
+   ],
+   "desc": "radare2 的 fork（含 Cutter GUI）",
+   "install": {
+    "pacman": "rizin",
+    "git": "https://github.com/rizinorg/rizin"
+   },
+   "usage": [
+    "rizin -A ./chal -c 'afl'"
+   ],
+   "ctf_use": "喜欢现代 CLI 与 GUI 的用这个",
+   "url": "https://rizin.re/",
+   "dup_of": "radare2"
+  },
+  {
+   "name": "jadx",
+   "aliases": [
+    "jadx-gui"
+   ],
+   "cats": [
+    "rev",
+    "mobile"
+   ],
+   "desc": "Android APK/DEX 反编译到 Java",
+   "install": {
+    "pacman": "jadx",
+    "git": "https://github.com/skylot/jadx"
+   },
+   "usage": [
+    "jadx -d out/ app.apk",
+    "jadx-gui app.apk"
+   ],
+   "ctf_use": "安卓逆向第一刀；看 MainActivity 与校验函数",
+   "url": "https://github.com/skylot/jadx"
+  },
+  {
+   "name": "apktool",
+   "aliases": [],
+   "cats": [
+    "rev",
+    "mobile"
+   ],
+   "desc": "APK 拆包/回编译（资源与 smali）",
+   "install": {
+    "pacman": "apktool"
+   },
+   "usage": [
+    "apktool d app.apk -o app_src",
+    "apktool b app_src -o patched.apk"
+   ],
+   "ctf_use": "改 smali/资源后重打包（配合签名）",
+   "url": "https://github.com/iBotPeaches/Apktool"
+  },
+  {
+   "name": "dex2jar",
+   "aliases": [],
+   "cats": [
+    "rev",
+    "mobile"
+   ],
+   "desc": "dex → jar（再上 jd-gui 看）",
+   "install": {
+    "pacman": "dex2jar",
+    "git": "https://github.com/pxb1988/dex2jar"
+   },
+   "usage": [
+    "d2j-dex2jar.sh classes.dex",
+    "jd-gui classes-dex2jar.jar"
+   ],
+   "ctf_use": "jadx 反编译失败（混淆重）时的兜底",
+   "url": "https://github.com/pxb1988/dex2jar",
+   "dup_of": "jadx"
+  },
+  {
+   "name": "frida",
+   "aliases": [
+    "frida-tools"
+   ],
+   "cats": [
+    "rev",
+    "mobile"
+   ],
+   "desc": "运行时插桩（hook 函数/改内存）",
+   "install": {
+    "pip": "frida-tools"
+   },
+   "usage": [
+    "frida -U -f com.example.app -l hook.js",
+    "frida-trace -U -i 'strcmp' com.example.app"
+   ],
+   "ctf_use": "安卓/原生程序动态改判定的利器（也可附加到桌面进程）",
+   "url": "https://frida.re/"
+  },
+  {
+   "name": "uncompyle6",
+   "aliases": [
+    "pycdc",
+    "decompyle3"
+   ],
+   "cats": [
+    "rev"
+   ],
+   "desc": "Python 字节码反编译（.pyc → 源码）",
+   "install": {
+    "pip": "uncompyle6",
+    "git": "https://github.com/zrax/pycdc"
+   },
+   "usage": [
+    "uncompyle6 chal.pyc",
+    "pycdc chal.pyc"
+   ],
+   "ctf_use": "pyc 题第一步；版本太新就换 pycdc",
+   "url": "https://github.com/rocky/python-uncompyle6"
+  },
+  {
+   "name": "pyinstxtractor",
+   "aliases": [],
+   "cats": [
+    "rev"
+   ],
+   "desc": "PyInstaller 打包程序解包",
+   "install": {
+    "git": "https://github.com/extremecoders-re/pyinstxtractor"
+   },
+   "usage": [
+    "python3 pyinstxtractor.py chal.exe"
+   ],
+   "ctf_use": "exe/elf 是 PyInstaller 打的先解包再反编译",
+   "url": "https://github.com/extremecoders-re/pyinstxtractor"
+  },
+  {
+   "name": "upx",
+   "aliases": [],
+   "cats": [
+    "rev"
+   ],
+   "desc": "可执行压缩/脱壳",
+   "install": {
+    "pacman": "upx"
+   },
+   "usage": [
+    "upx -d ./chal -o ./chal.unpacked"
+   ],
+   "ctf_use": "IDA/Ghidra 看不到正常代码时先看是不是 UPX",
+   "url": "https://upx.github.io/"
+  },
+  {
+   "name": "binwalk",
+   "aliases": [],
+   "cats": [
+    "misc",
+    "forensics"
+   ],
+   "desc": "固件/文件内嵌结构扫描与提取",
+   "install": {
+    "pacman": "binwalk"
+   },
+   "usage": [
+    "binwalk -Me chal.bin",
+    "binwalk chal.png"
+   ],
+   "ctf_use": "图片/固件里藏文件的标准工具（-e 直接切出来）",
+   "url": "https://github.com/ReFirmLabs/binwalk"
+  },
+  {
+   "name": "foremost",
+   "aliases": [
+    "scalpel"
+   ],
+   "cats": [
+    "forensics",
+    "misc"
+   ],
+   "desc": "按文件头恢复被删/内嵌文件",
+   "install": {
+    "pacman": "foremost"
+   },
+   "usage": [
+    "foremost -i disk.img -o out/",
+    "foremost -t png,jpg,zip -i chal.png -o out/"
+   ],
+   "ctf_use": "附加数据/磁盘镜像里捞文件",
+   "url": "https://foremost.sourceforge.net/"
+  },
+  {
+   "name": "zsteg",
+   "aliases": [],
+   "cats": [
+    "misc"
+   ],
+   "desc": "PNG/BMP LSB 隐写扫描",
+   "install": {
+    "gem": "zsteg",
+    "pacman": "zsteg"
+   },
+   "usage": [
+    "zsteg -a a.png",
+    "zsteg -E 'b1,rgb,lsb,xy' a.png > out.bin"
+   ],
+   "ctf_use": "图片题必跑；-a 全通道扫",
+   "url": "https://github.com/zed-0xff/zsteg"
+  },
+  {
+   "name": "stegsolve",
+   "aliases": [],
+   "cats": [
+    "misc"
+   ],
+   "desc": "位平面/通道可视化（Java GUI）",
+   "install": {
+    "pacman": "stegsolve",
+    "git": "https://github.com/zardus/ctf-tools"
+   },
+   "usage": [
+    "java -jar stegsolve.jar"
+   ],
+   "ctf_use": "LSB 里画出来的二维码/文字靠肉眼比位平面",
+   "url": "https://github.com/Giotino/stegsolve"
+  },
+  {
+   "name": "steghide",
+   "aliases": [
+    "outguess",
+    "stegseek"
+   ],
+   "cats": [
+    "misc"
+   ],
+   "desc": "JPEG/BMP/WAV 隐写（带口令）",
+   "install": {
+    "pacman": "steghide",
+    "git": "https://github.com/RickdeJager/stegseek"
+   },
+   "usage": [
+    "steghide extract -sf a.jpg -p ''",
+    "stegseek a.jpg wl.txt"
+   ],
+   "ctf_use": "有口令的隐写；stegseek 用字典自动试（快得多）",
+   "url": "https://github.com/RickdeJager/stegseek"
+  },
+  {
+   "name": "exiftool",
+   "aliases": [],
+   "cats": [
+    "misc",
+    "forensics"
+   ],
+   "desc": "读写图片/音频/文档元数据",
+   "install": {
+    "pacman": "perl-image-exiftool"
+   },
+   "usage": [
+    "exiftool a.jpg",
+    "exiftool -Comment=hi a.jpg"
+   ],
+   "ctf_use": "元数据里藏 flag/提示是常见设计",
+   "url": "https://exiftool.org/"
+  },
+  {
+   "name": "pngcheck",
+   "aliases": [],
+   "cats": [
+    "misc"
+   ],
+   "desc": "PNG 结构校验（损坏的块/CRC）",
+   "install": {
+    "pacman": "pngcheck"
+   },
+   "usage": [
+    "pngcheck -v a.png"
+   ],
+   "ctf_use": "尺寸被改/CRC 不对时看它报哪一块错",
+   "url": "http://www.libpng.org/pub/png/apps/pngcheck.html"
+  },
+  {
+   "name": "bkcrack",
+   "aliases": [],
+   "cats": [
+    "misc"
+   ],
+   "desc": "ZipCrypto 已知明文攻击（破 zip 密码）",
+   "install": {
+    "pacman": "bkcrack",
+    "git": "https://github.com/kimci86/bkcrack"
+   },
+   "usage": [
+    "bkcrack -C f.zip -c inner.txt -p known.txt",
+    "bkcrack -C f.zip -k <key> -U unlocked.zip newpass"
+   ],
+   "ctf_use": "有 12 字节已知明文即可秒破 zip（比字典快几个数量级）",
+   "url": "https://github.com/kimci86/bkcrack"
+  },
+  {
+   "name": "john",
+   "aliases": [
+    "john-the-ripper"
+   ],
+   "cats": [
+    "hash",
+    "misc"
+   ],
+   "desc": "John the Ripper（含 *2john 系列）",
+   "install": {
+    "pacman": "john"
+   },
+   "usage": [
+    "zip2john f.zip > h.txt && john --wordlist=wl.txt h.txt",
+    "john --show h.txt"
+   ],
+   "ctf_use": "压缩包/文档/影子文件的口令爆破统一入口",
+   "url": "https://www.openwall.com/john/",
+   "dup_of": "hashcat（CPU/GPU 之分，都可留）"
+  },
+  {
+   "name": "hashcat",
+   "aliases": [],
+   "cats": [
+    "hash"
+   ],
+   "desc": "GPU 哈希爆破（模式丰富）",
+   "install": {
+    "pacman": "hashcat"
+   },
+   "usage": [
+    "hashcat -m 0 -a 0 h.txt wl.txt -O",
+    "hashcat -m 11600 h.txt wl.txt   # 7z"
+   ],
+   "ctf_use": "有 GPU 时比 john 快；-m 用错模式=白跑，先 hashid",
+   "note": "题目环境下别忘加 --force 之外的限速选项",
+   "url": "https://hashcat.net/hashcat/"
+  },
+  {
+   "name": "hashid",
+   "aliases": [
+    "hash-identifier"
+   ],
+   "cats": [
+    "hash"
+   ],
+   "desc": "哈希类型识别",
+   "install": {
+    "pip": "hashid",
+    "pacman": "hash-identifier"
+   },
+   "usage": [
+    "hashid e10adc3949ba59abbe56e057f20f883e"
+   ],
+   "ctf_use": "先认类型再选 hashcat -m",
+   "url": "https://github.com/psypanda/hashID",
+   "dup_of": "haiti"
+  },
+  {
+   "name": "hydra",
+   "aliases": [],
+   "cats": [
+    "hash",
+    "net"
+   ],
+   "desc": "在线口令爆破（http/ssh/ftp…）",
+   "install": {
+    "pacman": "hydra"
+   },
+   "usage": [
+    "hydra -l admin -P wl.txt \"$U\" http-post-form \"/login:u=^USER^&p=^PASS^:F=invalid\""
+   ],
+   "ctf_use": "有登录点且允许爆破时；优先试题目主题词小字典",
+   "url": "https://github.com/vanhauser-thc/thc-hydra"
+  },
+  {
+   "name": "wireshark",
+   "aliases": [
+    "tshark"
+   ],
+   "cats": [
+    "forensics",
+    "net"
+   ],
+   "desc": "流量分析（GUI + tshark CLI）",
+   "install": {
+    "pacman": "wireshark-qt"
+   },
+   "usage": [
+    "tshark -r a.pcap -q -z conv,tcp",
+    "tshark -r a.pcap --export-objects http,./out"
+   ],
+   "ctf_use": "流量题主力：追流/导出对象/看协议字段",
+   "url": "https://www.wireshark.org/"
+  },
+  {
+   "name": "volatility3",
+   "aliases": [
+    "vol",
+    "volatility"
+   ],
+   "cats": [
+    "forensics"
+   ],
+   "desc": "内存镜像取证",
+   "install": {
+    "pip": "volatility3",
+    "pacman": "volatility3"
+   },
+   "usage": [
+    "vol -f mem.raw windows.pslist",
+    "vol -f mem.raw windows.filescan | grep -i flag"
+   ],
+   "ctf_use": "内存镜像题：先 imageinfo → pslist/filescan/strings",
+   "url": "https://github.com/volatilityfoundation/volatility3"
+  },
+  {
+   "name": "sleuthkit",
+   "aliases": [
+    "autopsy"
+   ],
+   "cats": [
+    "forensics"
+   ],
+   "desc": "磁盘镜像取证（分区/文件系统/恢复）",
+   "install": {
+    "pacman": "sleuthkit"
+   },
+   "usage": [
+    "fls -r disk.img",
+    "icat disk.img <inode> > out.bin",
+    "mmls disk.img"
+   ],
+   "ctf_use": "磁盘镜像题：分区 → 列文件 → 导出 inode",
+   "url": "https://www.sleuthkit.org/"
+  },
+  {
+   "name": "testdisk",
+   "aliases": [
+    "photorec"
+   ],
+   "cats": [
+    "forensics"
+   ],
+   "desc": "分区恢复/删除文件恢复",
+   "install": {
+    "pacman": "testdisk"
+   },
+   "usage": [
+    "testdisk disk.img",
+    "photorec disk.img"
+   ],
+   "ctf_use": "被删文件/坏分区表题的兜底",
+   "url": "https://www.cgsecurity.org/wiki/TestDisk"
+  },
+  {
+   "name": "bulk_extractor",
+   "aliases": [],
+   "cats": [
+    "forensics"
+   ],
+   "desc": "批量特征提取（信用卡/邮箱/URL…）",
+   "install": {
+    "pacman": "bulk-extractor",
+    "git": "https://github.com/simsong/bulk_extractor"
+   },
+   "usage": [
+    "bulk_extractor -o out/ disk.img"
+   ],
+   "ctf_use": "大镜像里捞 flag 样式串比 strings 聪明",
+   "url": "https://github.com/simsong/bulk_extractor"
+  },
+  {
+   "name": "audacity",
+   "aliases": [],
+   "cats": [
+    "misc"
+   ],
+   "desc": "音频编辑 + 频谱图",
+   "install": {
+    "pacman": "audacity"
+   },
+   "usage": [
+    "audacity a.wav   # Analyze → Plot Spectrum"
+   ],
+   "ctf_use": "音频隐写第一步：看频谱里有没有画字/二维码",
+   "url": "https://www.audacityteam.org/"
+  },
+  {
+   "name": "sox",
+   "aliases": [
+    "ffmpeg"
+   ],
+   "cats": [
+    "misc"
+   ],
+   "desc": "音频命令行处理（生成频谱图）",
+   "install": {
+    "pacman": "sox"
+   },
+   "usage": [
+    "sox a.wav -n spectrogram -o spec.png"
+   ],
+   "ctf_use": "无 GUI 环境也能出频谱图",
+   "url": "https://sox.sourceforge.net/"
+  },
+  {
+   "name": "sqlitebrowser",
+   "aliases": [
+    "sqlcipher",
+    "sqlite3"
+   ],
+   "cats": [
+    "misc",
+    "web"
+   ],
+   "desc": "SQLite 查看/查询（含加密变体）",
+   "install": {
+    "pacman": "sqlitebrowser"
+   },
+   "usage": [
+    "sqlite3 a.db '.tables'",
+    "sqlcipher a.db \"PRAGMA key='x'; .tables\""
+   ],
+   "ctf_use": ".db 附件直接查表；打不开就考虑 SQLCipher/WAL",
+   "url": "https://sqlitebrowser.org/"
+  },
+  {
+   "name": "7zip",
+   "aliases": [
+    "p7zip",
+    "unar"
+   ],
+   "cats": [
+    "misc"
+   ],
+   "desc": "压缩包解压（格式最全）",
+   "install": {
+    "pacman": "7zip"
+   },
+   "usage": [
+    "7z l a.zip",
+    "7z x a.zip -oout/ -y"
+   ],
+   "ctf_use": "嵌套/伪加密/怪后缀都先交给它试",
+   "url": "https://www.7-zip.org/"
+  },
+  {
+   "name": "CyberChef",
+   "aliases": [
+    "cyberchef"
+   ],
+   "cats": [
+    "data",
+    "online"
+   ],
+   "desc": "编码/加密/数据变换瑞士军刀",
+   "install": {
+    "pacman": "cyberchef",
+    "git": "https://github.com/gchq/CyberChef"
+   },
+   "usage": [
+    "# 本地版：cyberchef --serve 或直接用官网；魔法棒自动识别多层编码"
+   ],
+   "ctf_use": "编码题的默认答案（也可离线部署，题目敏感时别用在线版）",
+   "url": "https://gchq.github.io/CyberChef/"
+  },
+  {
+   "name": "ciphey",
+   "aliases": [],
+   "cats": [
+    "data"
+   ],
+   "desc": "自动多层解码（AI 猜编码）",
+   "install": {
+    "pip": "ciphey"
+   },
+   "usage": [
+    "ciphey -t '5L2g5aW9'",
+    "ciphey -f enc.txt"
+   ],
+   "ctf_use": "拿到一串不知道是什么，先让它猜一遍",
+   "url": "https://github.com/Ciphey/Ciphey"
+  },
+  {
+   "name": "sage",
+   "aliases": [
+    "sagemath"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "数学计算环境（格/数论/椭圆曲线）",
+   "install": {
+    "pacman": "sagemath"
+   },
+   "usage": [
+    "sage -c 'print(factor(2^64+1))'",
+    "sage -c 'M=Matrix(ZZ,[[1,2],[3,4]]);print(M.LLL())'"
+   ],
+   "ctf_use": "格攻击/复杂数论题绕不开；小题目用 python+gmpy2 就够",
+   "note": "包很大（几个 G），不常用就先别装",
+   "url": "https://www.sagemath.org/"
+  },
+  {
+   "name": "RsaCtfTool",
+   "aliases": [
+    "rsactftool"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "RSA 攻击自动化（十几种攻击全试）",
+   "install": {
+    "git": "https://github.com/RsaCtfTool/RsaCtfTool",
+    "pip": "RsaCtfTool"
+   },
+   "usage": [
+    "python3 RsaCtfTool.py --publickey pub.pem --uncipherfile c.txt"
+   ],
+   "ctf_use": "不知道是哪种 RSA 攻击时的第一条命令",
+   "url": "https://github.com/RsaCtfTool/RsaCtfTool"
+  },
+  {
+   "name": "gmpy2",
+   "aliases": [
+    "pycryptodome"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "大整数/数论运算（写攻击脚本用）",
+   "install": {
+    "pip": "gmpy2"
+   },
+   "usage": [
+    "python3 -c \"import gmpy2;print(gmpy2.iroot(27,3))\""
+   ],
+   "ctf_use": "开方/求逆/素数判定；配合 pycryptodome 处理 AES/RSA",
+   "url": "https://github.com/aleaxit/gmpy2"
+  },
+  {
+   "name": "yafu",
+   "aliases": [
+    "msieve"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "整数分解（比纯 Python 快）",
+   "install": {
+    "pacman": "yafu",
+    "git": "https://github.com/bbuhrow/yafu"
+   },
+   "usage": [
+    "yafu \"factor(0x1234...)\"",
+    "yafu -batchfile n.txt"
+   ],
+   "ctf_use": "n 不大但 Fermat/Pollard 都不行时的分解工具",
+   "url": "https://github.com/bbuhrow/yafu"
+  },
+  {
+   "name": "factordb",
+   "aliases": [
+    "factordb-pycli"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "在线大数分解库（查已知分解）",
+   "install": {
+    "pip": "factordb-python"
+   },
+   "usage": [
+    "python3 -c \"from factordb.factordb import FactorDB;f=FactorDB(n);f.connect();print(f.get_factor_list())\""
+   ],
+   "ctf_use": "题目用公开大数时的第一步（秒出）",
+   "url": "http://factordb.com/"
+  },
+  {
+   "name": "nmap",
+   "aliases": [],
+   "cats": [
+    "recon",
+    "net"
+   ],
+   "desc": "端口/服务/版本扫描",
+   "install": {
+    "pacman": "nmap"
+   },
+   "usage": [
+    "nmap -sV -Pn -p- --min-rate 1000 host",
+    "nmap -sV -p 80,8080 --script http-title host"
+   ],
+   "ctf_use": "给 IP/多端口靶机时先看清有哪些服务",
+   "note": "多数比赛禁全网段扫描；只打题目给的目标",
+   "url": "https://nmap.org/"
+  },
+  {
+   "name": "masscan",
+   "aliases": [],
+   "cats": [
+    "recon",
+    "net"
+   ],
+   "desc": "超高速端口扫描",
+   "install": {
+    "pacman": "masscan"
+   },
+   "usage": [
+    "masscan -p1-65535 --rate 1000 host"
+   ],
+   "ctf_use": "大范围端口确认（注意合规与限速）",
+   "url": "https://github.com/robertdavidgraham/masscan"
+  },
+  {
+   "name": "netcat",
+   "aliases": [
+    "nc",
+    "ncat",
+    "socat"
+   ],
+   "cats": [
+    "net",
+    "pwn"
+   ],
+   "desc": "网络瑞士军刀（连靶机/起监听）",
+   "install": {
+    "pacman": "openbsd-netcat"
+   },
+   "usage": [
+    "nc -v host 1337",
+    "ncat -lvnp 4444",
+    "socat TCP-LISTEN:1337,reuseaddr,fork EXEC:./chal"
+   ],
+   "ctf_use": "手动交互 pwn 服务/搭本地起服务用 socat",
+   "url": "https://github.com/nmap/ncat"
+  },
+  {
+   "name": "proxychains-ng",
+   "aliases": [
+    "proxychains"
+   ],
+   "cats": [
+    "net"
+   ],
+   "desc": "让任意命令走代理",
+   "install": {
+    "pacman": "proxychains-ng"
+   },
+   "usage": [
+    "proxychains4 -q ctfctl req get \"$U/\""
+   ],
+   "ctf_use": "换出口/进内网时的通用包装",
+   "url": "https://github.com/rofl0r/proxychains-ng"
+  },
+  {
+   "name": "chisel",
+   "aliases": [
+    "ligolo-ng"
+   ],
+   "cats": [
+    "net",
+    "post"
+   ],
+   "desc": "隧道/端口转发（穿透内网）",
+   "install": {
+    "go": "github.com/jpillora/chisel@latest"
+   },
+   "usage": [
+    "chisel server -p 8000 --reverse",
+    "chisel client host:8000 R:8080:127.0.0.1:80"
+   ],
+   "ctf_use": "拿到跳板后把内网端口拉出来",
+   "url": "https://github.com/jpillora/chisel"
+  },
+  {
+   "name": "aircrack-ng",
+   "aliases": [],
+   "cats": [
+    "wireless"
+   ],
+   "desc": "WiFi 抓包与破解（WPA 握手）",
+   "install": {
+    "pacman": "aircrack-ng"
+   },
+   "usage": [
+    "aircrack-ng -w wl.txt cap.cap"
+   ],
+   "ctf_use": "无线题：看有什么网 → 抓包 → 爆破握手",
+   "note": "多数比赛不许真攻击无线；题目给的是抓包文件就只用离线部分",
+   "url": "https://www.aircrack-ng.org/"
+  },
+  {
+   "name": "bettercap",
+   "aliases": [],
+   "cats": [
+    "net",
+    "wireless"
+   ],
+   "desc": "网络嗅探/ARP/MITM 框架",
+   "install": {
+    "pacman": "bettercap"
+   },
+   "usage": [
+    "bettercap -iface eth0 -eval \"net.probe on; net.show\""
+   ],
+   "ctf_use": "内网嗅探与中间人（需授权环境）",
+   "url": "https://www.bettercap.org/"
+  },
+  {
+   "name": "gnuradio",
+   "aliases": [
+    "gqrx",
+    "urh",
+    "rtl-sdr"
+   ],
+   "cats": [
+    "wireless"
+   ],
+   "desc": "软件无线电（SDR 信号处理）",
+   "install": {
+    "pacman": "gnuradio"
+   },
+   "usage": [
+    "gqrx   # 扫频 + 解调（IQ 文件题常用 Universal Radio Hacker）"
+   ],
+   "ctf_use": "SDR/IQ 文件题：先看瀑布图，再解调制",
+   "url": "https://www.gnuradio.org/"
+  },
+  {
+   "name": "frida-android",
+   "aliases": [
+    "objection"
+   ],
+   "cats": [
+    "mobile",
+    "rev"
+   ],
+   "desc": "安卓运行时 hook/绕过检测",
+   "install": {
+    "pip": "objection"
+   },
+   "usage": [
+    "objection -g com.app explore",
+    "frida -U -f com.app -l bypass.js"
+   ],
+   "ctf_use": "APK 有 root 检测/校验在 native 层时用",
+   "url": "https://github.com/sensepost/objection"
+  },
+  {
+   "name": "adb",
+   "aliases": [
+    "android-tools"
+   ],
+   "cats": [
+    "mobile"
+   ],
+   "desc": "安卓调试桥（装包/拉文件/看日志）",
+   "install": {
+    "pacman": "android-tools"
+   },
+   "usage": [
+    "adb devices",
+    "adb install app.apk",
+    "adb shell pm list packages"
+   ],
+   "ctf_use": "连模拟器/真机：装 APK、拉数据库、模拟输入",
+   "url": "https://developer.android.com/tools/adb"
+  },
+  {
+   "name": "amass",
+   "aliases": [
+    "subfinder",
+    "assetfinder"
+   ],
+   "cats": [
+    "osint",
+    "recon"
+   ],
+   "desc": "子域名/资产发现",
+   "install": {
+    "pacman": "amass",
+    "go": "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
+   },
+   "usage": [
+    "subfinder -d example.com -silent",
+    "amass enum -passive -d example.com"
+   ],
+   "ctf_use": "OSINT 题找隐藏子域/资产",
+   "url": "https://github.com/owasp-amass/amass"
+  },
+  {
+   "name": "theHarvester",
+   "aliases": [],
+   "cats": [
+    "osint"
+   ],
+   "desc": "邮箱/主机/泄露信息收集",
+   "install": {
+    "pacman": "theharvester",
+    "pip": "theHarvester"
+   },
+   "usage": [
+    "theHarvester -d example.com -b duckduckgo,bing -l 200"
+   ],
+   "ctf_use": "人肉/情报题的起点",
+   "url": "https://github.com/laramies/theHarvester"
+  },
+  {
+   "name": "sherlock",
+   "aliases": [
+    "maigret",
+    "holehe"
+   ],
+   "cats": [
+    "osint"
+   ],
+   "desc": "跨站点用户名/邮箱画像",
+   "install": {
+    "pip": "sherlock-project"
+   },
+   "usage": [
+    "sherlock username",
+    "holehe mail@example.com"
+   ],
+   "ctf_use": "给了用户名/邮箱要查踪迹",
+   "url": "https://github.com/sherlock-project/sherlock",
+   "dup_of": "Maigret"
+  },
+  {
+   "name": "gitleaks",
+   "aliases": [
+    "trufflehog"
+   ],
+   "cats": [
+    "web",
+    "osint"
+   ],
+   "desc": "从 git 仓库历史里捞密钥",
+   "install": {
+    "pacman": "gitleaks",
+    "go": "github.com/gitleaks/gitleaks/v8@latest"
+   },
+   "usage": [
+    "gitleaks detect -v --source ./repo"
+   ],
+   "ctf_use": "拿到 .git 或公开仓库时先扫密钥与历史提交",
+   "url": "https://github.com/gitleaks/gitleaks"
+  },
+  {
+   "name": "git-dumper",
+   "aliases": [],
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "从网站把 .git 整个拉下来",
+   "install": {
+    "pip": "git-dumper"
+   },
+   "usage": [
+    "git-dumper \"$U/.git/\" ./dump && cd dump && git log --all --oneline"
+   ],
+   "ctf_use": ".git 泄露题的标准打法（再看 stash/悬空对象）",
+   "url": "https://github.com/arthaud/git-dumper"
+  },
+  {
+   "name": "PayloadsAllTheThings",
+   "aliases": [
+    "payloads"
+   ],
+   "cats": [
+    "web",
+    "data"
+   ],
+   "desc": "各类 payload 与绕过速查（离线仓库）",
+   "install": {
+    "git": "https://github.com/swisskyrepo/PayloadsAllTheThings"
+   },
+   "usage": [
+    "grep -ri \"file upload\" PayloadsAllTheThings/ | head"
+   ],
+   "ctf_use": "当手册查，不当炮台用（判断仍在人这边）",
+   "url": "https://github.com/swisskyrepo/PayloadsAllTheThings"
+  },
+  {
+   "name": "ctf-tools",
+   "aliases": [
+    "zardus-ctf-tools"
+   ],
+   "cats": [
+    "misc"
+   ],
+   "desc": "CTF 工具安装脚本合集（zardus）",
+   "install": {
+    "git": "https://github.com/zardus/ctf-tools"
+   },
+   "usage": [
+    "./install stegsolve && ./install pwn && ls bin/"
+   ],
+   "ctf_use": "一次性把 misc/rev/crypto 常用工具装齐（每个工具落 bin/）",
+   "url": "https://github.com/zardus/ctf-tools"
+  },
+  {
+   "name": "pwninit",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "自动配好题目给的 libc/ld 与 patch",
+   "install": {
+    "cargo": "pwninit"
+   },
+   "usage": [
+    "pwninit --bin ./chal --libc ./libc.so.6"
+   ],
+   "ctf_use": "省掉手写 patchelf 与拷贝 ld 的功夫",
+   "url": "https://github.com/io12/pwninit"
+  },
+  {
+   "name": "one_gadget+libc-database",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "（见 one_gadget / libc-database 两条）",
+   "install": {},
+   "usage": [],
+   "ctf_use": "占位说明，无需安装",
+   "url": ""
+  },
+  {
+   "name": "x64dbg",
+   "aliases": [
+    "dnspy",
+    "ilspy"
+   ],
+   "cats": [
+    "rev"
+   ],
+   "desc": "Windows 动态调试/.NET 反编译",
+   "install": {
+    "git": "https://github.com/dnSpy/dnSpy"
+   },
+   "usage": [
+    "# Windows 侧：x64dbg 调 PE，dnSpy 直接反编译 .NET 并改 IL"
+   ],
+   "ctf_use": "PE/.NET 逆向题（.NET 题常直接 dnSpy 改判定）",
+   "url": "https://github.com/x64dbg/x64dbg"
+  },
+  {
+   "name": "qemu-user",
+   "aliases": [
+    "qemu"
+   ],
+   "cats": [
+    "pwn",
+    "rev"
+   ],
+   "desc": "异构架构运行/调试（mips/arm…）",
+   "install": {
+    "pacman": "qemu-user"
+   },
+   "usage": [
+    "qemu-mipsel -L /usr/mipsel-linux-gnu ./chal",
+    "qemu-arm -g 1234 ./chal"
+   ],
+   "ctf_use": "非 x86 二进制题的运行与调试（配合 -g 上 gdb-multiarch）",
+   "url": "https://www.qemu.org/"
+  },
+  {
+   "name": "ropstar",
+   "aliases": [],
+   "cats": [
+    "pwn"
+   ],
+   "desc": "自动生成 ROP 链（省手写）",
+   "install": {
+    "pip": "ropstar"
+   },
+   "usage": [
+    "python3 -c \"from ropstar import *;print(chain)\""
+   ],
+   "ctf_use": "x86_64 自动 ROP；先手工理解再省事",
+   "url": "https://github.com/CptGibbon/ropstar"
+  },
+  {
+   "name": "haiti",
+   "aliases": [
+    "hash-identifier"
+   ],
+   "cats": [
+    "hash",
+    "crypto"
+   ],
+   "dup_of": "hashid",
+   "desc": "哈希类型识别（比 hashid 新，Ruby）",
+   "install": {
+    "gem": "haiti"
+   },
+   "usage": [
+    "haiti e10adc3949ba59abbe56e057f20f883e"
+   ],
+   "ctf_use": "先认类型再选 hashcat -m（与 hashid 二选一）",
+   "url": "https://github.com/noraj/haiti"
+  },
+  {
+   "name": "FLOSS",
+   "aliases": [
+    "flare-floss"
+   ],
+   "cats": [
+    "rev"
+   ],
+   "desc": "自动解混淆并提取隐藏字符串（恶意样本/加壳程序）",
+   "install": {
+    "pip": "flare-floss"
+   },
+   "usage": [
+    "floss ./chal",
+    "floss -n 6 ./chal"
+   ],
+   "ctf_use": "rev 题里 strings 一片空白时用它（能跑栈字符串、解简单混淆）",
+   "url": "https://github.com/mandiant/flare-floss"
+  },
+  {
+   "name": "xortool",
+   "aliases": [],
+   "cats": [
+    "crypto",
+    "misc"
+   ],
+   "desc": "单字节/多字节异或密钥与明文推测",
+   "install": {
+    "pip": "xortool"
+   },
+   "usage": [
+    "xortool -c 20 cipher.bin",
+    "xortool -l 8 -c 20 cipher.bin"
+   ],
+   "ctf_use": "密文没头绪但疑是异或时；比手写爆破快",
+   "url": "https://github.com/hellman/xortool"
+  },
+  {
+   "name": "hash_extender",
+   "aliases": [
+    "hashpump"
+   ],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "哈希长度扩展攻击（H(secret+msg) 型 MAC）",
+   "install": {
+    "go": "github.com/iagox86/hash_extender@latest",
+    "git": "https://github.com/iagox86/hash_extender"
+   },
+   "usage": [
+    "hash_extender --data 'user=guest' --secret 16 --append '&admin=1' --format sha256 --signature <原签名>"
+   ],
+   "ctf_use": "签名是 md5/sha1(secret+msg) 时的标准打法（HMAC 不适用）",
+   "url": "https://github.com/iagox86/hash_extender"
+  },
+  {
+   "name": "oletools",
+   "aliases": [
+    "olevba"
+   ],
+   "cats": [
+    "misc",
+    "forensics"
+   ],
+   "desc": "Office/OLE 文档分析（宏、VBA、嵌入对象）",
+   "install": {
+    "pip": "oletools"
+   },
+   "usage": [
+    "olevba doc.docm",
+    "oleid doc.docx",
+    "oledump.py -i doc.doc"
+   ],
+   "ctf_use": "给 .doc/.xls 附件时的第一步（宏里常藏 flag 或下载地址）",
+   "url": "https://github.com/decalage2/oletools"
+  },
+  {
+   "name": "crypto-attacks",
+   "aliases": [],
+   "cats": [
+    "crypto"
+   ],
+   "desc": "系统化的密码攻击实现集（RSA/ECC/格/PRNG，需 Sage）",
+   "install": {
+    "git": "https://github.com/jvdsn/crypto-attacks"
+   },
+   "usage": [
+    "sage -python attacks/rsa/hastad.py ...",
+    "ls attacks/"
+   ],
+   "ctf_use": "RsaCtfTool 没覆盖的攻击（格、Coppersmith 变体）来这里翻现成脚本",
+   "url": "https://github.com/jvdsn/crypto-attacks"
+  },
+  {
+   "name": "Maigret",
+   "aliases": [],
+   "cats": [
+    "osint"
+   ],
+   "dup_of": "sherlock",
+   "desc": "跨站用户名检索 + 报告（Sherlock 增强）",
+   "install": {
+    "pip": "maigret"
+   },
+   "usage": [
+    "maigret username --json ndjson"
+   ],
+   "ctf_use": "OSINT 题查人，比 sherlock 多报告与更多站点",
+   "url": "https://github.com/soxoj/maigret"
+  },
+  {
+   "name": "GHunt",
+   "aliases": [],
+   "cats": [
+    "osint"
+   ],
+   "desc": "Google 账号信息调查（需要 cookie）",
+   "install": {
+    "pip": "ghunt"
+   },
+   "usage": [
+    "ghunt email user@gmail.com"
+   ],
+   "ctf_use": "题目出现 gmail 时能挖出公开资料",
+   "url": "https://github.com/mxrch/GHunt"
+  },
+  {
+   "name": "SpiderFoot",
+   "aliases": [],
+   "cats": [
+    "osint",
+    "recon"
+   ],
+   "desc": "自动化 OSINT 扫描（200+ 模块，可 CLI/Web）",
+   "install": {
+    "pip": "spiderfoot"
+   },
+   "usage": [
+    "spiderfoot -s example.com -m all"
+   ],
+   "ctf_use": "大范围 OSINT 题；小题目别用它（慢）",
+   "url": "https://github.com/smicallef/spiderfoot"
+  },
+  {
+   "name": "CTFCrackTools",
+   "aliases": [
+    "ctfcracktools-x"
+   ],
+   "cats": [
+    "crypto",
+    "misc"
+   ],
+   "desc": "桌面 CTF 工具箱（节点式工作流，43+ 编解码/古典密码/哈希算法）",
+   "install": {
+    "git": "https://github.com/0Chencc/CTFCrackTools"
+   },
+   "usage": [
+    "# 下载 Releases 里的对应平台可执行文件（Rust+React 重写版，<15MB）"
+   ],
+   "ctf_use": "想图形化拼编解码流程时用它；**GPL-3.0：只能参考功能与算法清单，不能把代码抄进本项目**",
+   "note": "作者自述是入门向工具；AES/DES 这类我们没实现的分组密码在它和 CyberChef 里都有",
+   "url": "https://github.com/0Chencc/CTFCrackTools"
+  },
+  {
+   "name": "CTF-WEB-TOOLS",
+   "aliases": [],
+   "cats": [
+    "web"
+   ],
+   "desc": "PHP+Python 的本地 Web 题分析控制台（批量目标、附件文本抽取、JS 线索、候选 flag 汇总）",
+   "install": {
+    "git": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+   },
+   "usage": [
+    "php -S 127.0.0.1:8000   # 进目录后跑；需要 PHP8 + Python3"
+   ],
+   "ctf_use": "需要「一堆目标批量粗筛 + 附件文本抽取」时值得一看；**仓库没写 LICENSE，只能参考思路**",
+   "note": "它的多编码解码（UTF-8/GBK/BIG5）与「外链 JS 里挖 API 路径」我们已吸收进 file/recon",
+   "url": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+  }
+ ]
 }

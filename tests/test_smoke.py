@@ -373,6 +373,57 @@ def main() -> int:
         except subprocess.TimeoutExpired:
             wproc.kill()
 
+        print("\n[19] codec：编码族 / 古典密码 / 哈希 / 提取（已知向量）")
+        vec = [("b64", ["b64", "hello"], "aGVsbG8="),
+               ("b32", ["b32", "hello"], "NBSWY3DP"),
+               ("b58", ["b58", "hello"], "Cn8eVZg"),
+               ("b85", ["b85", "hello"], "Xk~0{Zv"),
+               ("b85d", ["b85d", "Xk~0{Zv"], "hello"),
+               ("rot13", ["rot13", "Uryyb"], "Hello"),
+               ("morse", ["morse", "SOS"], "... --- ..."),
+               ("morsed", ["morsed", "... --- ..."], "SOS"),
+               ("binaryd", ["binaryd", "01001000 01101001"], "Hi"),
+               ("hash md5", ["hash", "md5", "abc"], "900150983cd24fb0d6963f7d28e17f72"),
+               ("hash sha256", ["hash", "sha256", "abc"],
+                "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),
+               ("hmac-sha256", ["hash", "hmac-sha256", "hello", "--key", "key"],
+                "9307b3b915efb5171ff14d8cb55fbcc798c6c0ef1456d66ded1a6aa723a58b7b"),
+               # RC4 已知向量：key=Key, plaintext=Plaintext → BBF316E8D940AF0AD3
+               ("rc4", ["cipher", "rc4", "Plaintext", "--key", "Key"], "bbf316e8d940af0ad3"),
+               ("rc4 解密", ["cipher", "rc4", "bbf316e8d940af0ad3", "--key", "Key", "--decrypt"], "Plaintext"),
+               ("vigenere", ["cipher", "vigenere", "ATTACKATDAWN", "--key", "LEMON"], "LXFOPVEFRNHR"),
+               ("vigenere 解密", ["cipher", "vigenere", "LXFOPVEFRNHR", "--key", "LEMON", "--decrypt"], "ATTACKATDAWN"),
+               ("railfence", ["cipher", "railfence", "WEAREDISCOVEREDFLEEATONCE", "--rails", "3"],
+                "WECRLTEERDSOEEFEAOCAIVDEN"),
+               ("railfence 解密", ["cipher", "railfence", "WECRLTEERDSOEEFEAOCAIVDEN", "--rails", "3", "--decrypt"],
+                "WEAREDISCOVEREDFLEEATONCE"),
+               ("affine", ["cipher", "affine", "AFFINECIPHER", "--a", "5", "--b", "8"], "IHHWVCSWFRCP"),
+               # Beaufort 教科书向量（Wikipedia 例）
+               ("beaufort", ["cipher", "beaufort", "DEFENDTHEEASTWALLOFTHECASTLE", "--key", "FORTIFICATION"],
+                "CKMPVCPVWPIWUJOGIUAPVWRIWUUK"),
+               ("atbash", ["cipher", "atbash", "SVOOL"], "HELLO"),
+               ]
+        for name, argv, want in vec:
+            r = cli("codec", *argv)
+            check(f"codec {name}", want in r.stdout, f"want {want!r} got {r.stdout[:120]!r} {r.stderr[:120]!r}")
+        # 参数顺序兜底：文本写在选项后面也要能跑
+        r = cli("codec", "cipher", "caesar", "--shift", "3", "KHOOR")
+        check("codec：文本写在选项后面也能跑", "NKRRU" in r.stdout and "unrecognized" not in r.stderr, r.stdout + r.stderr)
+        r = cli("codec", "cipher", "playfair", "HIDETHEGOLDINTHETREESTUMP", "--key", "PLAYFAIR")
+        check("codec playfair 出密文", len(r.stdout.strip()) >= 20, r.stdout[:120])
+        enc = cli("codec", "cipher", "xor", "hello", "--key", "k")
+        dec = cli("codec", "cipher", "xor", enc.stdout.strip(), "--key", "k", "--decrypt")
+        check("codec xor 往返（加密→hex→解密）", enc.returncode == 0 and "hello" in dec.stdout,
+              f"enc={enc.stdout[:60]!r} dec={dec.stdout[:60]!r}")
+        r = cli("codec", "guess", "aGVsbG8gd29ybGQ=")
+        check("codec guess 认出 base64", "hello world" in r.stdout, r.stdout[:200])
+        r = cli("codec", "guess", "900150983cd24fb0d6963f7d28e17f72")
+        check("codec guess 认出 MD5 并给 hashcat 模式", "MD5" in r.stdout and "-m 0" in r.stdout, r.stdout[:200])
+        r = cli("codec", "extract", "--flags", "--urls", "--emails",
+                "flag{a_b} see https://x.io/p mail a@b.com")
+        check("codec extract 捞 flag/URL/邮箱", "flag{a_b}" in r.stdout and "https://x.io/p" in r.stdout
+              and "a@b.com" in r.stdout, r.stdout[:300])
+
     finally:
         srv.terminate()
         try:

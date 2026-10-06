@@ -149,10 +149,35 @@ ctfctl export md     [...] [--title T] [--lines 12] [--max-chars N] [--note] [--
 ```
 ctfctl cookie list|set|del|raw|flask-unsign|flask-sign     cookie jar + Flask session 爆破与伪造
 ctfctl jwt    decode|sign|crack [--base URL --name credential]   解 / 改字段重签 / 爆破密钥
-ctfctl codec  b64|b64d|url|urld|hex|hexd|guess             编解码（不给参数读 stdin）
 ctfctl note   new|import                                   九段模板 writeup / 报告进 vault
 ctfctl rules  list|test|check                              规则表查看 / 离线试匹配 / 体检
 ```
+
+### codec —— 编解码 / 古典密码 / 哈希 / 提取（对标 CTFCrackTools + CyberChef 的常用面）
+```
+# 编码族（可逆的都成对）
+ctfctl codec b64|b64d  b32|b32d  b85|b85d  a85|a85d  b58|b58d  hex|hexd  uu|uud
+             url|urld  rot13  rot47  binary|binaryd  morse|morsed  brainfuck
+             unicode|unicoded  htmld  guess
+
+# 古典密码与流密码（标准测试向量都过了：Beaufort/RC4 用的是教科书向量）
+ctfctl codec cipher caesar   "KHOOR" --shift 3 | --brute        # 凯撒，--brute 打 26 个位移
+ctfctl codec cipher atbash   "SVOOL"
+ctfctl codec cipher vigenere "LXFOPVEFRNHR" --key LEMON --decrypt
+ctfctl codec cipher beaufort "DEFENDTHEEASTWALLOFTHECASTLE" --key FORTIFICATION
+ctfctl codec cipher railfence "WEAREDISCOVEREDFLEEATONCE" --rails 3 [--decrypt]
+ctfctl codec cipher affine   "AFFINECIPHER" --a 5 --b 8 [--decrypt]
+ctfctl codec cipher bacon    "AABAB..." [--decrypt] · polybius · playfair --key MONARCHY [--decrypt]
+ctfctl codec cipher xor      "hello" --key k            # → hex；--decrypt 时输入 hex
+ctfctl codec cipher xor      --brute                    # 256 个单字节密钥按可打印率排序
+ctfctl codec cipher rc4      "Plaintext" --key Key | --decrypt
+
+# 哈希 / 提取
+ctfctl codec hash md5|sha1|sha256|sha512 [abc] · hmac-sha256 --key K · pbkdf2 --salt S --iters N
+ctfctl codec extract --flags --urls --emails --ipv4 --b64 --hex64 [--regex RE]   # 从大段文本里捞
+```
+- 只做**标准库能几行写完**的东西；AES/DES/更复杂的分组密码交给 `cyberchef` / `CTFCrackTools`（`ctfctl tools show cyberchef`）
+- 文本可以写在选项后面（`caesar --shift 3 KHOOR` 能跑）：首次解析失败时会自动重排参数顺序
 - `cookie flask-sign` 的时间戳**自动回拨 60s** —— Flask 不接受"比服务端新"的签名（会整块丢弃→500）
 - `jwt decode/sign` 可以 `--base URL --name credential` 直接从 cookie jar 里取令牌
 
@@ -229,7 +254,10 @@ ctfctl tools show ffuf              # 详情 + 安装命令 + 几条用法 + 踩
 ctfctl tools check [--missing]      # 扫本机（pacman -Qq + PATH）
 ctfctl tools install ffuf           # 只打印安装命令；--run 才执行；--manager pacman|pip|go…
 ```
-- 分类用的是 **Kali / BlackArch 的官方分类**（快照落 `ctfctl/data/tools.json`，每条工具记来源与抓取日期）
+- 分类用的是 **Kali / BlackArch 的官方分类**，两个来源都是权威数据而不是我手编：
+  - Kali 侧：`kali-meta` 的 29 个 `kali-tools-*` 元包，**它的 Depends 列表就是该分类的工具全集**（`tools show` 会打印工具属于哪些官方分类）
+  - BlackArch 侧：官方工具表 + pacman 库 `blackarch.db` 的 `%GROUPS%`（2860 条工具带 `blackarch-*` 分组）
+  - 中文说明/安装/用法来自人工维护的 `ctfctl/data/ctf-tools.json`（105 条，标 `★`；有同功能替代的标 `≠` 并写明「二选一」）
 - `✓` = 本机已装；`tools check --missing` 一次列出缺哪些 + 对应安装命令
 - 只做「索引 + 打印命令」：**不代跑利用、不自动下载**（`install --run` 是你显式按的）
 - 个人补充放 `~/.config/ctfctl/tools.json`（同 schema，追加不覆盖）
@@ -245,14 +273,17 @@ ctfctl kb sources              # 语料来源与统计口径（样本多大、�
 ```
 - 每张卡的 `corpus` 是**实测数字**：这条手法在这批语料里命中多少个 writeup 文件（怎么算出来的见 `scripts/harvest_writeups.py` 的 docstring）
 - 卡片和规则表是同一套东西的两面：**规则**给可粘贴命令，**卡片**讲清机制与信号（先"想"再"抄"）
-- **当前语料**（口径见下节；每跑一次 `count` 都会变）：sajjadium/ctf-writeups 57 篇 · Dvd848/CTFs 760 篇 · p4-team/ctf 864 篇 · ctf-wiki 739 篇 = **2420 个文本文件 / 25.3 MB**；命中文件数前列：编码 970、命令执行 697、RSA 252、AES 225、栈溢出 221（原始数字在 `research/kb-evidence.json`）
+- **当前语料**（口径见下节）：**7 套 / 3791 个文本文件 / 69 MB** —— Des-CTF-Knowledge 1093（中文 WP）· Dvd848/CTFs 760 · p4-team/ctf 864 · ctf-wiki 739 · balsn 145 · JorianWoltjer 133 · sajjadium 57；命中文件数前列：编码 1886、命令执行 1498、RSA 698、栈溢出 667、Java 反序列化 440、USB 流量 517（原始数字在 `research/kb-evidence.json`）
+- **32 张卡**覆盖 web / misc / pwn / rev / crypto / 取证：Java 反序列化、JNDI/Log4Shell、Python pickle、原型链污染、phar、无字母数字 RCE、伪随机预测、长度扩展、USB 键鼠流量、内存取证、逻辑越权…
 - 个人卡片放 `~/.config/ctfctl/kb.json`
 
 ### tui —— 工作台（见上面第 3 节 `tui` 的按键表）
 
 ### 语料统计（kb 的 `corpus` 数字怎么来的）
 ```bash
-python3 scripts/harvest_writeups.py fetch owner/repo [--mirror https://ghfast.top/]
+# 语料抓取（GitHub 直连 codeload 可用；raw 被掐时用 --mirror https://ghfast.top/）
+python3 scripts/harvest_writeups.py fetch Dest1ny-Sec/Des-CTF-Knowledge balsn/ctf_writeup \
+        Dvd848/CTFs p4-team/ctf ctf-wiki/ctf-wiki sajjadium/ctf-writeups JorianWoltjer/practical-ctf
 python3 scripts/harvest_writeups.py count --corpus ~/.cache/ctfctl/corpus/xxx --top 30 --json research/kb-evidence.json
 python3 scripts/harvest_writeups.py sources
 ```
@@ -345,7 +376,7 @@ def register(sub) -> None:
 ## 7. 测试
 
 ```bash
-cd ~/项目/ctf-tool && python3 tests/test_smoke.py        # 99 项断言（含 tools/kb/tui/file/go/web 接口）
+cd ~/项目/ctf-tool && python3 tests/test_smoke.py        # 127 项断言（含 tools/kb/tui/file/go/web/codec 向量）
 ```
 
 自带一个本地 demo 靶机（`tests/demo_server.py`），刻意复刻踩过的坑：
@@ -418,7 +449,23 @@ ctf-tool/
 爆破 flag 本身、赛后公开题解或共享 flag。
 自查材料：`replay` + `export` 的历史就是"我只对哪些 URL 发过请求"的证据链。
 
-## 10. 已知边界 / 路线
+## 10. 借鉴与致谢（不重复造轮子的地方）
+
+这类工具已经很多，本项目的原则是**能用别人的就用别人的，只自己写「胶水」与「判断」**：
+
+| 参考对象 | 借了什么 | 许可与边界 |
+|---|---|---|
+| [zardus/ctf-tools](https://github.com/zardus/ctf-tools)、BlackArch 官方工具表、Kali `kali-meta` | 工具清单与**官方分类体系**（元包 Depends / `%GROUPS%`） | 数据/事实，MIT 与官方公开数据 |
+| [CTFCrackTools](https://github.com/0Chencc/CTFCrackTools) | **算法清单的覆盖面**（Base 家族、古典密码、RC4 等该有哪些）→ 据此补齐 `codec` | GPL-3.0：**只看功能面，未复制任何代码** |
+| [CTF-WEB-TOOLS](https://github.com/ChenFu0604/CTF-WEB-TOOLS) | 两个思路：附件**多编码解码**、外链 **JS 里挖 API 路径/可疑变量** | 仓库无 LICENSE：只借思路 |
+| [ctf-wiki](https://github.com/ctf-wiki/ctf-wiki)、[Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)、[JorianWoltjer/practical-ctf](https://github.com/JorianWoltjer/practical-ctf) 等 writeup 语料 | **知识库的机制与手法词频**（`kb` 的 corpus 数字、`techniques.json` 的关键词表） | 只做统计与归纳，保留原文链接；不搬运正文 |
+| CyberChef / Ciphey / RsaCtfTool / ysoserial / Volatility3 等 | 直接用（`tools` 里给安装命令），不重写 | 各自许可见 `ctfctl tools show <名字>` |
+
+**边界**：GPL 项目的代码一行没抄；无 LICENSE 的项目只借想法；语料只做本地统计。发现更好的同类项目（或我们重复实现了什么）请提 issue。
+
+---
+
+## 11. 已知边界 / 路线
 
 - HTTP/2、WebSocket、非文本协议不支持；文件上传只给了命令模板。
 - `browser` 通道目前只覆盖 `ctfctl browser` 自己，`req/recon/fuzz` 还走本机出口
@@ -430,8 +477,9 @@ ctf-tool/
 
 ---
 
-## 11. 变更日志
+## 12. 变更日志
 
+- **1.2** — `codec` 大扩充（编码族 20+ 对、古典密码/流密码 11 种含 Playfair/Polybius/Bacon/Affine/Beaufort/Rail fence、哈希与 HMAC/PBKDF2、`extract` 批量捞 flag/URL/邮箱/哈希；全部过标准测试向量，RC4/Beaufort 用教科书向量校准）；`tools` 接入**权威分类数据**（kali-meta 29 个元包的 Depends + blackarch.db 的 `%GROUPS%`），人工条目扩到 105 条并加「同功能二选一」标注；`kb` 扩到 **32 张卡**、语料扩到 **7 套 3791 个文件**（含中文 Des-CTF-Knowledge）；参数顺序兜底与 `| head` 的 BrokenPipeError 修掉；测试 127 项
 - **1.1** — 默认界面改成 **WebUI 工作台**（`ctfctl web`，纯标准库 http.server + 单页应用）：键盘驱动（回车分析 / 1-9 跑建议 / i 敲命令 / k o u h c 看栏目）、动作带 why 与命令预览、只监听回环且非回环强制 token；把分析引擎抽成 `core/workbench.py`、栏目数据抽成 `core/browse.py`（TUI 与 WebUI 共用，行为不漂移）；新增 WebUI 接口测试（共 99 项断言）
 - **1.0** — 改名 `webctl` → **`ctfctl`**（旧名留作别名；cache/config 自动迁移）；裸跑进**工作台 TUI**（键盘驱动、按键执行建议）；新增 **`go`**（URL/文件一条命令出方向）、**`file`**（文件初筛：结构/内嵌/附加数据/伪加密/ELF 保护/熵/字符串 + 建议）、**`tools`**（2923 条工具目录：BlackArch 48 类 + Kali 官方分类元包 + 人工中文条目，含装没装与安装命令）、**`kb`**（21 张手法卡，带实测语料命中数）、**`advise` 建议引擎**（证据→why→可执行动作，带打分）、`data/techniques.json`、`scripts/harvest_writeups.py`（语料抓取+分来源词频统计）、`scripts/build_catalog.py`（工具目录生成）
 - **0.5** — 开源发布（https://github.com/Phirisyyds/ctfctl，MIT；镜像 DreamwalkerYYS/ctfctl）；`fuzz --safe`（并发≤5 / 间隔≥0.2s / 字典超上限拦下）；README 增加"比赛时怎么用（合规）"一节

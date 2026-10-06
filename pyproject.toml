@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctfctl"
-version = "1.1.0"
+version = "1.2.0"
 description = "CTF 工具箱：会话化请求 / 侦察 / 爆破 / 请求历史 / 重放 / 对比 / 录制导出 / 工具目录 / 知识库 / TUI（纯标准库，零依赖）"
 readme = "README.md"
 requires-python = ">=3.9"
