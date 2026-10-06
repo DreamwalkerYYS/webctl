@@ -1,0 +1,266 @@
+{
+  "_comment": "建议表：证据 → 方向 → 可执行动作。when 内各类条件 AND、同类内正则 OR；缺的类不限制。kind: web|file|text。next 的 kind：cmd（跑 ctfctl 子命令）/ shell（外部工具，TUI 里按回车执行）/ kb（看知识卡）/ tool（看工具条目）。{path} 会被替换成真实文件路径。",
+  "rules": [
+    {
+      "id": "web-baseline",
+      "name": "Web 题通用：改请求三板斧",
+      "weight": 0,
+      "when": {"kind_re": ["^web$"]},
+      "why": "Web 题的默认动作不是扫，而是把六样可控项各改一遍：方法、Content-Type、参数位置、Cookie、UA、Referer。",
+      "next": [
+        {"label": "会话化重发一次基线请求（看真实头/状态/字节）", "kind": "cmd", "argv": ["req", "get", "{url}", "-v"], "why": "先有基线，后面所有差异才有参照"},
+        {"label": "换 UA / 加 X-Forwarded-For 各试一发", "kind": "cmd", "argv": ["req", "get", "{url}", "-H", "X-Forwarded-For: 127.0.0.1", "--ua", "Mozilla/5.0"], "why": "很多题只认 UA 或只认内网来源"},
+        {"label": "看知识库的改请求清单", "kind": "cmd", "argv": ["kb", "show", "vault-writeup-loop"], "why": "把'下一发打哪'变成清单而不是回忆"}
+      ],
+      "kb": ["staged-field-swap", "egress-403"],
+      "tools": ["ffuf", "feroxbuster"]
+    },
+    {
+      "id": "web-403-egress",
+      "name": "403/空响应 → 先怀疑出口",
+      "weight": 3,
+      "when": {"kind_re": ["^web$"], "body_re": ["403", "Forbidden"], "header_re": ["403"]},
+      "why": "命令行出口与浏览器出口不是同一个 IP，靶机常只放行其中一个；连接被拒=服务没起，超时=中间被掐。",
+      "next": [
+        {"label": "换第二个出口再打一次（CDP 浏览器通道）", "kind": "cmd", "argv": ["browser", "{url}", "--launch"], "why": "两条出口谁通用谁"},
+        {"label": "确认这个 URL 现在真的活着（状态+字节数）", "kind": "cmd", "argv": ["req", "get", "{url}", "--no-follow", "-v"]}
+      ],
+      "kb": ["egress-403"],
+      "tools": ["proxychains-ng"]
+    },
+    {
+      "id": "elf-pwn-or-rev",
+      "name": "ELF 可执行 → pwn（或逆向）",
+      "weight": 8,
+      "when": {"kind_re": ["^file$"], "magic_re": ["^ELF"]},
+      "why": "给了 ELF 就是要在二进制里找事：有 socket/交互 → 多半 pwn；没有 → 逆向找校验逻辑。保护机制决定利用难度。",
+      "next": [
+        {"label": "看交互方式与字符串（有没有 /bin/sh、flag、socket）", "kind": "shell", "cmd": "readelf -h {path} | head -20; strings -n 6 {path} | grep -Ei 'flag|sh|socket|system' | head -20", "why": "决定这题是 pwn 还是 rev"},
+        {"label": "跑 checksec 看保护（NX/PIE/Canary/RELRO）", "kind": "shell", "cmd": "checksec --file={path}", "why": "NX 关→可执行栈；PIE 关→地址固定；Canary 关→可溢出"},
+        {"label": "反编译看主逻辑（Ghidra 或 r2）", "kind": "shell", "cmd": "r2 -A -q -c 'afl; s main; pdf' {path}", "why": "先定位 main 与危险函数"},
+        {"label": "尝试找溢出偏移（cyclic）", "kind": "shell", "cmd": "python3 -c \"import sys;print('A'*100)\" | {path}", "why": "先确认崩溃点，再用 cyclic 定位偏移"}
+      ],
+      "tools": ["pwntools", "pwndbg", "ghidra", "radare2", "checksec", "ROPgadget", "one_gadget"],
+      "kb": ["pwn-first-actions"]
+    },
+    {
+      "id": "pe-windows",
+      "name": "PE/Windows 可执行 → rev",
+      "weight": 6,
+      "when": {"kind_re": ["^file$"], "magic_re": ["^PE"]},
+      "why": "Windows 程序基本是逆向题：静态看导入表与字符串，动态上调试器看注册/校验逻辑。",
+      "next": [
+        {"label": "看导入表与字符串（有 MessageBox/注册校验就是 rev）", "kind": "shell", "cmd": "rabin2 -I {path}; strings -n 6 {path} | head -30"},
+        {"label": "上 Ghidra / IDA 反编译 main", "kind": "shell", "cmd": "ghidraRun   # 新建工程后拖入 {path}"}
+      ],
+      "tools": ["ghidra", "radare2", "x64dbg"],
+      "kb": ["rev-workflow"]
+    },
+    {
+      "id": "zip-pseudo",
+      "name": "伪加密 zip（本地头 vs 中央目录标志位不一致）",
+      "weight": 10,
+      "when": {"kind_re": ["^file$"], "findings_re": ["zip:pseudo-encrypt"]},
+      "why": "zip 的加密标志在本地文件头（偏移 6）与中央目录各一份。作者只改一份就是「伪加密」：解压器要求密码，但数据其实没加密 —— 把两份改一致就能解。实测本工具初筛直接给出了不一致的条目名。",
+      "next": [
+        {"label": "一键修标志位（把本地头与中央目录的 bit0 清零）", "kind": "shell", "cmd": "python3 - <<'PY'\nimport sys,struct\np='{path}'; d=bytearray(open(p,'rb').read())\nn=0; i=0\nwhile True:\n    j=d.find(b'PK\\x03\\x04', i)\n    if j<0: break\n    f=struct.unpack('<H', d[j+6:j+8])[0]\n    if f & 1: d[j+6:j+8]=struct.pack('<H', f & ~1); n+=1\n    cs=struct.unpack('<I', d[j+18:j+22])[0]; nl,el=struct.unpack('<HH', d[j+26:j+30])\n    i=j+30+nl+el+(cs or 0)\nk=0\nwhile True:\n    j=d.find(b'PK\\x01\\x02', k)\n    if j<0: break\n    f=struct.unpack('<H', d[j+8:j+10])[0]\n    if f & 1: d[j+8:j+10]=struct.pack('<H', f & ~1); n+=1\n    k=j+46\nopen(p+'.fixed','wb').write(bytes(d)); print('改了',n,'处 →',p+'.fixed')\nPY"},
+        {"label": "用现成工具验证（zipdetails 会打印两处标志）", "kind": "shell", "cmd": "zipdetails {path} 2>/dev/null | grep -iE 'encrypt|flag' | head"},
+        {"label": "修完直接解开", "kind": "shell", "cmd": "7z x {path}.fixed -o{path}.out -y && find {path}.out -type f | head"}
+      ],
+      "tools": ["zipdetails", "7zip", "010editor"],
+      "kb": ["zip-pseudo-encrypt"]
+    },
+    {
+      "id": "zip-encrypted",
+      "name": "加密压缩包 → 先判伪加密，再爆破/已知明文",
+      "weight": 9,
+      "when": {"kind_re": ["^file$"], "findings_re": ["^zip:encrypted$"], "magic_re": ["ZIP"]},
+      "why": "zip 的加密标志位在本地文件头与中央目录各一份，作者常只改一处（伪加密）；真加密时已知明文攻击（bkcrack）比字典快得多。",
+      "next": [
+        {"label": "先当伪加密处理（工具自动校验两份标志位并修复）", "kind": "shell", "cmd": "7z l -slt {path} | grep -Ei 'encrypted|method' | head; zipdetails {path} 2>/dev/null | grep -i encrypt | head", "why": "两份标志位不一致 = 伪加密，改回即可解"},
+        {"label": "真加密：先 zip2john + 小字典（比赛主题词优先）", "kind": "shell", "cmd": "zip2john {path} > /tmp/z.txt && john --wordlist=/usr/share/wordlists/rockyou.txt /tmp/z.txt"},
+        {"label": "有已知明文片段就上 bkcrack", "kind": "shell", "cmd": "bkcrack -C {path} -c <包内文件名> -p <我有的明文文件>", "why": "ZipCrypto 已知明文 12 字节即可恢复密钥"}
+      ],
+      "tools": ["bkcrack", "john", "hashcat", "zipdetails"],
+      "kb": ["zip-pseudo-encrypt"]
+    },
+    {
+      "id": "zip-nested",
+      "name": "嵌套压缩包 → 一层层解并看命名",
+      "weight": 5,
+      "when": {"kind_re": ["^file$"], "findings_re": ["zip:nested"]},
+      "why": "嵌套是常见设计：每层可能换考点（伪加密→爆破→明文提示）。命名里常带顺序或提示。",
+      "next": [
+        {"label": "列出全部条目名（命名就是线索）", "kind": "shell", "cmd": "7z l {path}"},
+        {"label": "全解开到目录（保留结构）", "kind": "shell", "cmd": "7z x {path} -o{path}.out -y"}
+      ],
+      "tools": ["7zip", "binwalk"],
+      "kb": ["zip-pseudo-encrypt"]
+    },
+    {
+      "id": "appended-data",
+      "name": "结构末尾有附加数据 → 很可能挂着另一个文件",
+      "weight": 9,
+      "when": {"kind_re": ["^file$"], "findings_re": ["appended"]},
+      "why": "PNG(IEND)/JPEG(FFD9)/ZIP(EOCD)/GIF(3B) 之后的数据不参与渲染，却是最经典的\"藏一个文件\"位置。",
+      "next": [
+        {"label": "把附加数据切出来单独看类型", "kind": "shell", "cmd": "binwalk -e {path}; foremost -i {path} -o {path}.foremost", "why": "binwalk 直接按签名切出来"},
+        {"label": "手工切（拿上面报告的偏移）", "kind": "shell", "cmd": "python3 -c \"import sys;p='{path}';d=open(p,'rb').read();off=int(sys.argv[1],0) if len(sys.argv)>1 else 0\" ", "why": "工具没结果时自己按偏移切"},
+        {"label": "对切出来的东西再跑一次初筛", "kind": "cmd", "argv": ["file", "{path}", "--strings", "20"], "why": "层层筛，每层都当新附件"}
+      ],
+      "tools": ["binwalk", "foremost"],
+      "kb": ["img-append-lsb-crc"]
+    },
+    {
+      "id": "image-stego",
+      "name": "图片 → 隐写三件套",
+      "weight": 6,
+      "when": {"kind_re": ["^file$"], "magic_re": ["(PNG|JPEG|GIF|BMP)"]},
+      "why": "图片题就三条路：附加数据（已单独判）、LSB 位平面、IHDR/CRC 被改。别一上来就肉眼比图。",
+      "next": [
+        {"label": "zsteg 全通道扫 LSB", "kind": "shell", "cmd": "zsteg -a {path} | head -40", "why": "PNG/BMP 的 LSB 一把梭"},
+        {"label": "steghide/outguess 试空口令与小字典", "kind": "shell", "cmd": "steghide extract -sf {path} -p '' ; outguess -r {path} out.txt", "why": "有口令的隐写常是空口令或主题词"},
+        {"label": "PNG 用 CRC 反推真实宽高", "kind": "shell", "cmd": "python3 - <<'PY'\nimport struct,zlib\nd=open('{path}','rb').read()\ni=d.find(b'IHDR');print('当前宽高',struct.unpack('>II',d[i+8:i+16]))\nPY", "why": "尺寸被改小 → 图上显示不全，按 CRC 能算出真值"}
+      ],
+      "tools": ["zsteg", "stegsolve", "steghide", "binwalk", "exiftool"],
+      "kb": ["img-append-lsb-crc"]
+    },
+    {
+      "id": "pcap-traffic",
+      "name": "PCAP → 流量分析",
+      "weight": 6,
+      "when": {"kind_re": ["^file$"], "findings_re": ["pcap"]},
+      "why": "流量题的入口永远是「导出对象 / 追 TCP 流 / 看协议字段」，先概览再深挖。",
+      "next": [
+        {"label": "协议分层统计 + 会话列表", "kind": "shell", "cmd": "tshark -r {path} -q -z io,phs | head -30; tshark -r {path} -q -z conv,tcp | head -20"},
+        {"label": "导出 HTTP 对象（文件就在里面）", "kind": "shell", "cmd": "tshark -r {path} --export-objects http,./pcap-out -q"},
+        {"label": "抓可疑串（flag/password/base64）", "kind": "shell", "cmd": "tshark -r {path} -T fields -e frame.number -e _ws.col.Info 2>/dev/null | head -40; strings {path} | grep -Ei 'flag|pass' | head"}
+      ],
+      "tools": ["wireshark", "tshark", "networkminer"],
+      "kb": ["pcap-first-pass"]
+    },
+    {
+      "id": "sqlite-db",
+      "name": "SQLite 数据库 → 直接查表",
+      "weight": 6,
+      "when": {"kind_re": ["^file$"], "magic_re": ["SQLite"]},
+      "why": "给了 .db 就是让你查；注意题目常把它改成 SQLCipher（加密 SQLite）或把关键数据塞在 WAL/未用页里。",
+      "next": [
+        {"label": "列所有表与 schema", "kind": "shell", "cmd": "sqlite3 {path} '.tables' '.schema'", "why": "先看有什么表"},
+        {"label": "把所有表 dump 出来搜 flag", "kind": "shell", "cmd": "for t in $(sqlite3 {path} '.tables'); do echo \"== $t\"; sqlite3 {path} \"select * from $t limit 20;\"; done | grep -i -E 'flag|ctf|{' | head -20"},
+        {"label": "打不开（file is not a database）→ 试 SQLCipher/看有没有 WAL", "kind": "shell", "cmd": "sqlcipher {path} \"PRAGMA key='';select name from sqlite_master;\" 2>/dev/null; ls -la {path}*", "why": "SQLCipher 需要密钥，密钥常在同题的其他文件里"}
+      ],
+      "tools": ["sqlitebrowser", "sqlcipher"],
+      "kb": ["sqlite-and-wal"]
+    },
+    {
+      "id": "text-rsa",
+      "name": "文本里有 n/e/c → RSA",
+      "weight": 8,
+      "when": {"kind_re": ["(file|text)"], "findings_re": ["text:rsa"]},
+      "why": "给了 n e c 就是 RSA。先看 n 的位数与 e：小 n 先分解；e 小试小明文/共模；多组密文同 n 试共模。",
+      "next": [
+        {"label": "先跑自动工具（它会把常见攻击都试一遍）", "kind": "shell", "cmd": "RsaCtfTool --publickey /dev/stdin --uncipher <c>", "why": "拿不准攻击类型时最省时间"},
+        {"label": "小 n：先 factordb 再 Fermat（p、q 相近）", "kind": "shell", "cmd": "python3 -c \"import math\\nn=$(grep -oE '^n *= *[0-9]+' {path} | head -1 | grep -oE '[0-9]+')\\nprint('bits', n.bit_length())\\na=math.isqrt(n); a=a+1 if a*a<n else a\\nfor _ in range(200000):\\n    b2=a*a-n; b=math.isqrt(b2)\\n    if b*b==b2: print('p',a-b,'q',a+b); break\\n    a+=1\"", "why": "p、q 相近时 Fermat 秒解"},
+        {"label": "e 很小且 m^e<n：直接开方", "kind": "shell", "cmd": "python3 -c \"import gmpy2;print(gmpy2.iroot(c,3))\""}
+      ],
+      "tools": ["RsaCtfTool", "sage", "yafu", "factordb"],
+      "kb": ["rsa-near-primes"]
+    },
+    {
+      "id": "text-hash",
+      "name": "文本里有长哈希串 → 识别模式再爆破",
+      "weight": 5,
+      "when": {"kind_re": ["(file|text)"], "findings_re": ["text:hash"]},
+      "why": "32/40/64 位十六进制分别是 MD5/SHA1/SHA256。先识别再上 hashcat 对应模式，别用错 mode 白跑。",
+      "next": [
+        {"label": "识别哈希类型", "kind": "shell", "cmd": "hashid '<哈希串>'  # 或 hash-identifier；32=md5(-m 0) 40=sha1(-m 100) 64=sha256(-m 1400)"},
+        {"label": "hashcat 字典爆破（先小字典 + 规则）", "kind": "shell", "cmd": "hashcat -m 0 -a 0 <哈希文件> /usr/share/wordlists/rockyou.txt -O"},
+        {"label": "也可能是要你构造碰撞（弱比较/长度扩展）", "kind": "cmd", "argv": ["kb", "show", "php-weak-compare"]}
+      ],
+      "tools": ["hashcat", "john", "hashid"],
+      "kb": ["php-weak-compare"]
+    },
+    {
+      "id": "text-encoding",
+      "name": "文本像编码 → 逐层解并验证",
+      "weight": 5,
+      "when": {"kind_re": ["(file|text)"], "findings_re": ["text:base64"]},
+      "why": "base 家族靠字符集与填充判断，嵌套编码要逐层解；非标准表要用已知明文反推。",
+      "next": [
+        {"label": "让工具猜家族", "kind": "cmd", "argv": ["codec", "guess"], "why": "不给参数就读 stdin，直接粘进去"},
+        {"label": "Base 家族多层解码", "kind": "cmd", "argv": ["codec", "b64d"], "why": "解一层看一层，别一次猜到底"},
+        {"label": "多层自动解码（CyberChef 魔法棒 / ciphey）", "kind": "shell", "cmd": "ciphey -t '$(cat {path})'"}
+      ],
+      "tools": ["CyberChef", "ciphey"],
+      "kb": ["encoding-family"]
+    },
+    {
+      "id": "high-entropy",
+      "name": "高熵 → 加密/压缩/异或过的数据",
+      "weight": 5,
+      "when": {"kind_re": ["^file$"], "findings_re": ["entropy-high"]},
+      "why": "熵接近 8 说明没有可识别结构：要么加密/压缩，要么整体异或/加了壳。先确认是不是单字节异或（爆破 256 次看有没有可读文本）。",
+      "next": [
+        {"label": "单字节异或爆破（看是否出现可读文本/PNG 头）", "kind": "shell", "cmd": "python3 - <<'PY'\nd=open('{path}','rb').read()\nfor k in range(256):\n    t=bytes(b^k for b in d[:64])\n    if b'flag' in t.lower() or t[:4] in (b'PK\\x03\\x04',b'\\x89PNG') or sum(32<=c<127 for c in t)>50:\n        print(hex(k), t[:48])\nPY"},
+        {"label": "确认是不是压缩流（gzip/zlib/xz 头）", "kind": "shell", "cmd": "binwalk {path}; xxd {path} | head -4"}
+      ],
+      "tools": ["binwalk", "xorsearch", "CyberChef"],
+      "kb": []
+    },
+    {
+      "id": "flag-in-file",
+      "name": "初筛直接命中 flag 样式串",
+      "weight": 10,
+      "when": {"kind_re": ["^file$"], "findings_re": ["strings:flag"]},
+      "why": "文件里已经出现 flag 样式的字符串 —— 先按事实收下，但**必须回平台提交验证**（假 flag 是常见设计）。",
+      "next": [
+        {"label": "把命中的串原样交给平台验证（别改写大小写）", "kind": "shell", "cmd": "strings -n 6 {path} | grep -Eo '[A-Za-z0-9_?]{1,24}\\{[^}]{2,200}\\}' | sort -u"},
+        {"label": "同时看它附近还有什么（可能是提示另一半）", "kind": "shell", "cmd": "grep -aoE '.{0,60}\\{[^}]{2,80}\\}.{0,60}' {path} | head"}
+      ],
+      "tools": [],
+      "kb": []
+    },
+    {
+      "id": "archive-plain",
+      "name": "未加密压缩包/归档 → 解开看结构",
+      "weight": 3,
+      "when": {"kind_re": ["^file$"], "magic_re": ["(ZIP 压缩包|gzip|bzip2|xz|tar)"]},
+      "why": "归档题的价值在里面的命名与结构：提示词常写在文件名里，也可能是多层套娃。",
+      "next": [
+        {"label": "列出条目（不解压）", "kind": "shell", "cmd": "7z l {path} | head -40"},
+        {"label": "解到独立目录（保留结构，别污染当前目录）", "kind": "shell", "cmd": "7z x {path} -o{path}.out -y && ls -la {path}.out"}
+      ],
+      "tools": ["7zip", "binwalk"],
+      "kb": []
+    },
+    {
+      "id": "audio-spectrum",
+      "name": "音频文件 → 频谱/波形里藏图",
+      "weight": 6,
+      "when": {"kind_re": ["^file$"], "magic_re": ["(WAV|MP3|FLAC|OGG)"]},
+      "why": "音频隐写最常见的就是频谱图上画字母/二维码；其次是 LSB 与摩斯/DTMF 编码。",
+      "next": [
+        {"label": "看频谱图（Audacity / sox + spectrogram）", "kind": "shell", "cmd": "sox {path} -n spectrogram -o {path}.png && xdg-open {path}.png"},
+        {"label": "听/看波形：摩斯、DTMF、慢放单词", "kind": "shell", "cmd": "ffmpeg -i {path} -filter:a \"atempo=0.5\" {path}.slow.wav"},
+        {"label": "LSB 与元数据", "kind": "shell", "cmd": "exiftool {path}; python3 -c \"print(open('{path}','rb').read()[:16])\""}
+      ],
+      "tools": ["audacity", "sox", "ffmpeg", "exiftool"],
+      "kb": []
+    },
+    {
+      "id": "unknown-text",
+      "name": "纯文本但看不出类型 → 先归类",
+      "weight": 2,
+      "when": {"kind_re": ["^text$"]},
+      "why": "文本题的顺序是：编码？古典密码？还是某种数据格式（坐标/JSON/自造表）。别先猜，先量。",
+      "next": [
+        {"label": "编码家族识别", "kind": "cmd", "argv": ["codec", "guess"]},
+        {"label": "字符集统计（判断是不是古典密码：只有字母？带空格？）", "kind": "shell", "cmd": "python3 -c \"import collections,sys;t=open('{path}',encoding='utf-8',errors='replace').read();print(collections.Counter(c for c in t if not c.isspace()).most_common(15));print('长度',len(t))\""},
+        {"label": "看知识库里的编码/古典密码卡", "kind": "cmd", "argv": ["kb", "show", "encoding-family"]}
+      ],
+      "tools": ["CyberChef", "ciphey", "dcode"],
+      "kb": ["encoding-family"]
+    }
+  ]
+}

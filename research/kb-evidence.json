@@ -1,0 +1,1069 @@
+{
+ "corpus": {
+  "sajjadium__ctf-writeups": {
+   "dir": "/root/.cache/ctfctl/corpus/sajjadium__ctf-writeups",
+   "files": 57,
+   "bytes": 23042,
+   "counts": {
+    "sqli": {
+     "files": 0,
+     "examples": []
+    },
+    "ssti": {
+     "files": 0,
+     "examples": []
+    },
+    "lfi": {
+     "files": 0,
+     "examples": []
+    },
+    "rce": {
+     "files": 8,
+     "examples": [
+      "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md",
+      "ctf-writeups-master/ctfs/ASIS/2018/Finals/asvdb/README.md"
+     ]
+    },
+    "ssrf": {
+     "files": 0,
+     "examples": []
+    },
+    "xxe": {
+     "files": 0,
+     "examples": []
+    },
+    "deser": {
+     "files": 0,
+     "examples": []
+    },
+    "jwt": {
+     "files": 0,
+     "examples": []
+    },
+    "flask_session": {
+     "files": 0,
+     "examples": []
+    },
+    "upload": {
+     "files": 0,
+     "examples": []
+    },
+    "php_magic": {
+     "files": 1,
+     "examples": [
+      "ctf-writeups-master/ctfs/iCTF/2018/fantasticiot/README.md"
+     ]
+    },
+    "php_filter": {
+     "files": 0,
+     "examples": []
+    },
+    "audit": {
+     "files": 0,
+     "examples": []
+    },
+    "authbypass": {
+     "files": 0,
+     "examples": []
+    },
+    "xss": {
+     "files": 0,
+     "examples": []
+    },
+    "csrf": {
+     "files": 0,
+     "examples": []
+    },
+    "race": {
+     "files": 0,
+     "examples": []
+    },
+    "prototype": {
+     "files": 0,
+     "examples": []
+    },
+    "web3": {
+     "files": 0,
+     "examples": []
+    },
+    "graphql": {
+     "files": 0,
+     "examples": []
+    },
+    "log4shell": {
+     "files": 0,
+     "examples": []
+    },
+    "format_string": {
+     "files": 3,
+     "examples": [
+      "ctf-writeups-master/ctfs/SECCON/2017/Quals/README.md",
+      "ctf-writeups-master/ctfs/SECCON/2017/Quals/secure_keymanager/README.md",
+      "ctf-writeups-master/ctfs/UTCTF/2019/babyecho/README.md"
+     ]
+    },
+    "buffer_overflow": {
+     "files": 31,
+     "examples": [
+      "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+     ]
+    },
+    "heap": {
+     "files": 24,
+     "examples": [
+      "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+     ]
+    },
+    "rev_java": {
+     "files": 0,
+     "examples": []
+    },
+    "rev_ghidra": {
+     "files": 0,
+     "examples": []
+    },
+    "crypto_rsa": {
+     "files": 0,
+     "examples": []
+    },
+    "crypto_aes": {
+     "files": 0,
+     "examples": []
+    },
+    "crypto_classic": {
+     "files": 0,
+     "examples": []
+    },
+    "crypto_prng": {
+     "files": 0,
+     "examples": []
+    },
+    "crypto_lattice": {
+     "files": 0,
+     "examples": []
+    },
+    "hash_crack": {
+     "files": 0,
+     "examples": []
+    },
+    "archive_crack": {
+     "files": 0,
+     "examples": []
+    },
+    "stego_img": {
+     "files": 1,
+     "examples": [
+      "ctf-writeups-master/ctfs/StarCTF/2018/note/README.md"
+     ]
+    },
+    "stego_audio": {
+     "files": 0,
+     "examples": []
+    },
+    "pcap": {
+     "files": 0,
+     "examples": []
+    },
+    "forensics_fs": {
+     "files": 0,
+     "examples": []
+    },
+    "encoding": {
+     "files": 16,
+     "examples": [
+      "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+      "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+     ]
+    },
+    "osint": {
+     "files": 0,
+     "examples": []
+    },
+    "net_scan": {
+     "files": 0,
+     "examples": []
+    },
+    "pwn_env": {
+     "files": 7,
+     "examples": [
+      "ctf-writeups-master/ctfs/ASIS/2018/Finals/inception/README.md",
+      "ctf-writeups-master/ctfs/ASIS/2018/Quals/cat/README.md",
+      "ctf-writeups-master/ctfs/C3CTF/2017/README.md"
+     ]
+    },
+    "misc_game": {
+     "files": 0,
+     "examples": []
+    },
+    "misc_python_sandbox": {
+     "files": 0,
+     "examples": []
+    },
+    "misc_shell_sandbox": {
+     "files": 0,
+     "examples": []
+    },
+    "ai_llm_ctf": {
+     "files": 0,
+     "examples": []
+    }
+   }
+  },
+  "ctf-wiki__ctf-wiki": {
+   "dir": "/root/.cache/ctfctl/corpus/ctf-wiki__ctf-wiki",
+   "files": 739,
+   "bytes": 6269587,
+   "counts": {
+    "sqli": {
+     "files": 8,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/sqli.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md"
+     ]
+    },
+    "ssti": {
+     "files": 0,
+     "examples": []
+    },
+    "lfi": {
+     "files": 28,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/blockchain/publicblockchain/weaknesses.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
+      "ctf-wiki-master/docs/zh-tw/docs/executable/pe/pe-export-table.md"
+     ]
+    },
+    "rce": {
+     "files": 146,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/discussion.md",
+      "ctf-wiki-master/docs/en/docs/contribute/before-contributing.md",
+      "ctf-wiki-master/docs/en/docs/introduction/mode.md"
+     ]
+    },
+    "ssrf": {
+     "files": 4,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md",
+      "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+     ]
+    },
+    "xxe": {
+     "files": 4,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/misc/encode/computer.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
+      "ctf-wiki-master/docs/zh/docs/misc/encode/computer.md"
+     ]
+    },
+    "deser": {
+     "files": 2,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+      "ctf-wiki-master/docs/zh/docs/web/php/php.md"
+     ]
+    },
+    "jwt": {
+     "files": 0,
+     "examples": []
+    },
+    "flask_session": {
+     "files": 0,
+     "examples": []
+    },
+    "upload": {
+     "files": 4,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+      "ctf-wiki-master/docs/zh/docs/introduction/content.md",
+      "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+     ]
+    },
+    "php_magic": {
+     "files": 48,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/so-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/blockcipher/mode/padding-oracle-attack.md"
+     ]
+    },
+    "php_filter": {
+     "files": 4,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/complex.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+      "ctf-wiki-master/docs/zh/docs/crypto/hash/complex.md"
+     ]
+    },
+    "audit": {
+     "files": 5,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+      "ctf-wiki-master/docs/zh/docs/introduction/content.md",
+      "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+     ]
+    },
+    "authbypass": {
+     "files": 10,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/learn.md"
+     ]
+    },
+    "xss": {
+     "files": 17,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md"
+     ]
+    },
+    "csrf": {
+     "files": 8,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/introduction/content.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/csrf.md",
+      "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md"
+     ]
+    },
+    "race": {
+     "files": 8,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/exploitation/race/userfaultfd.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/race-condition/introduction.md",
+      "ctf-wiki-master/docs/zh/docs/pwn/linux/kernel-mode/exploitation/heap/slub/uaf.md"
+     ]
+    },
+    "prototype": {
+     "files": 0,
+     "examples": []
+    },
+    "web3": {
+     "files": 38,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/blockchain/challenges.md",
+      "ctf-wiki-master/docs/zh-tw/docs/blockchain/introduction.md",
+      "ctf-wiki-master/docs/zh-tw/docs/blockchain/ethereum/basics.md"
+     ]
+    },
+    "graphql": {
+     "files": 0,
+     "examples": []
+    },
+    "log4shell": {
+     "files": 0,
+     "examples": []
+    },
+    "format_string": {
+     "files": 57,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/native_layer/so.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_e_attack.md"
+     ]
+    },
+    "buffer_overflow": {
+     "files": 86,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/signature/elgamal.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/basic-knowledge.md"
+     ]
+    },
+    "heap": {
+     "files": 107,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+      "ctf-wiki-master/docs/zh-tw/docs/executable/pe/pe-excutable.md",
+      "ctf-wiki-master/docs/zh-tw/docs/introduction/cgc.md"
+     ]
+    },
+    "rev_java": {
+     "files": 49,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_develop/basic_develop.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/readme.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/dex/dex.md"
+     ]
+    },
+    "rev_ghidra": {
+     "files": 22,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/dynamic_debug.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/ida_native_debug.md"
+     ]
+    },
+    "crypto_rsa": {
+     "files": 50,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/introduction.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/introduction.md"
+     ]
+    },
+    "crypto_aes": {
+     "files": 67,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md"
+     ]
+    },
+    "crypto_classic": {
+     "files": 13,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/monoalphabetic.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/others.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/polyalphabetic.md"
+     ]
+    },
+    "crypto_prng": {
+     "files": 15,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_complex.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/lcg/challenge.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/prng/csprng.md"
+     ]
+    },
+    "crypto_lattice": {
+     "files": 20,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/knapsack/knapsack.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/lattice-reduction.md"
+     ]
+    },
+    "hash_crack": {
+     "files": 2,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/attack.md",
+      "ctf-wiki-master/docs/zh/docs/crypto/hash/attack.md"
+     ]
+    },
+    "archive_crack": {
+     "files": 3,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/misc/archive/zip.md",
+      "ctf-wiki-master/docs/zh/docs/misc/archive/rar.md",
+      "ctf-wiki-master/docs/zh/docs/misc/archive/zip.md"
+     ]
+    },
+    "stego_img": {
+     "files": 43,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_chosen_plain_cipher.md",
+      "ctf-wiki-master/docs/zh-tw/docs/executable/elf/structure/basic-info.md",
+      "ctf-wiki-master/docs/zh-tw/docs/executable/elf/structure/dynamic-sections.md"
+     ]
+    },
+    "stego_audio": {
+     "files": 2,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/misc/audio/introduction.md",
+      "ctf-wiki-master/docs/zh/docs/misc/audio/introduction.md"
+     ]
+    },
+    "pcap": {
+     "files": 32,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md"
+     ]
+    },
+    "forensics_fs": {
+     "files": 23,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
+      "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+      "ctf-wiki-master/docs/zh-tw/docs/misc/prefix.md"
+     ]
+    },
+    "encoding": {
+     "files": 145,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/index.md",
+      "ctf-wiki-master/docs/en/docs/contribute/basic-contribute-approach.md",
+      "ctf-wiki-master/docs/en/docs/introduction/resources.md"
+     ]
+    },
+    "osint": {
+     "files": 2,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/misc/recon.md",
+      "ctf-wiki-master/docs/zh/docs/misc/recon.md"
+     ]
+    },
+    "net_scan": {
+     "files": 12,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/ics/discover.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-overview.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-structure.md"
+     ]
+    },
+    "pwn_env": {
+     "files": 112,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/so-example.md"
+     ]
+    },
+    "misc_game": {
+     "files": 10,
+     "examples": [
+      "ctf-wiki-master/docs/en/docs/index.md",
+      "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/defense/readme.md"
+     ]
+    },
+    "misc_python_sandbox": {
+     "files": 4,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md",
+      "ctf-wiki-master/docs/zh-tw/docs/pwn/sandbox/python/python-sandbox-escape.md",
+      "ctf-wiki-master/docs/zh/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md"
+     ]
+    },
+    "misc_shell_sandbox": {
+     "files": 0,
+     "examples": []
+    },
+    "ai_llm_ctf": {
+     "files": 2,
+     "examples": [
+      "ctf-wiki-master/docs/zh/docs/ai/ai-for-security/agent/introduction.md",
+      "ctf-wiki-master/docs/zh/docs/ai/security-for-ai/attacks/llm/prompt-injection.md"
+     ]
+    }
+   }
+  }
+ },
+ "files": 796,
+ "bytes": 6292629,
+ "fetched": "2026-10-06",
+ "ext": [
+  ".md",
+  ".markdown",
+  ".txt",
+  ".rst",
+  ".html",
+  ".htm"
+ ],
+ "counts": {
+  "sqli": {
+   "files": 8,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 8
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/sqli.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md"
+   ]
+  },
+  "ssti": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "lfi": {
+   "files": 28,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 28
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/blockchain/publicblockchain/weaknesses.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
+    "ctf-wiki-master/docs/zh-tw/docs/executable/pe/pe-export-table.md"
+   ]
+  },
+  "rce": {
+   "files": 154,
+   "per_source": {
+    "sajjadium__ctf-writeups": 8,
+    "ctf-wiki__ctf-wiki": 146
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md",
+    "ctf-writeups-master/ctfs/ASIS/2018/Finals/asvdb/README.md"
+   ]
+  },
+  "ssrf": {
+   "files": 4,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 4
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md",
+    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+   ]
+  },
+  "xxe": {
+   "files": 4,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 4
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/misc/encode/computer.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
+    "ctf-wiki-master/docs/zh/docs/misc/encode/computer.md"
+   ]
+  },
+  "deser": {
+   "files": 2,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 2
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+    "ctf-wiki-master/docs/zh/docs/web/php/php.md"
+   ]
+  },
+  "jwt": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "flask_session": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "upload": {
+   "files": 4,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 4
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+    "ctf-wiki-master/docs/zh/docs/introduction/content.md",
+    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+   ]
+  },
+  "php_magic": {
+   "files": 49,
+   "per_source": {
+    "sajjadium__ctf-writeups": 1,
+    "ctf-wiki__ctf-wiki": 48
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/iCTF/2018/fantasticiot/README.md"
+   ]
+  },
+  "php_filter": {
+   "files": 4,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 4
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/complex.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+    "ctf-wiki-master/docs/zh/docs/crypto/hash/complex.md"
+   ]
+  },
+  "audit": {
+   "files": 5,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 5
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+    "ctf-wiki-master/docs/zh/docs/introduction/content.md",
+    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+   ]
+  },
+  "authbypass": {
+   "files": 10,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 10
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/learn.md"
+   ]
+  },
+  "xss": {
+   "files": 17,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 17
+   },
+   "examples": [
+    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md"
+   ]
+  },
+  "csrf": {
+   "files": 8,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 8
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/introduction/content.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/csrf.md",
+    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md"
+   ]
+  },
+  "race": {
+   "files": 8,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 8
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/exploitation/race/userfaultfd.md",
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/race-condition/introduction.md",
+    "ctf-wiki-master/docs/zh/docs/pwn/linux/kernel-mode/exploitation/heap/slub/uaf.md"
+   ]
+  },
+  "prototype": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "web3": {
+   "files": 38,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 38
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/blockchain/challenges.md",
+    "ctf-wiki-master/docs/zh-tw/docs/blockchain/introduction.md",
+    "ctf-wiki-master/docs/zh-tw/docs/blockchain/ethereum/basics.md"
+   ]
+  },
+  "graphql": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "log4shell": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "format_string": {
+   "files": 60,
+   "per_source": {
+    "sajjadium__ctf-writeups": 3,
+    "ctf-wiki__ctf-wiki": 57
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/SECCON/2017/Quals/README.md",
+    "ctf-writeups-master/ctfs/SECCON/2017/Quals/secure_keymanager/README.md",
+    "ctf-writeups-master/ctfs/UTCTF/2019/babyecho/README.md"
+   ]
+  },
+  "buffer_overflow": {
+   "files": 117,
+   "per_source": {
+    "sajjadium__ctf-writeups": 31,
+    "ctf-wiki__ctf-wiki": 86
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+   ]
+  },
+  "heap": {
+   "files": 131,
+   "per_source": {
+    "sajjadium__ctf-writeups": 24,
+    "ctf-wiki__ctf-wiki": 107
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+   ]
+  },
+  "rev_java": {
+   "files": 49,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 49
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_develop/basic_develop.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/readme.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/dex/dex.md"
+   ]
+  },
+  "rev_ghidra": {
+   "files": 22,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 22
+   },
+   "examples": [
+    "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/dynamic_debug.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/ida_native_debug.md"
+   ]
+  },
+  "crypto_rsa": {
+   "files": 50,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 50
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/introduction.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/introduction.md"
+   ]
+  },
+  "crypto_aes": {
+   "files": 67,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 67
+   },
+   "examples": [
+    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md"
+   ]
+  },
+  "crypto_classic": {
+   "files": 13,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 13
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/monoalphabetic.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/others.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/polyalphabetic.md"
+   ]
+  },
+  "crypto_prng": {
+   "files": 15,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 15
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_complex.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/lcg/challenge.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/prng/csprng.md"
+   ]
+  },
+  "crypto_lattice": {
+   "files": 20,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 20
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/knapsack/knapsack.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/lattice-reduction.md"
+   ]
+  },
+  "hash_crack": {
+   "files": 2,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 2
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/attack.md",
+    "ctf-wiki-master/docs/zh/docs/crypto/hash/attack.md"
+   ]
+  },
+  "archive_crack": {
+   "files": 3,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 3
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/misc/archive/zip.md",
+    "ctf-wiki-master/docs/zh/docs/misc/archive/rar.md",
+    "ctf-wiki-master/docs/zh/docs/misc/archive/zip.md"
+   ]
+  },
+  "stego_img": {
+   "files": 44,
+   "per_source": {
+    "sajjadium__ctf-writeups": 1,
+    "ctf-wiki__ctf-wiki": 43
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/StarCTF/2018/note/README.md"
+   ]
+  },
+  "stego_audio": {
+   "files": 2,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 2
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/misc/audio/introduction.md",
+    "ctf-wiki-master/docs/zh/docs/misc/audio/introduction.md"
+   ]
+  },
+  "pcap": {
+   "files": 32,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 32
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md"
+   ]
+  },
+  "forensics_fs": {
+   "files": 23,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 23
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
+    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+    "ctf-wiki-master/docs/zh-tw/docs/misc/prefix.md"
+   ]
+  },
+  "encoding": {
+   "files": 161,
+   "per_source": {
+    "sajjadium__ctf-writeups": 16,
+    "ctf-wiki__ctf-wiki": 145
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+    "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+   ]
+  },
+  "osint": {
+   "files": 2,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 2
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/misc/recon.md",
+    "ctf-wiki-master/docs/zh/docs/misc/recon.md"
+   ]
+  },
+  "net_scan": {
+   "files": 12,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 12
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/ics/discover.md",
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-overview.md",
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-structure.md"
+   ]
+  },
+  "pwn_env": {
+   "files": 119,
+   "per_source": {
+    "sajjadium__ctf-writeups": 7,
+    "ctf-wiki__ctf-wiki": 112
+   },
+   "examples": [
+    "ctf-writeups-master/ctfs/ASIS/2018/Finals/inception/README.md",
+    "ctf-writeups-master/ctfs/ASIS/2018/Quals/cat/README.md",
+    "ctf-writeups-master/ctfs/C3CTF/2017/README.md"
+   ]
+  },
+  "misc_game": {
+   "files": 10,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 10
+   },
+   "examples": [
+    "ctf-wiki-master/docs/en/docs/index.md",
+    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/defense/readme.md"
+   ]
+  },
+  "misc_python_sandbox": {
+   "files": 4,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 4
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md",
+    "ctf-wiki-master/docs/zh-tw/docs/pwn/sandbox/python/python-sandbox-escape.md",
+    "ctf-wiki-master/docs/zh/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md"
+   ]
+  },
+  "misc_shell_sandbox": {
+   "files": 0,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 0
+   },
+   "examples": []
+  },
+  "ai_llm_ctf": {
+   "files": 2,
+   "per_source": {
+    "sajjadium__ctf-writeups": 0,
+    "ctf-wiki__ctf-wiki": 2
+   },
+   "examples": [
+    "ctf-wiki-master/docs/zh/docs/ai/ai-for-security/agent/introduction.md",
+    "ctf-wiki-master/docs/zh/docs/ai/security-for-ai/attacks/llm/prompt-injection.md"
+   ]
+  }
+ }
+}

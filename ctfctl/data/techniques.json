@@ -1,0 +1,483 @@
+{
+ "_comment": "手法关键词表：给 scripts/harvest_writeups.py 统计语料用，也是 kb 卡片信号词的另一半。aliases = 大小写不敏感子串；给了 re 就用正则（更精确，比如要区分 'sqlmap' 与 'sql'）。",
+ "techniques": {
+  "sqli": {
+   "name": "SQL 注入",
+   "aliases": [
+    "sql injection",
+    "sqli",
+    "union select",
+    "报错注入",
+    "布尔盲注",
+    "时间盲注",
+    "sqlmap"
+   ]
+  },
+  "ssti": {
+   "name": "模板注入 SSTI",
+   "aliases": [
+    "ssti",
+    "server-side template",
+    "模板注入",
+    "{{7*7}}",
+    "{{config",
+    "jinja",
+    "twig"
+   ]
+  },
+  "lfi": {
+   "name": "文件包含/路径穿越",
+   "aliases": [
+    "lfi",
+    "local file inclusion",
+    "文件包含",
+    "path traversal",
+    "目录穿越",
+    "../.."
+   ]
+  },
+  "rce": {
+   "name": "命令执行",
+   "aliases": [
+    "rce",
+    "command injection",
+    "命令执行",
+    "远程命令",
+    "eval(",
+    "passthru"
+   ]
+  },
+  "ssrf": {
+   "name": "SSRF",
+   "aliases": [
+    "ssrf",
+    "server-side request forgery",
+    "服务端请求伪造"
+   ]
+  },
+  "xxe": {
+   "name": "XXE",
+   "aliases": [
+    "xxe",
+    "xml external entity",
+    "外部实体"
+   ]
+  },
+  "deser": {
+   "name": "反序列化",
+   "aliases": [
+    "unserialize",
+    "deserializ",
+    "反序列化",
+    "__wakeup",
+    "__destruct",
+    "pickle",
+    "ysoserial",
+    "phpggc"
+   ]
+  },
+  "jwt": {
+   "name": "JWT 伪造/爆破",
+   "aliases": [
+    "jwt",
+    "json web token",
+    "eyjhbgcio",
+    "alg:none",
+    "算法混淆"
+   ]
+  },
+  "flask_session": {
+   "name": "Flask 客户端 session",
+   "aliases": [
+    "flask-unsign",
+    "itsdangerous",
+    "werkzeug",
+    "secret_key",
+    "session 伪造",
+    "客户端签名 session"
+   ]
+  },
+  "upload": {
+   "name": "文件上传绕过",
+   "aliases": [
+    "file upload",
+    "文件上传",
+    "webshell",
+    "一句话木马",
+    ".phtml",
+    "getimagesize"
+   ]
+  },
+  "php_magic": {
+   "name": "PHP 弱比较/函数特性",
+   "aliases": [
+    "md5(",
+    "sha1(",
+    "strcmp",
+    "弱比较",
+    "loose comparison",
+    "数组绕过",
+    "is_numeric",
+    "preg_replace"
+   ]
+  },
+  "php_filter": {
+   "name": "PHP 伪协议读源码",
+   "aliases": [
+    "php://filter",
+    "php://input",
+    "data://",
+    "伪协议",
+    "convert.base64-encode"
+   ]
+  },
+  "audit": {
+   "name": "代码审计（含备份/VCS 泄露）",
+   "aliases": [
+    "代码审计",
+    "source code audit",
+    "highlight_file",
+    "index.php.bak",
+    ".git/config",
+    "git-dumper",
+    ".ds_store",
+    ".swp"
+   ]
+  },
+  "authbypass": {
+   "name": "认证/越权绕过",
+   "aliases": [
+    "越权",
+    "idor",
+    "privilege escalation",
+    "权限绕过",
+    "弱口令",
+    "爆破密码",
+    "admin=true",
+    "role=admin"
+   ]
+  },
+  "xss": {
+   "name": "XSS",
+   "aliases": [
+    "xss",
+    "cross-site scripting",
+    "跨站脚本"
+   ]
+  },
+  "csrf": {
+   "name": "CSRF",
+   "aliases": [
+    "csrf",
+    "跨站请求伪造"
+   ]
+  },
+  "race": {
+   "name": "条件竞争",
+   "aliases": [
+    "race condition",
+    "条件竞争"
+   ]
+  },
+  "prototype": {
+   "name": "原型链污染",
+   "aliases": [
+    "prototype pollution",
+    "原型链",
+    "__proto__",
+    "constructor.prototype"
+   ]
+  },
+  "web3": {
+   "name": "区块链/Web3 题",
+   "aliases": [
+    "web3",
+    "solidity",
+    "smart contract",
+    "reentrancy"
+   ]
+  },
+  "graphql": {
+   "name": "GraphQL",
+   "aliases": [
+    "graphql",
+    "__schema",
+    "introspection"
+   ]
+  },
+  "log4shell": {
+   "name": "JNDI / 表达式注入",
+   "aliases": [
+    "jndi:",
+    "log4shell",
+    "spel",
+    "ognl",
+    "el 表达式",
+    "expression injection"
+   ]
+  },
+  "format_string": {
+   "name": "格式化字符串",
+   "aliases": [
+    "format string",
+    "格式化字符串",
+    "%p",
+    "%x"
+   ]
+  },
+  "buffer_overflow": {
+   "name": "栈溢出/ROP",
+   "aliases": [
+    "buffer overflow",
+    "栈溢出",
+    "ropgadget",
+    "pwntools",
+    "one_gadget",
+    "ret2libc",
+    "canary"
+   ]
+  },
+  "heap": {
+   "name": "堆利用",
+   "aliases": [
+    "heap",
+    "tcache",
+    "fastbin",
+    "unsorted bin",
+    "堆利用",
+    "uaf"
+   ]
+  },
+  "rev_java": {
+   "name": "逆向·Java/Android",
+   "aliases": [
+    "jadx",
+    "jd-gui",
+    "dex2jar",
+    "smali",
+    "apk",
+    "反编译"
+   ]
+  },
+  "rev_ghidra": {
+   "name": "逆向·二进制",
+   "aliases": [
+    "ghidra",
+    "ida pro",
+    "radare2",
+    "rizin",
+    "angr",
+    "z3"
+   ]
+  },
+  "crypto_rsa": {
+   "name": "RSA 攻击",
+   "aliases": [
+    "rsa",
+    "共模",
+    "低指数",
+    "wiener",
+    "fermat",
+    "factordb",
+    "小明文",
+    "e=3",
+    "e=65537"
+   ]
+  },
+  "crypto_aes": {
+   "name": "AES/分组密码",
+   "aliases": [
+    "aes",
+    "ecb",
+    "cbc",
+    "padding oracle",
+    "块加密",
+    "字节翻转",
+    "bit flipping"
+   ]
+  },
+  "crypto_classic": {
+   "name": "古典密码",
+   "aliases": [
+    "凯撒",
+    "caesar",
+    "维吉尼亚",
+    "vigenere",
+    "栅栏",
+    "railfence",
+    "培根",
+    "bacon",
+    "摩斯",
+    "morse",
+    "rot13"
+   ]
+  },
+  "crypto_prng": {
+   "name": "伪随机预测",
+   "aliases": [
+    "mt19937",
+    "random.seed",
+    "伪随机",
+    "prng",
+    "预测随机"
+   ]
+  },
+  "crypto_lattice": {
+   "name": "格攻击/数学攻击",
+   "aliases": [
+    "lattice",
+    "lll",
+    "coppersmith",
+    "格攻击"
+   ]
+  },
+  "hash_crack": {
+   "name": "哈希识别与爆破",
+   "aliases": [
+    "hashcat",
+    "john the ripper",
+    "哈希爆破",
+    "md5 爆破"
+   ]
+  },
+  "archive_crack": {
+   "name": "压缩包密码",
+   "aliases": [
+    "zip2john",
+    "fcrackzip",
+    "bkcrack",
+    "伪加密",
+    "zip 加密",
+    "rar 加密",
+    "zipcrypto"
+   ]
+  },
+  "stego_img": {
+   "name": "图片隐写",
+   "aliases": [
+    "stegsolve",
+    "zsteg",
+    "steghide",
+    "lsb",
+    "隐写",
+    "outguess",
+    "图片附加数据"
+   ]
+  },
+  "stego_audio": {
+   "name": "音频/频谱隐写",
+   "aliases": [
+    "频谱",
+    "spectrogram",
+    "audacity",
+    "音频隐写",
+    "dtmf",
+    "sox"
+   ]
+  },
+  "pcap": {
+   "name": "流量分析",
+   "aliases": [
+    "wireshark",
+    "pcap",
+    "tshark",
+    "流量分析",
+    "tcp stream",
+    "usb 流量"
+   ]
+  },
+  "forensics_fs": {
+   "name": "磁盘/内存取证",
+   "aliases": [
+    "volatility",
+    "内存镜像",
+    "磁盘镜像",
+    "foremost",
+    "binwalk"
+   ]
+  },
+  "encoding": {
+   "name": "编码家族",
+   "aliases": [
+    "base64",
+    "base32",
+    "base85",
+    "base92",
+    "url 编码",
+    "unicode 编码",
+    "jsfuck",
+    "aaencode",
+    "jjencode",
+    "brainfuck",
+    "ook",
+    "cyberchef"
+   ]
+  },
+  "osint": {
+   "name": "OSINT/信息收集",
+   "aliases": [
+    "osint",
+    "whois",
+    "google hacking",
+    "github 搜索",
+    "公开情报"
+   ]
+  },
+  "net_scan": {
+   "name": "端口/服务扫描",
+   "aliases": [
+    "nmap",
+    "端口扫描",
+    "feroxbuster",
+    "dirsearch",
+    "gobuster"
+   ]
+  },
+  "pwn_env": {
+   "name": "pwn 环境与交互",
+   "aliases": [
+    "socat",
+    "glibc",
+    "ld_preload",
+    "远程交互",
+    "exp.py"
+   ]
+  },
+  "misc_game": {
+   "name": "杂项/游戏题",
+   "aliases": [
+    "游戏题",
+    "unity",
+    "godot",
+    "save 文件"
+   ]
+  },
+  "misc_python_sandbox": {
+   "name": "Python 沙箱逃逸",
+   "aliases": [
+    "沙箱逃逸",
+    "sandbox escape",
+    "__subclasses__",
+    "__globals__",
+    "builtins"
+   ]
+  },
+  "misc_shell_sandbox": {
+   "name": "Shell 沙箱/命令过滤绕过",
+   "aliases": [
+    "空格绕过",
+    "无字母数字",
+    "通配符绕过",
+    "bash 绕过"
+   ]
+  },
+  "ai_llm_ctf": {
+   "name": "AI/LLM 题",
+   "aliases": [
+    "提示注入",
+    "prompt injection",
+    "大模型"
+   ]
+  }
+ }
+}

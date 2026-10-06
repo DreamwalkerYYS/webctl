@@ -1,7 +1,7 @@
 """最小 WebSocket 回声服务端 —— 只为离线验证 core/cdp.py 的帧格式。
 
     python3 tests/ws_echo_server.py 8901
-然后：cd ~/项目/ctf-tool && python3 -c "from webctl.core.cdp import WS; w=WS('ws://127.0.0.1:8901/'); w.send_text('hi'); print(w.recv_text())"
+然后：cd ~/项目/ctf-tool && python3 -c "from ctfctl.core.cdp import WS; w=WS('ws://127.0.0.1:8901/'); w.send_text('hi'); print(w.recv_text())"
 
 只实现：握手、文本帧（含分片长度）、ping/pong、close。不做压缩。
 """

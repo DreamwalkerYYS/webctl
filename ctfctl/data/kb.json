@@ -1,0 +1,1128 @@
+{
+ "_comment": "知识库卡片：信号（看到什么）→ 机制（为什么成立）→ 步骤 → 可粘贴命令。corpus 字段是 scripts/harvest_writeups.py 在这批公开 writeup 语料上实测的命中文件数（口径见 kb sources）。related_rules 指向 data/rules.json 的 id。",
+ "sources": [
+  {
+   "name": "sajjadium/ctf-writeups",
+   "url": "https://github.com/sajjadium/ctf-writeups",
+   "license": "见仓库（各题作者各自保留，仅作本地统计/学习用）",
+   "fetched": "2026-10-06",
+   "files": 57,
+   "bytes": 23042,
+   "repos": 1,
+   "scope": "选手 writeup 合集，按 ctfs/<赛事>/<年份>/<题>/README.md 组织；pwn 偏重（堆/ROP 为主），web 少",
+   "stages": {
+    "buffer_overflow": "31 文件",
+    "heap": "24 文件",
+    "encoding": "16 文件",
+    "rce": "8 文件",
+    "pwn_env": "7 文件",
+    "format_string": "3 文件",
+    "php_magic": "1 文件",
+    "stego_img": "1 文件"
+   }
+  },
+  {
+   "name": "ctf-wiki/ctf-wiki",
+   "url": "https://github.com/ctf-wiki/ctf-wiki",
+   "license": "CC BY-NC-SA 4.0（ctf-wiki 项目声明）",
+   "fetched": "2026-10-06",
+   "files": 739,
+   "bytes": 6269587,
+   "repos": 1,
+   "scope": "技法百科（不是 writeup）：按方向分章，讲机制与套路；用它的词频说明「这个手法在资料里有多常见」",
+   "stages": {
+    "rce": "146 文件",
+    "encoding": "145 文件",
+    "pwn_env": "112 文件",
+    "heap": "107 文件",
+    "buffer_overflow": "86 文件",
+    "crypto_aes": "67 文件",
+    "format_string": "57 文件",
+    "crypto_rsa": "50 文件"
+   }
+  }
+ ],
+ "phases": [
+  {
+   "id": "recon",
+   "name": "信息收集"
+  },
+  {
+   "id": "session",
+   "name": "会话与认证"
+  },
+  {
+   "id": "injection",
+   "name": "注入"
+  },
+  {
+   "id": "rce",
+   "name": "命令执行"
+  },
+  {
+   "id": "file",
+   "name": "文件与路径"
+  },
+  {
+   "id": "audit",
+   "name": "源码审计"
+  },
+  {
+   "id": "misc",
+   "name": "杂项与取证"
+  },
+  {
+   "id": "crypto",
+   "name": "密码学"
+  },
+  {
+   "id": "method",
+   "name": "方法论与排查"
+  }
+ ],
+ "cards": [
+  {
+   "id": "flask-session-forge",
+   "title": "Flask 客户端 session 伪造",
+   "phase": "session",
+   "tags": [
+    "web",
+    "session"
+   ],
+   "signals": [
+    "Set-Cookie: session=三段式 base64",
+    "Server: Werkzeug",
+    "cookie 里能看到自己的名字/角色"
+   ],
+   "mechanism": "Flask 默认把整个 session 内容（JSON）签名后放进 cookie，服务器只验签、不存状态。密钥（SECRET_KEY）一旦弱/泄露，就能任意改字段（role/is_admin），签名自己算。派生密钥 = HMAC(secret, b'cookie-session')，签名 = HMAC(那个, '<payload>.<ts>')，SHA1。",
+   "steps": [
+    "先确认是三段式（base64 的 JSON + 4 字节时间戳 + HMAC），不是纯随机 ID",
+    "拿一条真实 cookie 当爆破验证器（题目名/赛事名/弱口令常第一个命中）",
+    "爆出密钥后用同一密钥重签，改 role/name 等字段",
+    "手工实现时必须让时间戳回拨（如 now-60s）：Flask 带 max_age 校验，签名比服务端新会被整块丢弃"
+   ],
+   "cmds": [
+    "ctfctl cookie list --base \"$U\"",
+    "ctfctl cookie flask-crack -w /usr/share/wordlists/rockyou.txt --base \"$U\"",
+    "ctfctl cookie flask-sign --cookie '<session 值>' --secret <爆出的密钥> --set role=admin"
+   ],
+   "tools": [
+    "flask-unsign"
+   ],
+   "related_rules": [
+    "flask",
+    "client_session"
+   ],
+   "corpus": {
+    "technique": "flask_session",
+    "files": 0,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 0
+    },
+    "examples": [],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "Flask 官方：session 是客户端签名 cookie",
+     "url": "https://flask.palletsprojects.com/en/stable/quickstart/#sessions"
+    }
+   ]
+  },
+  {
+   "id": "jwt-forge",
+   "title": "JWT 伪造 / 算法混用",
+   "phase": "session",
+   "tags": [
+    "web",
+    "jwt"
+   ],
+   "signals": [
+    "页面或 cookie 里出现 eyJ...　.　...　.　...",
+    "Authorization: Bearer eyJ..."
+   ],
+   "mechanism": "JWT 是 base64url(header).base64url(payload).base64url(HMAC)。服务端只验签不加密 → payload 人人可读。三种常见破法：密钥弱（爆破）、密钥泄露（源码里搜 secret）、算法混用（把 alg 改 HS256/none 让服务端用错误的方式验签）。",
+   "steps": [
+    "解 payload 看角色/过期/iss，确定改哪个字段",
+    "先爆破密钥（字典小、命中率高）；报错信息往往暴露用的是 HS256 还是 RS256",
+    "有密钥就重签；服务端信任 header 里的 alg 时试 alg:none（签名段留空）或 RS256→HS256 混用",
+    "kid 可控时试路径穿越/注入（kid=../../dev/null）"
+   ],
+   "cmds": [
+    "ctfctl jwt decode \"$TOKEN\"",
+    "ctfctl jwt crack \"$TOKEN\" -w /usr/share/wordlists/rockyou.txt",
+    "ctfctl jwt sign \"$TOKEN\" --secret <密钥> --set role=admin"
+   ],
+   "tools": [
+    "jwt_tool",
+    "hashcat"
+   ],
+   "related_rules": [
+    "jwt_token",
+    "authz"
+   ],
+   "corpus": {
+    "technique": "jwt",
+    "files": 0,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 0
+    },
+    "examples": [],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "RFC 7519 (JWT)",
+     "url": "https://datatracker.ietf.org/doc/html/rfc7519"
+    }
+   ]
+  },
+  {
+   "id": "sqli-manual",
+   "title": "SQL 注入：手工三连再上工具",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "sqli"
+   ],
+   "signals": [
+    "?id= / ?search= / ?cat= 这类查询参数",
+    "报错里出现 SQL 语法或数据库名",
+    "加引号后回显/长度变化"
+   ],
+   "mechanism": "参数被拼进 SQL 语句。三种取数据方式：联合查询（有回显）、报错注入（有报错回显）、布尔/时间盲注（什么都没有，靠 diff 或 sleep 判断）。",
+   "steps": [
+    "三连：' → 1' → 1\" —— 看报错、回显、长度",
+    "有回显就 union select，先确定列数（order by N 二分）",
+    "没回显就布尔：ctfctl diff 比两个 payload 的响应是否稳定不同（退出码即结论）",
+    "真盲注再考虑时间盲注/外带；sqlmap 只当兜底，先想清楚注入点与闭合方式"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/?id=1'\" ",
+    "ctfctl diff live \"$U/?id=1\" --field id --a 1 --b \"1'and'1'='1\"",
+    "ctfctl req get \"$U/?id=1 union select 1,2,3-- -\""
+   ],
+   "tools": [
+    "sqlmap",
+    "ffuf"
+   ],
+   "related_rules": [
+    "sqli",
+    "blind"
+   ],
+   "corpus": {
+    "technique": "sqli",
+    "files": 8,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 8
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md",
+     "ctf-wiki-master/docs/zh-tw/docs/web/sqli.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: SQL 注入",
+     "url": "https://ctf-wiki.org/web/sqli/"
+    }
+   ]
+  },
+  {
+   "id": "ssti-probe",
+   "title": "模板注入（SSTI）：先算 7*7 再说",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "ssti"
+   ],
+   "signals": [
+    "镜像/Jinja/Twig/Freemarker 栈",
+    "用户输入被渲染进 HTML 模板",
+    "错误页把模板源码或变量名吐出来"
+   ],
+   "mechanism": "用户输入被当模板源码执行。先用 {{7*7}} / ${7*7} / #{7*7} 判断引擎，再沿对象链找执行点（Jinja 常见链：''.__class__.__mro__[1].__subclasses__()）。",
+   "steps": [
+    "三连：{{7*7}}、${7*7}、#{7*7} 分别试，看哪个变成 49（引擎指纹）",
+    "Jinja：{{config}} 看配置、{{''.__class__.__mro__}} 找类，再定位能 Popen 的子类",
+    "Twig：{{_self.env.registerUndefinedFilterCallback('system')}} 家族",
+    "有过滤就换编码/拼接/attr 访问，别硬拼 payload"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/?name={{7*7}}\"",
+    "ctfctl req get \"$U/?name={{config}}\"",
+    "ctfctl req get \"$U/?name={{''.__class__.__mro__[1].__subclasses__()}}\""
+   ],
+   "tools": [
+    "tplmap"
+   ],
+   "related_rules": [
+    "flask"
+   ],
+   "corpus": {
+    "technique": "ssti",
+    "files": 0,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 0
+    },
+    "examples": [],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: SSTI",
+     "url": "https://ctf-wiki.org/web/ssti/"
+    }
+   ]
+  },
+  {
+   "id": "php-weak-compare",
+   "title": "PHP 弱比较与函数特性（md5 数组绕过）",
+   "phase": "audit",
+   "tags": [
+    "web",
+    "php"
+   ],
+   "signals": [
+    "源码里 md5( / sha1( / strcmp( / == 同时出现",
+    "要求两个不同输入的哈希相等",
+    "is_numeric / intval / 0e 开头"
+   ],
+   "mechanism": "md5()/sha1() 收数组返回 NULL，NULL == NULL 为真 → 两个不同数组即相等（=== 也拦不住这条，因为都是 NULL）。'0e123' 这类串在 == 下都被当 0，所以 0e 开头的两个哈希相等；strcmp() 收数组返回 NULL，NULL == 0 为真。",
+   "steps": [
+    "先看比较用的是 == 还是 ===、函数收的是字符串还是任意类型",
+    "数组绕过：参数写成 a[]=1&b[]=2（两个不同数组 → 都是 NULL）",
+    "0e 碰撞：找两个 0e 开头的哈希输入（弱口令小字典里就有）",
+    "strcmp 绕过后再看代码有没有把数组转字符串（转了就失效）"
+   ],
+   "cmds": [
+    "ctfctl req post \"$U/\" -d 'a[]=1' -d 'b[]=2'",
+    "python3 -c \"import hashlib;print([ (w,hashlib.md5(w.encode()).hexdigest()) for w in ('240610708','QNKCDZO') ])\""
+   ],
+   "tools": [
+    "php",
+    "hashcat"
+   ],
+   "related_rules": [
+    "php"
+   ],
+   "corpus": {
+    "technique": "php_magic",
+    "files": 49,
+    "per_source": {
+     "sajjadium__ctf-writeups": 1,
+     "ctf-wiki__ctf-wiki": 48
+    },
+    "examples": [
+     "ctf-writeups-master/ctfs/iCTF/2018/fantasticiot/README.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PHP 手册：比较运算符（松散比较表）",
+     "url": "https://www.php.net/manual/en/language.operators.comparison.php"
+    }
+   ]
+  },
+  {
+   "id": "lfi-filter-read",
+   "title": "文件包含 / 伪协议读源码",
+   "phase": "file",
+   "tags": [
+    "web",
+    "lfi"
+   ],
+   "signals": [
+    "?file= / ?page= / ?template= / ?path=",
+    "include/require 报错里出现路径",
+    "页面把某个模板文件名当参数"
+   ],
+   "mechanism": "参数被拼进 include/readfile/open。php://filter 能把文件当流读出来并 base64 编码，从而拿到源码而不执行；file:// 读任意本地文件；路径穿越用 ../ 或 ..%2f 绕过滤。",
+   "steps": [
+    "先试 plain 路径（../../etc/passwd）确认穿越可用",
+    "再用 php://filter/convert.base64-encode/resource=index.php 读源码（拿到代码就能找下一步）",
+    "被过滤 ../ 时试 ..%2f、....//、绝对路径、/proc/self/cwd/",
+    "读到源码后找：判定条件（要满足什么）+ 危险函数（include/system/eval）"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/?file=php://filter/convert.base64-encode/resource=index.php\"",
+    "ctfctl req get \"$U/?file=../../../../etc/passwd\"",
+    "ctfctl req get \"$U/?file=data://text/plain;base64,PD8gc3lzdGVtKCRfR0VUWzFdKTs/Pg==\""
+   ],
+   "tools": [
+    "php_filter_chain_generator",
+    "lfimap"
+   ],
+   "related_rules": [
+    "lfi_ssrf",
+    "php"
+   ],
+   "corpus": {
+    "technique": "lfi",
+    "files": 28,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 28
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/blockchain/publicblockchain/weaknesses.md",
+     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PHP 手册：php://filter 包装器",
+     "url": "https://www.php.net/manual/en/wrappers.php.php"
+    }
+   ]
+  },
+  {
+   "id": "rce-separator",
+   "title": "命令执行：先证明点通，再谈绕过",
+   "phase": "rce",
+   "tags": [
+    "web",
+    "rce"
+   ],
+   "signals": [
+    "?cmd= / ?exec= / type=run + php_code",
+    "页面有\"执行/运行\"按钮",
+    "回显里出现命令输出或报错"
+   ],
+   "mechanism": "参数进了 system/exec/shell_exec 或者被 eval。分隔符家族（; | || & && $() `` %0a）覆盖绝大多数写法；被过滤就走编码/通配符/变量拼接。",
+   "steps": [
+    "先发 echo 1;（或 echo 7*7）确认执行点真的通 —— 再谈利用",
+    "按未过滤的分隔符逐个试：; | || & && $( ) 反引号 换行(%0a)",
+    "被过滤空格：${IFS}、$IFS$9、%09、< 重定向",
+    "被过滤关键字：通配符（/???/??t）、拼接（c''at）、base64 管道、变量替换"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/?cmd=echo%207*7\"",
+    "ctfctl req get \"$U/?cmd=;id\"",
+    "ctfctl req get \"$U/?cmd=cat%20/flag*\""
+   ],
+   "tools": [
+    "commix"
+   ],
+   "related_rules": [
+    "rce"
+   ],
+   "corpus": {
+    "technique": "rce",
+    "files": 154,
+    "per_source": {
+     "sajjadium__ctf-writeups": 8,
+     "ctf-wiki__ctf-wiki": 146
+    },
+    "examples": [
+     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md",
+     "ctf-writeups-master/ctfs/0CTF/2018/Quals/babyheap/README.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PayloadsAllTheThings: Command Injection",
+     "url": "https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Command%20Injection"
+    }
+   ]
+  },
+  {
+   "id": "backup-leak-and-fake200",
+   "title": "源码/备份泄露 与 假 200 的判定",
+   "phase": "recon",
+   "tags": [
+    "web",
+    "recon"
+   ],
+   "signals": [
+    "robots.txt 里有奇怪路径",
+    "站内有 vim/编辑器残迹或 200 但 0 字节的页面",
+    "目录列表被关但备份文件没删"
+   ],
+   "mechanism": "nginx 的 try_files 回退会把不存在的路径也返回 200 + 首页 HTML（假 200）；判据是字节数与 Content-Type 与首页一致。Apache 则给真 404，所以先看 Server 头再决定怎么判。",
+   "steps": [
+    "扫清单里的备份名：index.php.bak / ~ / .swp / .swo / .un~ / www.zip / .git/HEAD",
+    "对每个 200 比字节数与 Content-Type（相等=假；不等且是 zip/octet-stream=真）",
+    "免费的真伪判据：.php 结尾会走 PHP 层给真 404，非 .php 才被回退成假 200",
+    "拿到源码包就解包，先 grep 判定条件与危险函数"
+   ],
+   "cmds": [
+    "ctfctl recon \"$U\" --full",
+    "ctfctl fuzz \"$U/FUZZ\" -e php,bak,zip,swp --safe",
+    "curl -s \"$U/index.php.bak\" -o /dev/null -w '%{http_code} %{size_download} %{content_type}\\n'"
+   ],
+   "tools": [
+    "feroxbuster",
+    "ffuf",
+    "git-dumper"
+   ],
+   "related_rules": [
+    "fake200",
+    "source_leak",
+    "git_leak",
+    "vim_swp"
+   ],
+   "corpus": {
+    "technique": "audit",
+    "files": 5,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 5
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+     "ctf-wiki-master/docs/zh/docs/introduction/content.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "nginx try_files 语义",
+     "url": "https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files"
+    }
+   ]
+  },
+  {
+   "id": "staged-field-swap",
+   "title": "多关卡靶：字段名与值是反的",
+   "phase": "method",
+   "tags": [
+    "web",
+    "method"
+   ],
+   "signals": [
+    "页面 data-recipient / data-greeting 之类成对属性",
+    "闸门反馈分级（\"请构造 POST\" / \"信封格式不对\" / \"请求体无法解析\"）"
+   ],
+   "mechanism": "作者的提示词把\"字段名\"和\"值\"写反了：data-recipient 是值、data-greeting 才是字段名。猜错的关键在于把两个 token 直接当键值对填。",
+   "steps": [
+    "先手打 4-6 个候选：token 当名字 / 当值 / 交换角色 / 单字段",
+    "把闸门反馈当探针：body 编码非法(如 a=%ZZ) 会单独报\"请求体无法解析\" → 证明送达并解析了",
+    "命中即停；大字典前先算代价（共享靶机会限流）",
+    "通关状态会污染会话：每个命中都换新会话单发复验"
+   ],
+   "cmds": [
+    "ctfctl req post \"$U/st4ge1-<hex>\" -d 'QuestionCTF=hello_web'",
+    "ctfctl req post \"$U/st4ge1-<hex>\" -d 'recipient=QuestionCTF&greeting=hello_web'"
+   ],
+   "tools": [],
+   "related_rules": [
+    "authz"
+   ],
+   "corpus": {
+    "technique": "authbypass",
+    "files": 10,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 10
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
+     "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "关卡路径随机且绑 cookie：只能从 / 用自己的会话一路走",
+     "url": ""
+    }
+   ]
+  },
+  {
+   "id": "egress-403",
+   "title": "所有路径都 403/空 = 出口问题，不是题目",
+   "phase": "method",
+   "tags": [
+    "method",
+    "network"
+   ],
+   "signals": [
+    "403 + Content-Length: 0，且所有路径一样",
+    "chrome-error://chromewebdata/",
+    "connection refused vs 超时"
+   ],
+   "mechanism": "命令行出口（容器/校园网/代理）与浏览器出口不是同一个 IP，靶机常只放行其中一个。连接被拒=服务没起；超时=中间被掐；这两个要把\"题目坏了\"和\"我这边不通\"分开。",
+   "steps": [
+    "先在两个出口各打一个已知存在的路径，确认哪条通（记录状态码与字节数）",
+    "选定出口后全程只用那一条（cookie/会话不跨出口共享）",
+    "容器的出口换了就换 browser 通道（CDP 同源 fetch）",
+    "NSSCTF 靶机闲置会自动停机、端口每次变 → 连不上先要地址栏完整 URL"
+   ],
+   "cmds": [
+    "ctfctl req get \"$U/\" --no-follow -v",
+    "ctfctl browser \"$U/\" --launch",
+    "ctfctl req get \"$U/\" --proxy 127.0.0.1:8080"
+   ],
+   "tools": [
+    "proxychains-ng"
+   ],
+   "related_rules": [
+    "egress_403"
+   ],
+   "refs": []
+  },
+  {
+   "id": "upload-bypass",
+   "title": "文件上传：后缀黑名单绕过",
+   "phase": "file",
+   "tags": [
+    "web",
+    "upload"
+   ],
+   "signals": [
+    "<input type=file> + 提示\"只能传图片\"",
+    "上传后有固定 URL 能访问到文件"
+   ],
+   "mechanism": "黑名单只挡 .php：换等价后缀（.phtml/.php5/.phar/.pht）、大小写混写、双写（.pphphp）、尾点/空格/::DATA，或上传 .htaccess/.user.ini 改解析规则。内容校验用图片头绕过（GIF89a 前缀）。",
+   "steps": [
+    "先确认能不能访问到上传的文件（拿到路径与状态码）",
+    "逐个试后缀变体，一次只改一个变量（否则不知道哪个生效）",
+    "被 Content-Type / getimagesize 挡：加 GIF89a 头或用 polyglot（图里带 php 代码）",
+    "真拿不到就找目录穿越（filename=../shell.php）或上传 .htaccess"
+   ],
+   "cmds": [
+    "ctfctl req post \"$U/upload\" -F 'file=@x.phtml;filename=x.phtml'",
+    "ctfctl req get \"$U/uploads/x.phtml?0=id\""
+   ],
+   "tools": [
+    "weevely"
+   ],
+   "related_rules": [
+    "upload"
+   ],
+   "corpus": {
+    "technique": "upload",
+    "files": 4,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 4
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+     "ctf-wiki-master/docs/zh/docs/introduction/content.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PayloadsAllTheThings: File Upload",
+     "url": "https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Upload"
+    }
+   ]
+  },
+  {
+   "id": "php-unserialize",
+   "title": "PHP 反序列化：找可控入口与魔术方法",
+   "phase": "injection",
+   "tags": [
+    "web",
+    "php",
+    "deser"
+   ],
+   "signals": [
+    "源码里有 unserialize(",
+    "__wakeup / __destruct / __toString",
+    "参数长得像 O:4:\"User\":1:{...}"
+   ],
+   "mechanism": "unserialize 把攻击者可控的字符串还原成对象，还原过程会触发魔术方法（__wakeup/__destruct/__toString），链走到危险函数就成 RCE。属性数量/长度写错会被 O 的长度校验挡住。",
+   "steps": [
+    "读源码找链：入口（可控 unserialize）→ 魔术方法 → 危险函数",
+    "手工构造 payload：C 长度必须与字符串字节数完全一致（中文/转义最容易错）",
+    "CVE/框架链（Laravel/Symfony/ThinkPHP）用现成工具生成",
+    "用 ctfctl req 发；有过滤（如 O 被挡）试 C 表示法、大小写、%00 截断"
+   ],
+   "cmds": [
+    "python3 -c \"print('O:4:\\\"User\\\":1:{s:4:\\\"role\\\";s:5:\\\"admin\\\";}')\"",
+    "ctfctl req post \"$U/\" -d 'data=O:4:%22User%22:1:{s:4:%22role%22;s:5:%22admin%22;}'"
+   ],
+   "tools": [
+    "phpggc"
+   ],
+   "related_rules": [
+    "unserialize"
+   ],
+   "corpus": {
+    "technique": "deser",
+    "files": 2,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
+     "ctf-wiki-master/docs/zh/docs/web/php/php.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PHP 手册：unserialize 与魔术方法",
+     "url": "https://www.php.net/manual/en/language.oop5.magic.php"
+    }
+   ]
+  },
+  {
+   "id": "zip-pseudo-encrypt",
+   "title": "压缩包密码：先判伪加密，再爆破",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "misc-archive"
+   ],
+   "signals": [
+    "zip 要求密码但内容看着像公开题",
+    "题目给 .zip 且没有提示词",
+    "zip 里有嵌套 zip"
+   ],
+   "mechanism": "zip 的加密标志位在本地文件头与中央目录各有一份。作者有时只改一处 → 伪加密（改回标志位即可解）。真加密（ZipCrypto/AES）就得爆破或已知明文攻击（bkcrack）。",
+   "steps": [
+    "先看是不是伪加密：010 Editor/hexdump 把两个 flag 位改回 0（或直接用工具）",
+    "真加密且是 ZipCrypto：有明文片段就用 bkcrack 已知明文攻击（比重在字典上快得多）",
+    "否则 zip2john + john/hashcat（口令常用小字典或赛题主题词）",
+    "解出一层看是否还有一层（嵌套是常见设计）"
+   ],
+   "cmds": [
+    "zip2john frist.zip > h.txt && john --wordlist=/usr/share/wordlists/rockyou.txt h.txt",
+    "bkcrack -C frist.zip -c plain.txt -p known.txt",
+    "7z l -slt frist.zip     # 看 Method/Encrypted 列判断真伪加密"
+   ],
+   "tools": [
+    "bkcrack",
+    "john",
+    "hashcat"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "archive_crack",
+    "files": 3,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 3
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/misc/archive/zip.md",
+     "ctf-wiki-master/docs/zh/docs/misc/archive/rar.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "ZipCrypto 已知明文攻击（bkcrack）",
+     "url": "https://github.com/kimci86/bkcrack"
+    }
+   ]
+  },
+  {
+   "id": "img-append-lsb-crc",
+   "title": "图片题三件套：附加数据 / LSB / IHDR 与 CRC",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "stego"
+   ],
+   "signals": [
+    "文件大小明显大于像素需要",
+    "PNG 尺寸被改过",
+    "题目说\"看看图里有什么\""
+   ],
+   "mechanism": "三种独立机制：① 文件结构后面挂着另一份文件（IEND 之后 / JPEG EOI 之后）；② 像素最低位藏数据（LSB，按通道/顺序读出来）；③ IHDR 的宽高被改 → 图片显示不全，而 IDAT 里的数据按 CRC 还能反推真实尺寸。",
+   "steps": [
+    "binwalk/foremost 看有没有内嵌文件；没结果再看 LSB（zsteg -a）",
+    "PNG 尺寸可疑就按 CRC 反推宽高（IHDR 的 CRC 只覆盖前 4+4 字节以外的 13 字节数据）",
+    "确认\"差异是真的\"再追：同一手段换个工具复现一次，别用肉眼判",
+    "有密码的隐写（steghide/outguess）先跑小字典"
+   ],
+   "cmds": [
+    "binwalk -e p.png; zsteg -a p.png; foremost -i p.png -o out/",
+    "python3 -c \"import struct;print(struct.unpack('>II',open('p.png','rb').read()[16:24]))\"",
+    "stegsolve p.png   # 逐通道/位平面肉眼比对"
+   ],
+   "tools": [
+    "binwalk",
+    "zsteg",
+    "stegsolve",
+    "steghide"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "stego_img",
+    "files": 44,
+    "per_source": {
+     "sajjadium__ctf-writeups": 1,
+     "ctf-wiki__ctf-wiki": 43
+    },
+    "examples": [
+     "ctf-writeups-master/ctfs/StarCTF/2018/note/README.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "PNG 规范（IHDR/IDAT/CRC 定义）",
+     "url": "https://www.w3.org/TR/png-3/"
+    }
+   ]
+  },
+  {
+   "id": "rsa-near-primes",
+   "title": "RSA：先判攻击类型，再动手",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "rsa"
+   ],
+   "signals": [
+    "给 n e c 三个数",
+    "n 有 128/256/512 位",
+    "同一 n 多组密文"
+   ],
+   "mechanism": "按特征分流：p、q 相近 → Fermat 分解；e 很小且 m^e < n → 直接开 e 次方；同一 n 两组密文 → 共模攻击；d 小 → Wiener；已知高位 p → Coppersmith。",
+   "steps": [
+    "先看 n 的位数与 e：e=3/低指数优先试小明文与共模",
+    "n 位数小（<256 位）先试 factordb，再试 Fermat",
+    "多组密文同 n → 共模攻击（gmpy2 求逆）",
+    "都不成再考虑格攻击（需 Sage）——先诚实停下确认假设"
+   ],
+   "cmds": [
+    "ctfctl codec hex  # 抄题目里的数（不给参数读 stdin）",
+    "python3 -c \"import gmpy2;print(gmpy2.iroot(c,3))\"",
+    "sage -c 'print(factor(n))'"
+   ],
+   "tools": [
+    "sage",
+    "RsaCtfTool",
+    "yafu"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "crypto_rsa",
+    "files": 50,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 50
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
+     "ctf-wiki-master/docs/zh-tw/docs/crypto/introduction.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: RSA 常见攻击",
+     "url": "https://ctf-wiki.org/crypto/asymmetric/rsa/rsa_intro/"
+    }
+   ]
+  },
+  {
+   "id": "encoding-family",
+   "title": "编码题：识别家族 → 层层剥",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "encoding"
+   ],
+   "signals": [
+    "一串只有 A-Za-z0-9+/= 的字符",
+    "结尾有 = 或 ==（base32/64 特征）",
+    "题名里有 base/编码相关词"
+   ],
+   "mechanism": "base 家族靠字符集与填充判断（base16=hex、base32=[A-Z2-7]、base64=[A-Za-z0-9+/]、base85/92 字符集更宽）；嵌套编码要逐层解并每层看字符集变化。变体（自定义表、倒序表）要拿\"解法能解出可读文本\"当验证。",
+   "steps": [
+    "先 ctfctl codec guess 让它猜家族，再手工确认",
+    "每解一层就重新看字符集（层数与家族都在变）",
+    "非标准表：拿已知明文（如 flag{ 前缀）反推字母表映射",
+    "别硬猜：写出\"解完必须能看出是文本/镜像头\"的判据"
+   ],
+   "cmds": [
+    "ctfctl codec guess",
+    "ctfctl codec b64d \"$(cat s.txt)\"",
+    "ctfctl codec hexd \"666c6167\""
+   ],
+   "tools": [
+    "CyberChef",
+    "ciphey"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "encoding",
+    "files": 161,
+    "per_source": {
+     "sajjadium__ctf-writeups": 16,
+     "ctf-wiki__ctf-wiki": 145
+    },
+    "examples": [
+     "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "CyberChef（魔法棒自动识别多层编码）",
+     "url": "https://gchq.github.io/CyberChef/"
+    }
+   ]
+  },
+  {
+   "id": "vault-writeup-loop",
+   "title": "做题闭环：负结果比成功更值钱",
+   "phase": "method",
+   "tags": [
+    "method",
+    "workflow"
+   ],
+   "signals": [
+    "一条线索试了一轮没进展",
+    "被同一招绕了两回",
+    "要回答\"还差多远\""
+   ],
+   "mechanism": "CTF 的时间黑洞是重复劳动：试过什么不写下来，下一轮又从零开始。工具侧的对应设计是请求历史（replay）+ 导出（export md），把\"当时怎么发的\"和\"结论\"一起落盘。",
+   "steps": [
+    "每轮开动前先 replay list 回看：这一步是不是已经做过",
+    "负结果也要落盘：试了什么 / 怎么试的 / 结论（含\"未能判定\"）",
+    "卡住就换线并报进度，单条线索超过一轮没进展就停",
+    "收尾用 export md 生成脱敏片段，写进 vault 的 CTF/ 笔记"
+   ],
+   "cmds": [
+    "ctfctl replay list -n 20",
+    "ctfctl export md --last 10 --title 题名 --note",
+    "ctfctl note new --title 题名 --platform 平台 --kps 考点 --index"
+   ],
+   "tools": [],
+   "related_rules": [],
+   "refs": []
+  },
+  {
+   "id": "pwn-first-actions",
+   "title": "pwn 第一步：保护机制 → 交互 → 泄漏",
+   "phase": "method",
+   "tags": [
+    "pwn"
+   ],
+   "signals": [
+    "给了 ELF 附件（可能有 nc 连的远程）",
+    "题目说 'nc host port'",
+    "给了 libc.so"
+   ],
+   "mechanism": "pwn 的顺序是固定的：① 看保护（NX/PIE/Canary/RELRO 决定能怎么打）② 看交互（read/scanf 到栈的哪个位置、有没有 gift）③ 找泄漏点（输出一个地址就够绕 PIE）④ 写 exp（pwntools 一组远程/本地一致）。跳过①②直接抄 exp 是最常见的浪费时间。",
+   "steps": [
+    "checksec/ctfctl file 看保护：NX 关→可写 shellcode；PIE 关→地址固定；Canary 关→直接溢出",
+    "用 cyclic 找偏移（cyclic 200 喂进去，看 RBP/RIP 被覆盖成什么值）",
+    "找泄漏：puts/printf 输出一个 libc 地址即可算 base；没泄漏就考虑 ret2dlresolve/暴力爆破\n",
+    "本地用同一版 libc 跑通（patchelf/pwninit）再打远程"
+   ],
+   "cmds": [
+    "ctfctl file ./chal",
+    "checksec --file=./chal",
+    "python3 -c \"from pwn import *;print(cyclic(200))\"",
+    "ROPgadget --binary ./chal --only 'pop|ret' | head"
+   ],
+   "tools": [
+    "pwntools",
+    "pwndbg",
+    "ROPgadget",
+    "checksec",
+    "one_gadget",
+    "pwninit",
+    "libc-database"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "buffer_overflow",
+    "note": "命中文件数（不是题数）",
+    "files": 117,
+    "per_source": {
+     "sajjadium__ctf-writeups": 31,
+     "ctf-wiki__ctf-wiki": 86
+    },
+    "examples": [
+     "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
+     "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md"
+    ]
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: pwn 环境与工具",
+     "url": "https://ctf-wiki.org/pwn/linux/user-mode/environment/"
+    }
+   ]
+  },
+  {
+   "id": "rev-workflow",
+   "title": "逆向：静态 → 动态 → 自动化",
+   "phase": "method",
+   "tags": [
+    "rev"
+   ],
+   "signals": [
+    "给了 exe/elf/apk/pyc/jar",
+    "题目说 'flag 在程序里' 或 '输入正确密码'"
+   ],
+   "mechanism": "逆向是「信息量最大化」的活：先拿字符串与导入表定方向（有没有校验/网络/文件读），再反编译看主逻辑，卡在算法上就用动态调试或符号执行跳过。",
+   "steps": [
+    "先 strings/导入表：flag/密文/网络/Crypto 字样决定题型",
+    "Ghidra 反编译 main 与交叉引用；关注比较函数（strcmp/memcmp/自定义）",
+    "静态看不懂就动态：gdb/frida/x64dbg 在比较处下断看两边值（最快的一招）",
+    "算法是纯数学/位运算 → 直接转成 z3 约束或 angr 符号执行跑通"
+   ],
+   "cmds": [
+    "ctfctl file ./chal",
+    "strings -n 6 ./chal | head -40",
+    "r2 -A -q -c 'izz~flag' ./chal",
+    "python3 -c \"import angr;p=angr.Project('./chal',auto_load_libs=False);print(p.entry)\""
+   ],
+   "tools": [
+    "ghidra",
+    "radare2",
+    "frida",
+    "angr",
+    "z3-solver",
+    "jadx",
+    "dnSpy",
+    "uncompyle6",
+    "pyinstxtractor"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "rev_ghidra",
+    "note": "命中文件数（不是题数）",
+    "files": 22,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 22
+    },
+    "examples": [
+     "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
+     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/dynamic_debug.md"
+    ]
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: 逆向工程",
+     "url": "https://ctf-wiki.org/reverse/introduction/"
+    }
+   ]
+  },
+  {
+   "id": "pcap-first-pass",
+   "title": "流量题：先概览，再追流，最后导出对象",
+   "phase": "misc",
+   "tags": [
+    "forensics",
+    "pcap"
+   ],
+   "signals": [
+    "给了 .pcap/.pcapng/.cap",
+    "题目提到 '抓包/流量/中间人'"
+   ],
+   "mechanism": "流量题 80% 的 flag 在 HTTP 对象或某个 TCP 流里。顺序错了会在 wireshark 里翻半小时：先 -z io,phs 看协议构成，再 conv 看会话，再 export-objects 把文件都拽出来。",
+   "steps": [
+    "协议分层统计（有没有 USB/ICMP/DNS 隧道这种特殊流量）",
+    "会话列表找最大的那条流；HTTP 直接导出对象",
+    "导出对象后对每个文件跑 ctfctl file 再筛一遍",
+    "特殊流量单独处理：USB 键盘要解析 HID 报告，DNS 隧道看子域名字符"
+   ],
+   "cmds": [
+    "tshark -r a.pcap -q -z io,phs",
+    "tshark -r a.pcap -q -z conv,tcp",
+    "tshark -r a.pcap --export-objects http,./out -q",
+    "ctfctl file ./out/<导出物>"
+   ],
+   "tools": [
+    "wireshark",
+    "tshark",
+    "networkminer",
+    "tcpflow",
+    "binwalk"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "pcap",
+    "note": "命中文件数（不是题数）",
+    "files": 32,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 32
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
+     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md"
+    ]
+   },
+   "refs": [
+    {
+     "title": "ctf-wiki: 流量分析",
+     "url": "https://ctf-wiki.org/misc/traffic/introduction/"
+    }
+   ]
+  },
+  {
+   "id": "sqlite-and-wal",
+   "title": "给了 .db：先查表，再看 WAL/未用页/SQLCipher",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "forensics"
+   ],
+   "signals": [
+    "附件里有 .db/.sqlite/.sqlite3",
+    "题目提到 '数据库/删掉的数据/照片'"
+   ],
+   "mechanism": "① 普通 SQLite 直接查表；② 关键数据常在被删但仍在未用页（freelist）里的行，用 .recover 能捞回来；③ 如果文件头是 SQLCipher（或 file 认不出），要先拿密钥（密钥常在同题别的文件里）；④ WAL 文件里存着还没 checkpoint 的新数据 —— 只看 .db 会漏掉最后写的那些。",
+   "steps": [
+    "先 sqlite3 查 schema/表/行；报 'file is not a database' 就是加密变体",
+    "翻被删数据：sqlite3 a.db '.recover' > rec.sql，或 strings/未用页搜",
+    "有 -wal/-journal 一起拖上：sqlite3 a.db 载入后 WAL 会被应用",
+    "SQLCipher：用候选密钥 PRAGMA key，再用 .tables 验证（报错就是密钥错）"
+   ],
+   "cmds": [
+    "sqlite3 a.db '.tables' '.schema'",
+    "sqlite3 a.db '.recover' > rec.sql && grep -i flag rec.sql",
+    "sqlcipher a.db \"PRAGMA key='<候选密钥>'; select name from sqlite_master;\"",
+    "ls -la a.db*; strings a.db | grep -i flag"
+   ],
+   "tools": [
+    "sqlitebrowser",
+    "sqlcipher",
+    "binwalk"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "forensics_fs",
+    "note": "命中文件数（不是题数）",
+    "files": 23,
+    "per_source": {
+     "sajjadium__ctf-writeups": 0,
+     "ctf-wiki__ctf-wiki": 23
+    },
+    "examples": [
+     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
+     "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md"
+    ]
+   },
+   "refs": [
+    {
+     "title": "SQLite 官方：.recover 与 WAL 机制",
+     "url": "https://sqlite.org/cli.html"
+    }
+   ]
+  }
+ ],
+ "_evidence": {
+  "_comment": "kb 卡片 corpus.files 的来源：scripts/harvest_writeups.py 在这批语料上的实测命中。口径：文件计数（一个文件命中多次算 1）、大小写不敏感子串、每来源内按内容 sha1 去重、跳过语料根目录的索引文件。",
+  "files_total": 796,
+  "bytes_total": 6292629,
+  "fetched": "2026-10-06",
+  "generated_by": "python3 scripts/harvest_writeups.py count --corpus ... --json research/kb-evidence.json"
+ }
+}

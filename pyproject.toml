@@ -3,16 +3,16 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "webctl"
-version = "0.5.0"
-description = "Web CTF 通用工具：会话化请求 / 侦察 / 爆破 / 请求历史 / 重放 / 对比 / 录制导出（纯标准库，零依赖）"
+name = "ctfctl"
+version = "1.0.0"
+description = "CTF 工具箱：会话化请求 / 侦察 / 爆破 / 请求历史 / 重放 / 对比 / 录制导出 / 工具目录 / 知识库 / TUI（纯标准库，零依赖）"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "Phirisyyds" }]
-keywords = ["ctf", "web", "security", "pentest", "cli"]
+keywords = ["ctf", "web", "security", "pentest", "cli", "tui", "writeup"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Environment :: Console",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
@@ -22,15 +22,16 @@ classifiers = [
 dependencies = []          # 刻意零依赖，只用标准库
 
 [project.urls]
-Homepage = "https://github.com/Phirisyyds/webctl"
-Repository = "https://github.com/Phirisyyds/webctl"
-Issues = "https://github.com/Phirisyyds/webctl/issues"
+Homepage = "https://github.com/Phirisyyds/ctfctl"
+Repository = "https://github.com/Phirisyyds/ctfctl"
+Issues = "https://github.com/Phirisyyds/ctfctl/issues"
 
 [project.scripts]
-webctl = "webctl.cli:main"
+ctfctl = "ctfctl.cli:main"
+webctl = "ctfctl.cli:main"        # 兼容旧名（会打印一行改名提示）
 
 [tool.setuptools]
-packages = ["webctl", "webctl.core", "webctl.commands"]
+packages = ["ctfctl", "ctfctl.core", "ctfctl.commands"]
 
 [tool.setuptools.package-data]
-webctl = ["data/*.json", "templates/*.md"]
+ctfctl = ["data/*.json", "data/*.md", "templates/*.md"]

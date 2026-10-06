@@ -1,4 +1,4 @@
-"""webctl 冒烟测试：起本地 demo 靶机，跑真实 CLI，断言判定逻辑。
+"""ctfctl 冒烟测试：起本地 demo 靶机，跑真实 CLI，断言判定逻辑。
 
     python3 tests/test_smoke.py          # 全部用例
 不需要 pytest（零依赖），失败会打印 FAIL 并返回非 0。
@@ -15,8 +15,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORT = 8849
 BASE = f"http://127.0.0.1:{PORT}"
-# 测试用独立 cache：不污染 ~/.cache/webctl，也保证每次都是干净状态（历史里有旧记录会让断言飘）
-CACHE = "/tmp/webctl-test-cache"
+# 测试用独立 cache：不污染 ~/.cache/ctfctl，也保证每次都是干净状态（历史里有旧记录会让断言飘）
+CACHE = "/tmp/ctfctl-test-cache"
 
 FAILED: list[str] = []
 
@@ -28,8 +28,8 @@ def check(name: str, cond: bool, detail: str = "") -> None:
 
 
 def cli(*args: str, stdin: str | None = None) -> subprocess.CompletedProcess:
-    env = {**os.environ, "WEBCTL_CACHE": CACHE, "PYTHONPATH": ROOT}
-    return subprocess.run([sys.executable, "-m", "webctl", *args], capture_output=True,
+    env = {**os.environ, "CTFCTL_CACHE": CACHE, "PYTHONPATH": ROOT}
+    return subprocess.run([sys.executable, "-m", "ctfctl", *args], capture_output=True,
                           text=True, env=env, input=stdin, timeout=120)
 
 
@@ -85,7 +85,7 @@ def main() -> int:
         s = b64e(_hm.new(b"secret123", f"{h}.{p}".encode(), _h.sha256).digest())
         tok = f"{h}.{p}.{s}"
         check("jwt decode", '"role": "user"' in cli("jwt", "decode", tok).stdout)
-        wl = "/tmp/webctl_wl.txt"
+        wl = "/tmp/ctfctl_wl.txt"
         open(wl, "w").write("nope\nsecret123\n")
         check("jwt crack", "secret = secret123" in cli("jwt", "crack", tok, "-w", wl).stdout)
         new = cli("jwt", "sign", tok, "--secret", "secret123", "--set", "role=admin").stdout.strip()
@@ -94,7 +94,7 @@ def main() -> int:
 
         print("\n[5] Flask session：爆破 + 伪造（含时间戳回拨）")
         sys.path.insert(0, ROOT)
-        from webctl.commands.cookie import sign, unsign
+        from ctfctl.commands.cookie import sign, unsign
         ck = sign({"name": "guest"}, "django-insecure-key")
         check("flask sign/unsign 自洽", unsign(ck, "django-insecure-key") == {"name": "guest"})
         check("错密钥验签失败", unsign(ck, "wrong") is None)
@@ -123,7 +123,7 @@ def main() -> int:
         check("报告落盘存在", bool(rep) and os.path.exists(rep), str(rep))
 
         print("\n[7] note：模板生成（写到临时 vault，不碰你的真 vault）")
-        tmp_vault = "/tmp/webctl_vault"
+        tmp_vault = "/tmp/ctfctl_vault"
         import shutil as _sh
         _sh.rmtree(tmp_vault, ignore_errors=True)      # 保证可重复跑
         os.makedirs(os.path.join(tmp_vault, "CTF"), exist_ok=True)
@@ -138,7 +138,7 @@ def main() -> int:
         check("rules list 能列出规则", "flask" in cli("rules", "list").stdout)
 
         print("\n[9] fuzz：内置引擎 + 假 200 过滤")
-        wl = "/tmp/webctl_wl.txt"
+        wl = "/tmp/ctfctl_wl.txt"
         open(wl, "w").write("index.php.bak\nrobots.txt\nlogin\nadmin\nnope\nstatic/js/app.js\n")
         r = cli("fuzz", BASE + "/FUZZ", "-w", wl, "--engine", "builtin", "-t", "4")
         out = r.stdout
@@ -170,9 +170,9 @@ def main() -> int:
         check("值不同 → 退出码 1（可当布尔探针）", r.returncode == 1 and "sha不同" in r.stdout, r.stdout + r.stderr)
         r = cli("diff", "live", BASE + "/api/v1/user", "--field", "id", "--a", "1", "--b", "1")
         check("值相同 → 退出码 0", r.returncode == 0 and "完全一致" in r.stdout, r.stdout + r.stderr)
-        open("/tmp/webctl_d1.txt", "w").write("same\n")
-        open("/tmp/webctl_d2.txt", "w").write("same\n")
-        check("diff files 相同 → 0", cli("diff", "files", "/tmp/webctl_d1.txt", "/tmp/webctl_d2.txt").returncode == 0)
+        open("/tmp/ctfctl_d1.txt", "w").write("same\n")
+        open("/tmp/ctfctl_d2.txt", "w").write("same\n")
+        check("diff files 相同 → 0", cli("diff", "files", "/tmp/ctfctl_d1.txt", "/tmp/ctfctl_d2.txt").returncode == 0)
 
         print("\n[12] CDP WebSocket 帧格式（离线，用最小 echo 服务端）")
         wssrv = subprocess.Popen([sys.executable, os.path.join(ROOT, "tests", "ws_echo_server.py"), "8901"],
@@ -180,7 +180,7 @@ def main() -> int:
         try:
             time.sleep(1.0)
             sys.path.insert(0, ROOT)
-            from webctl.core.cdp import WS
+            from ctfctl.core.cdp import WS
             w = WS("ws://" + "127" + ".0.0.1" + ":8901/", timeout=5)
             w.send_text("hello")
             check("短消息回声", w.recv_text() == "hello")
@@ -197,8 +197,8 @@ def main() -> int:
         r = cli("browser", BASE + "/", "--cdp", "http" + "://" + "127" + "." + "0.0.1" + ":9" + "9" + "9")
         check("browser 通道失败时给三条排查线索", "排查" in (r.stdout + r.stderr), r.stdout + r.stderr)
         # 有 CDP 端口时才做的端到端（容器里没浏览器 → 环境变量指定才跑）
-        if os.environ.get("WEBCTL_CDP"):
-            cdp = os.environ["WEBCTL_CDP"]
+        if os.environ.get("CTFCTL_CDP"):
+            cdp = os.environ["CTFCTL_CDP"]
             r = cli("browser", BASE + "/echo-ua", "--cdp", cdp, "--ua", "QuestionCTFExplorer/1.0", "-q")
             check("browser 通道：UA 经 CDP 覆盖后真送达", "UA=QuestionCTFExplorer/1.0" in r.stdout, r.stdout + r.stderr)
             r = cli("browser", BASE + "/submit", "--cdp", cdp, "-X", "POST", "-d", "q=hi", "-q")
@@ -210,7 +210,7 @@ def main() -> int:
         check("script：带上了 cookie", "--cookie" in r.stdout, r.stdout[:400])
         r = cli("export", "python", "--last", "3")
         check("python：零依赖 urllib 脚本", "urllib.request" in r.stdout and "def put_cookies" in r.stdout, r.stdout[:400])
-        out = "/tmp/webctl_export.sh"
+        out = "/tmp/ctfctl_export.sh"
         if os.path.exists(out):
             os.remove(out)
         r = cli("export", "script", "--last", "2", "-o", out)
@@ -243,6 +243,69 @@ def main() -> int:
         check("其余命中单独列出", "其余命中" in out, out[-1500:])
         r = cli("recon", BASE, "--threads", "2", "--no-suggest")
         check("--no-suggest 关掉联想", "★ 最可能的" not in r.stdout, r.stdout[-800:])
+        print("\n[16] 工具目录 / 知识库 / TUI / 改名兼容")
+        r = cli("--version")
+        check("--version 到 1.0.0", "1.0.0" in r.stdout, r.stdout + r.stderr)
+        r = cli("tools")
+        check("tools：分类概览", r.returncode == 0 and "工具目录" in r.stdout, r.stdout[:600] + r.stderr[:400])
+        check("tools：给出分类行（含 web）", "web" in r.stdout, r.stdout[:600])
+        r = cli("tools", "check", "--missing")
+        check("tools check --missing：给安装命令", "pacman" in r.stdout or "pip" in r.stdout, r.stdout[:500])
+        r = cli("tools", "search", "ffuf")
+        check("tools search 命中 ffuf", "ffuf" in r.stdout, r.stdout[:400])
+        r = cli("tools", "show", "ffuf")
+        check("tools show：有安装与用法", "ffuf" in r.stdout and ("pacman" in r.stdout or "go install" in r.stdout), r.stdout[:600])
+        r = cli("tools", "show", "不存在的工具名")
+        check("tools show 未知名字退码非 0", r.returncode != 0, r.stdout + r.stderr)
+
+        r = cli("kb")
+        check("kb：概览有卡片数与语料", "知识库" in r.stdout and "语料" in r.stdout, r.stdout[:600] + r.stderr[:300])
+        r = cli("kb", "signals")
+        check("kb signals：有 信号→卡片 行", "→" in r.stdout, r.stdout[:400])
+        r = cli("kb", "search", "wakeup")
+        check("kb search：命中反序列化卡", r.returncode == 0, r.stdout[:400])
+        r = cli("kb", "sources")
+        check("kb sources：交代样本口径", "口径" in r.stdout or "URL" in r.stdout, r.stdout[:400])
+
+        r = cli("tui", "--dump", "2")
+        check("tui --dump：不开界面也能出内容", r.returncode == 0 and "知识库" in r.stdout, r.stdout[:500] + r.stderr[:300])
+
+        r = subprocess.run([sys.executable, "-c",
+                            "import sys; sys.argv=['webctl','--version'];"
+                            "from ctfctl.cli import main; main()"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=60)
+        check("旧名 webctl 触发改名提示", "已改名" in r.stderr, r.stderr)
+        r = cli("codec", "b64d", "aGVsbG8=")
+        check("旧命令仍正常（codec b64d）", "hello" in r.stdout, r.stdout)
+
+        print("\n[17] go / file：文件初筛 + 建议（misc/rev/pwn/crypto 的第一跳）")
+        import struct as _st, zlib as _zl
+        def _chunk(t, d):
+            return _st.pack(">I", len(d)) + t + d + _st.pack(">I", _zl.crc32(t + d) & 0xffffffff)
+        _ihdr = _st.pack(">IIBBBBB", 3, 3, 8, 2, 0, 0, 0)
+        _idat = _zl.compress(b"".join(b"\x00" + b"\xff\x00\x00" * 3 for _ in range(3)))
+        _png = b"\x89PNG\r\n\x1a\n" + _chunk(b"IHDR", _ihdr) + _chunk(b"IDAT", _idat) + _chunk(b"IEND", b"")
+        _bad = bytearray(_png); _bad[8 + 8 + 4] = 9
+        f_png = "/tmp/ctfctl-test-appended.png"
+        open(f_png, "wb").write(bytes(_bad) + b"flag{appended_test}\x00" + b"PK\x03\x04" + b"x" * 64)
+        f_bin = "/tmp/ctfctl-test-enc.bin"
+        open(f_bin, "wb").write(os.urandom(20000))
+        r = cli("file", f_png)
+        check("file：认出 PNG 且 CRC 失配", "PNG 图片" in r.stdout and "CRC 对不上" in r.stdout, r.stdout[:600])
+        check("file：报出附加数据与偏移", "附加数据" in r.stdout and "0x" in r.stdout, r.stdout[:800])
+        check("file：命中 flag 样式串", "flag{appended_test}" in r.stdout, r.stdout[:900])
+        check("file：给出隐写/附加数据方向的建议", "隐写" in r.stdout or "附加数据" in r.stdout, r.stdout[-1200:])
+        r = cli("file", f_bin, "--no-advice")
+        check("file：高熵二进制不给假 flag", "entropy-high" in r.stdout and "flag{" not in r.stdout, r.stdout[:400])
+        r = cli("file", "/tmp/ctfctl-no-such-file")
+        check("file：不存在的文件退码非 0", r.returncode != 0, r.stdout + r.stderr)
+        r = cli("go", f_png)
+        check("go：文件 → 走初筛并给建议", "文件初筛" in r.stdout and "下一步建议" in r.stdout, r.stdout[:400])
+        r = cli("go", BASE)
+        check("go：URL → 走侦察", "recon" in r.stdout.lower() or "基线" in r.stdout, r.stdout[:400])
+        r = cli("go", "/tmp")
+        check("go：目录 → 列表提示", "是目录" in r.stdout, r.stdout[:300])
+
     finally:
         srv.terminate()
         try:

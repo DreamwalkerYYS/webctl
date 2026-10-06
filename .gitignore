@@ -1,5 +1,8 @@
+
+# 生成目录：源快照（几十 MB，随用随抓：scripts/build_catalog.py --fetch）
+research/*.html
+research/*.js
 __pycache__/
 *.pyc
-*.egg-info/
-build/
-dist/
+~$*
+.~lock*
