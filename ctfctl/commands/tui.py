@@ -432,21 +432,21 @@ class App:
                     self.do_action(self.sel if ch in (10, 13) else ch - ord("1"))
                 elif ch == ord("@"):
                     self.do_all()
-                elif ch in (curses.KEY_UP, ord("k")):
+                elif ch == curses.KEY_UP:            # 注意：j/k 留给下面的栏目快捷键，别抢
                     if self.focus == 1:
                         self.sel = max(0, self.sel - 1)
                     else:
                         self.scroll = max(0, self.scroll - 1)
-                elif ch in (curses.KEY_DOWN, ord("j")):
+                elif ch == curses.KEY_DOWN:
                     if self.focus == 1:
                         self.sel = min(max(0, len(self.actions) - 1), self.sel + 1)
                     else:
                         self.scroll += 1
                 elif ch == 9:
                     self.focus = 1 - self.focus
-                elif ch == curses.KEY_PGUP:
+                elif ch == curses.KEY_PPAGE:
                     self.scroll = max(0, self.scroll - 10)
-                elif ch == curses.KEY_PGDN:
+                elif ch == curses.KEY_NPAGE:
                     self.scroll += 10
                 elif ch in (ord("i"), ord(":")):
                     v = self.prompt("ctfctl ")
@@ -474,9 +474,9 @@ class App:
                     self.bsel, self.bscroll = max(0, self.bsel - 1), 0
                 elif ch in (curses.KEY_DOWN, ord("j")):
                     self.bsel = min(max(0, len(self.bitems) - 1), self.bsel + 1)
-                elif ch == curses.KEY_PGUP:
+                elif ch == curses.KEY_PPAGE:
                     self.bscroll = max(0, self.bscroll - 10)
-                elif ch == curses.KEY_PGDN:
+                elif ch == curses.KEY_NPAGE:
                     self.bscroll += 10
                 elif ch == ord("/"):
                     self.filt = self.prompt("过滤: ")
