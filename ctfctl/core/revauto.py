@@ -1077,21 +1077,32 @@ def maze_auto(path: str, budget_s: float = 60.0) -> list[dict]:
         DIRS = {"W": (0, -1), "S": (0, 1), "A": (-1, 0), "D": (1, 0)}
 
         def make_rule(passable_zero: bool, slides: set):
+            """落点规则：先走 1 步；若落在"滑行格"（值 v ∈ slides）上，**再同方向恰好走 v 步**
+            （每一步的中间格都必须可走）。
+
+            注意：不是"遇到滑行格就一直滑"——程序里是 `for i in range(v): 再走一步`，
+            我第一版写成了 while 循环，导致所有候选路径被程序否掉（实测踩坑）。
+            """
             def landing(x, y, d):
                 dx, dy = DIRS[d]
                 nx, ny = x + dx, y + dy
-                for _ in range(64):
-                    if not (0 <= nx < side and 0 <= ny < side):
+
+                def one_step(px, py):
+                    if not (0 <= px < side and 0 <= py < side):
                         return None
-                    v = vals[ny * side + nx]
+                    v = vals[py * side + px]
                     ok = (v == 0) if passable_zero else (v != 0)
-                    if not ok:
-                        return None
-                    if v in slides:
-                        nx, ny = nx + dx, ny + dy        # 滑行格：同方向继续
-                        continue
-                    return nx, ny
-                return None
+                    return v if ok else None
+
+                v = one_step(nx, ny)
+                if v is None:
+                    return None
+                if v in slides:                     # 恰好再走 v 步
+                    for _ in range(v):
+                        nx, ny = nx + dx, ny + dy
+                        if one_step(nx, ny) is None:
+                            return None
+                return nx, ny
             return landing
 
         rules = [("非0可走", make_rule(False, set())), ("非0可走+滑行(3/4/5)", make_rule(False, {3, 4, 5})),
