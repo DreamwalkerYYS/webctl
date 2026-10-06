@@ -245,7 +245,8 @@ def main() -> int:
         check("--no-suggest 关掉联想", "★ 最可能的" not in r.stdout, r.stdout[-800:])
         print("\n[16] 工具目录 / 知识库 / TUI / 改名兼容")
         r = cli("--version")
-        check("--version 到 1.0.0", "1.0.0" in r.stdout, r.stdout + r.stderr)
+        from ctfctl import __version__ as _want_ver      # 不写死版本号（1.0→1.1 时这条就是坏的）
+        check(f"--version 报 {_want_ver}", _want_ver in r.stdout, r.stdout + r.stderr)
         r = cli("tools")
         check("tools：分类概览", r.returncode == 0 and "工具目录" in r.stdout, r.stdout[:600] + r.stderr[:400])
         check("tools：给出分类行（含 web）", "web" in r.stdout, r.stdout[:600])
