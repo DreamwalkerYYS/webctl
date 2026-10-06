@@ -381,7 +381,10 @@ def triage(path: str, want_strings: int = 12) -> dict:
 
 
 def evidence_of(t: dict) -> dict:
-    return {"kind": "file", "magic": t.get("magic", ""), "ext": t.get("ext", ""),
+    """给建议引擎的证据。文本类文件报 kind=text（好让「先归类」那套规则命中），其余报 kind=file。"""
+    is_text = bool(t.get("text")) or (t.get("magic") or "").endswith("纯文本")
+    return {"kind": "text" if is_text else "file",
+            "magic": t.get("magic", ""), "ext": t.get("ext", ""),
             "name": t.get("name", ""), "size": t.get("size"), "findings": t.get("findings", []),
             "body": (t.get("strings", {}).get("interesting") or [""])[0]}
 

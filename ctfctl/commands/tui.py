@@ -327,7 +327,7 @@ class App:
     # -------------------------------------------------- 输入框
     def prompt(self, label: str) -> str:
         h, w = self.scr.getmaxyx()
-        safe_add(scr, h - 1, 0, dpad(f"{label}", w - 1), w - 1, self._attr("rev"))
+        safe_add(self.scr, h - 1, 0, dpad(f"{label}", w - 1), w - 1, self._attr("rev"))
         self.scr.refresh()
         self._curs(1)
         try:

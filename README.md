@@ -232,6 +232,7 @@ ctfctl kb sources              # 语料来源与统计口径（样本多大、�
 ```
 - 每张卡的 `corpus` 是**实测数字**：这条手法在这批语料里命中多少个 writeup 文件（怎么算出来的见 `scripts/harvest_writeups.py` 的 docstring）
 - 卡片和规则表是同一套东西的两面：**规则**给可粘贴命令，**卡片**讲清机制与信号（先"想"再"抄"）
+- **当前语料**（口径见下节；每跑一次 `count` 都会变）：sajjadium/ctf-writeups 57 篇 · Dvd848/CTFs 760 篇 · p4-team/ctf 864 篇 · ctf-wiki 739 篇 = **2420 个文本文件 / 25.3 MB**；命中文件数前列：编码 970、命令执行 697、RSA 252、AES 225、栈溢出 221（原始数字在 `research/kb-evidence.json`）
 - 个人卡片放 `~/.config/ctfctl/kb.json`
 
 ### tui —— 工作台（见上面第 3 节 `tui` 的按键表）

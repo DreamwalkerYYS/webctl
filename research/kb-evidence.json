@@ -215,6 +215,697 @@
     }
    }
   },
+  "Dvd848__CTFs": {
+   "dir": "/root/.cache/ctfctl/corpus/Dvd848__CTFs",
+   "files": 760,
+   "bytes": 7746683,
+   "counts": {
+    "sqli": {
+     "files": 37,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/DB_Secret.md",
+      "CTFs-master/2018_CheckPoint_CSA/README.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Media-DB.md"
+     ]
+    },
+    "ssti": {
+     "files": 10,
+     "examples": [
+      "CTFs-master/2018_picoCTF/Flaskcards.md",
+      "CTFs-master/2019_SunshineCTF/Portfolio.md",
+      "CTFs-master/2019_TAMUctf/Science.md"
+     ]
+    },
+    "lfi": {
+     "files": 42,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md"
+     ]
+    },
+    "rce": {
+     "files": 272,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/DB_Secret.md",
+      "CTFs-master/2018_35C3_Junior/Logged_In.md",
+      "CTFs-master/2018_35C3_Junior/McDonald.md"
+     ]
+    },
+    "ssrf": {
+     "files": 7,
+     "examples": [
+      "CTFs-master/2019_BSidesTLV/Translation_As_A_Service.md",
+      "CTFs-master/2020_BSidesTLV/WebProxy.md",
+      "CTFs-master/2020_Matrix/Fly_Me_To_The_Moon.md"
+     ]
+    },
+    "xxe": {
+     "files": 8,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/blind.md",
+      "CTFs-master/2019_SunshineCTF/Wrestler_Name_Generator.md",
+      "CTFs-master/2019_picoCTF/la_cifra_de.md"
+     ]
+    },
+    "deser": {
+     "files": 16,
+     "examples": [
+      "CTFs-master/2018_Shabak/searchable_text.txt",
+      "CTFs-master/2018_picoCTF/buffer overflow 3.md",
+      "CTFs-master/2019_ArkCon/searchable_text.txt"
+     ]
+    },
+    "jwt": {
+     "files": 19,
+     "examples": [
+      "CTFs-master/2019_BSidesTLV/Pacman.md",
+      "CTFs-master/2019_KipodAfterFree/Cookie_Clicker.md",
+      "CTFs-master/2019_picoCTF/JaWT_Scratchpad.md"
+     ]
+    },
+    "flask_session": {
+     "files": 15,
+     "examples": [
+      "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
+      "CTFs-master/2018_picoCTF/Flaskcards.md",
+      "CTFs-master/2018_picoCTF/Secure Logon.md"
+     ]
+    },
+    "upload": {
+     "files": 4,
+     "examples": [
+      "CTFs-master/2020_BSidesTLV/Bugler.md",
+      "CTFs-master/2020_BSidesTLV/WebProxy.md",
+      "CTFs-master/2024_BSidesTLV/SafeStore.md"
+     ]
+    },
+    "php_magic": {
+     "files": 43,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+      "CTFs-master/2018_35C3_Junior/saltfish.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md"
+     ]
+    },
+    "php_filter": {
+     "files": 4,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/blind.md",
+      "CTFs-master/2019_SunshineCTF/Wrestler_Name_Generator.md",
+      "CTFs-master/2019_picoCTF/cereal_hacker_2.md"
+     ]
+    },
+    "audit": {
+     "files": 10,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/McDonald.md",
+      "CTFs-master/2018_35C3_Junior/blind.md",
+      "CTFs-master/2018_35C3_Junior/flags.md"
+     ]
+    },
+    "authbypass": {
+     "files": 7,
+     "examples": [
+      "CTFs-master/2018_GoogleCTF_BQ/Holey_Beep.md",
+      "CTFs-master/2019_picoCTF/Open-to-admins.md",
+      "CTFs-master/2020_Hoshen/Challenge3.md"
+     ]
+    },
+    "xss": {
+     "files": 20,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/Logged_In.md",
+      "CTFs-master/2018_OWASP-IL/README.md",
+      "CTFs-master/2018_picoCTF/Artisinal Handcrafted HTTP 3.md"
+     ]
+    },
+    "csrf": {
+     "files": 6,
+     "examples": [
+      "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
+      "CTFs-master/2019_picoCTF/Empire1.md",
+      "CTFs-master/2019_picoCTF/Empire2.md"
+     ]
+    },
+    "race": {
+     "files": 0,
+     "examples": []
+    },
+    "prototype": {
+     "files": 4,
+     "examples": [
+      "CTFs-master/2020_Deloitte_CyberTank/Whack-a-window.md",
+      "CTFs-master/2020_GoogleCTF/Log-Me-In.md",
+      "CTFs-master/2024_GoogleCTF_BQ/Prototypes_Fall.md"
+     ]
+    },
+    "web3": {
+     "files": 2,
+     "examples": [
+      "CTFs-master/2019_TAMUctf/Science.md",
+      "CTFs-master/2020_Deloitte_CyberTank/CyberTank_Telework.md"
+     ]
+    },
+    "graphql": {
+     "files": 6,
+     "examples": [
+      "CTFs-master/2019_36C3_Junior/querying.md",
+      "CTFs-master/2020_AppSec-IL/Graphene.md",
+      "CTFs-master/2021_Technion/Find_my_intro.md"
+     ]
+    },
+    "log4shell": {
+     "files": 14,
+     "examples": [
+      "CTFs-master/2018_picoCTF/A Simple Question.md",
+      "CTFs-master/2019_SunshineCTF/CB1.md",
+      "CTFs-master/2019_picoCTF/Flags.md"
+     ]
+    },
+    "format_string": {
+     "files": 40,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/blind.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_3.md",
+      "CTFs-master/2018_noxCTF/The_Name_Calculator.md"
+     ]
+    },
+    "buffer_overflow": {
+     "files": 89,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/1996.md",
+      "CTFs-master/2018_35C3_Junior/arraymaster1.md",
+      "CTFs-master/2018_35C3_Junior/arraymaster2.md"
+     ]
+    },
+    "heap": {
+     "files": 31,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/arraymaster1.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_3.md",
+      "CTFs-master/2018_Shabak/searchable_text.txt"
+     ]
+    },
+    "rev_java": {
+     "files": 14,
+     "examples": [
+      "CTFs-master/2018_CheckPoint_CSA/README.md",
+      "CTFs-master/2019_Mossad/Challenge1.md",
+      "CTFs-master/2019_TAMUctf/Secrets.md"
+     ]
+    },
+    "rev_ghidra": {
+     "files": 127,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/poet.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_3.md"
+     ]
+    },
+    "crypto_rsa": {
+     "files": 93,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/Decrypted.md",
+      "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+      "CTFs-master/2018_35C3_Junior/flags.md"
+     ]
+    },
+    "crypto_aes": {
+     "files": 85,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/1996.md",
+      "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+      "CTFs-master/2018_35C3_Junior/stringmaster2.md"
+     ]
+    },
+    "crypto_classic": {
+     "files": 24,
+     "examples": [
+      "CTFs-master/2019_TAMUctf/-.-.md",
+      "CTFs-master/2019_picoCTF/Tapping.md",
+      "CTFs-master/2019_picoCTF/la_cifra_de.md"
+     ]
+    },
+    "crypto_prng": {
+     "files": 7,
+     "examples": [
+      "CTFs-master/2019_CheckPoint_CSA/searchable_text.txt",
+      "CTFs-master/2021_CheckPoint_CSA/Slot_Machine_Reloaded.md",
+      "CTFs-master/2021_GoogleCTF_BQ/5_Istanbul_-_Bazaar.md"
+     ]
+    },
+    "crypto_lattice": {
+     "files": 11,
+     "examples": [
+      "CTFs-master/2019_ArkCon/searchable_text-onsite.txt",
+      "CTFs-master/2019_noxtis/README.md",
+      "CTFs-master/2019_picoCTF/cereal_hacker_2.md"
+     ]
+    },
+    "hash_crack": {
+     "files": 8,
+     "examples": [
+      "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+      "CTFs-master/2018_Shabak/searchable_text.txt",
+      "CTFs-master/2018_picoCTF/HEEEEEEERE'S Johnny!.md"
+     ]
+    },
+    "archive_crack": {
+     "files": 3,
+     "examples": [
+      "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+      "CTFs-master/2018_Shabak/searchable_text.txt",
+      "CTFs-master/2024_GoogleCTF_BQ/CorruptedZipFile.md"
+     ]
+    },
+    "stego_img": {
+     "files": 57,
+     "examples": [
+      "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Holey_Beep.md",
+      "CTFs-master/2018_picoCTF/LoadSomeBits.md"
+     ]
+    },
+    "stego_audio": {
+     "files": 14,
+     "examples": [
+      "CTFs-master/2019_Lahav433/README.md",
+      "CTFs-master/2019_noxtis/README.md",
+      "CTFs-master/2020_CheckPoint_CSA/Can_You_See_It.md"
+     ]
+    },
+    "pcap": {
+     "files": 43,
+     "examples": [
+      "CTFs-master/2018_CheckPoint_CSA/README.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+      "CTFs-master/2018_OWASP-IL/README.md"
+     ]
+    },
+    "forensics_fs": {
+     "files": 21,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/epic_mount.md",
+      "CTFs-master/2018_35C3_Junior/rare_mount.md",
+      "CTFs-master/2018_GoogleCTF_BQ/Floppy.md"
+     ]
+    },
+    "encoding": {
+     "files": 456,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/DB_Secret.md",
+      "CTFs-master/2018_35C3_Junior/Logged_In.md",
+      "CTFs-master/2018_35C3_Junior/McDonald.md"
+     ]
+    },
+    "osint": {
+     "files": 7,
+     "examples": [
+      "CTFs-master/2019_BSidesTLV/Redis_in_the_wild.md",
+      "CTFs-master/2020_Technion/The_Great_Journey.md",
+      "CTFs-master/2021_Technion/Finding_Ducky_-_Part_1.md"
+     ]
+    },
+    "net_scan": {
+     "files": 14,
+     "examples": [
+      "CTFs-master/2018_picoCTF/Help Me Reset 2.md",
+      "CTFs-master/2019_CheckPoint_CSA/searchable_text.txt",
+      "CTFs-master/2019_KipodAfterFree/KipodStab.md"
+     ]
+    },
+    "pwn_env": {
+     "files": 21,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/arraymaster2.md",
+      "CTFs-master/2018_35C3_Junior/poet.md",
+      "CTFs-master/2018_35C3_Junior/stringmaster2.md"
+     ]
+    },
+    "misc_game": {
+     "files": 13,
+     "examples": [
+      "CTFs-master/2018_picoCTF/buffer overflow 0.md",
+      "CTFs-master/2019_SunshineCTF/Return_To_Mania.md",
+      "CTFs-master/2019_SunshineCTF/Smash.md"
+     ]
+    },
+    "misc_python_sandbox": {
+     "files": 11,
+     "examples": [
+      "CTFs-master/2018_CheckPoint_CSA/README.md",
+      "CTFs-master/2018_OWASP-IL/README.md",
+      "CTFs-master/2018_picoCTF/Flaskcards and Freedom.md"
+     ]
+    },
+    "misc_shell_sandbox": {
+     "files": 0,
+     "examples": []
+    },
+    "ai_llm_ctf": {
+     "files": 1,
+     "examples": [
+      "CTFs-master/2024_GoogleCTF_BQ/Prompt_Infiltration_Tooling_Takeover.md"
+     ]
+    }
+   }
+  },
+  "p4-team__ctf": {
+   "dir": "/root/.cache/ctfctl/corpus/p4-team__ctf",
+   "files": 864,
+   "bytes": 11212704,
+   "counts": {
+    "sqli": {
+     "files": 31,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/web_200_lawn_care_simulator/README.md",
+      "ctf-master/2015-09-16-csaw/web_500_weebdate/README.md",
+      "ctf-master/2015-11-20-dctffinals/web200/README.md"
+     ]
+    },
+    "ssti": {
+     "files": 7,
+     "examples": [
+      "ctf-master/2016-01-29-nullcon/crypto_5/all_keys.txt",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock.txt",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock_orig.txt"
+     ]
+    },
+    "lfi": {
+     "files": 24,
+     "examples": [
+      "ctf-master/2015-11-20-dctffinals/re_200_time_is_not_your_friend/README.md",
+      "ctf-master/2015-11-20-dctffinals/re_300_tryharder/README.md",
+      "ctf-master/2015-12-05-seccon/seccon_wars_100/README.md"
+     ]
+    },
+    "rce": {
+     "files": 271,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_150_pcapin/README.md",
+      "ctf-master/2015-09-16-csaw/re_200_hacking_time/README.md"
+     ]
+    },
+    "ssrf": {
+     "files": 7,
+     "examples": [
+      "ctf-master/2017-01-21-insomnihack/the_great_escape1/filedump.txt",
+      "ctf-master/2017-12-09-seccon-quals/web_sqlsrf/README.md",
+      "ctf-master/2018-01-20-insomnihack/web_css/README.md"
+     ]
+    },
+    "xxe": {
+     "files": 3,
+     "examples": [
+      "ctf-master/2018-12-01-real-world-finals/flaglab/README.md",
+      "ctf-master/2019-09-07-trendmicro-quals/exploit_300/README.md",
+      "ctf-master/2022-01-29-insomnihack/pdf-xfiltration/README.md"
+     ]
+    },
+    "deser": {
+     "files": 17,
+     "examples": [
+      "ctf-master/2015-12-27-32c3/gurke_misc_300/README.md",
+      "ctf-master/2016-01-29-nullcon/web_1/README.md",
+      "ctf-master/2016-07-09-secuinside-ctf/trendyweb/README.md"
+     ]
+    },
+    "jwt": {
+     "files": 2,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2016-01-29-nullcon/crypto_5/all_keys.txt"
+     ]
+    },
+    "flask_session": {
+     "files": 3,
+     "examples": [
+      "ctf-master/2017-04-21-plaidctf/pykemon/README.md",
+      "ctf-master/2017-07-15-ctfzone/mprsa/README.md",
+      "ctf-master/2018-09-01-tokyowesterns/web_shrine/README.md"
+     ]
+    },
+    "upload": {
+     "files": 6,
+     "examples": [
+      "ctf-master/2016-04-15-plaid-ctf/web_pixelshop/README.md",
+      "ctf-master/2016-09-05-tokyo-mma/rotten_uploader/README.md",
+      "ctf-master/2017-08-25-hackit/web100/README.md"
+     ]
+    },
+    "php_magic": {
+     "files": 41,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/re_300_ftp/README.md",
+      "ctf-master/2015-10-10-asisfin/re_150_asishash/README.md",
+      "ctf-master/2015-10-10-asisfin/web_225_impossible/README.md"
+     ]
+    },
+    "php_filter": {
+     "files": 7,
+     "examples": [
+      "ctf-master/2016-04-15-plaid-ctf/web_pixelshop/README.md",
+      "ctf-master/2016-12-16-sharifctf7/web_200_irish_home/README.md",
+      "ctf-master/2016-12-27-33c3/web_400_list0r/README.md"
+     ]
+    },
+    "audit": {
+     "files": 4,
+     "examples": [
+      "ctf-master/2015-10-18-hitcon/web_100_babyfirst/README.md",
+      "ctf-master/2016-09-24-dctf/web200/README.md",
+      "ctf-master/2017-12-09-seccon-quals/web_automatic/README.md"
+     ]
+    },
+    "authbypass": {
+     "files": 2,
+     "examples": [
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock.txt",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock_orig.txt"
+     ]
+    },
+    "xss": {
+     "files": 27,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/web_500_weebdate/README.md",
+      "ctf-master/2015-12-05-seccon/README.md",
+      "ctf-master/2015-12-05-seccon/bonsai_xss_revolutions_web_200/README.md"
+     ]
+    },
+    "csrf": {
+     "files": 9,
+     "examples": [
+      "ctf-master/2016-01-16-insomnihack/crypto_200_fridginator/README.md",
+      "ctf-master/2016-02-05-sharif/web_400_hackme/README.md",
+      "ctf-master/2017-01-21-insomnihack/the_great_escape1/README.md"
+     ]
+    },
+    "race": {
+     "files": 8,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/trivia_trivia_4/README.md",
+      "ctf-master/2016-08-21-bioterra-ctf/orgone_market/README.md",
+      "ctf-master/2017-04-21-plaidctf/sha4/README.md"
+     ]
+    },
+    "prototype": {
+     "files": 0,
+     "examples": []
+    },
+    "web3": {
+     "files": 0,
+     "examples": []
+    },
+    "graphql": {
+     "files": 0,
+     "examples": []
+    },
+    "log4shell": {
+     "files": 12,
+     "examples": [
+      "ctf-master/2016-01-29-nullcon/recon_2/README.md",
+      "ctf-master/2017-02-04-bitsctf/ghost_in_the_machine/README.md",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock.txt"
+     ]
+    },
+    "format_string": {
+     "files": 12,
+     "examples": [
+      "ctf-master/2016-02-05-sharif/crypto_100_ure/README.md",
+      "ctf-master/2016-10-26-ekoparty/pwn_100/README.md",
+      "ctf-master/2016-12-16-sharifctf7/for_150_strange_pdf/README.md"
+     ]
+    },
+    "buffer_overflow": {
+     "files": 15,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/pwn_100_precision/README.md",
+      "ctf-master/2016-04-15-plaid-ctf/pwnable_pound/README.md",
+      "ctf-master/2016-09-24-dctf/exp200/README.md"
+     ]
+    },
+    "heap": {
+     "files": 13,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-16-csaw/pwn_300_ftp2/README.md",
+      "ctf-master/2016-09-05-tokyo-mma/restricted_ruby/README.md"
+     ]
+    },
+    "rev_java": {
+     "files": 15,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/web_200_lawn_care_simulator/README.md",
+      "ctf-master/2015-12-05-seccon/README.md",
+      "ctf-master/2016-01-16-insomnihack/crypto_200_fridginator/README.md"
+     ]
+    },
+    "rev_ghidra": {
+     "files": 34,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/crypto_50_zer0_day/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2016-01-29-nullcon/crypto_5/all_keys.txt"
+     ]
+    },
+    "crypto_rsa": {
+     "files": 109,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-26-trendmicro/README.md",
+      "ctf-master/2015-09-26-trendmicro/rsa/README.md"
+     ]
+    },
+    "crypto_aes": {
+     "files": 73,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/crypto_50_wh1ter0se/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-26-trendmicro/README.md"
+     ]
+    },
+    "crypto_classic": {
+     "files": 29,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/crypto_50_wh1ter0se/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-11-20-dctffinals/README.md"
+     ]
+    },
+    "crypto_prng": {
+     "files": 6,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/web_500_weebdate/README.md",
+      "ctf-master/2017-05-18-confidence-finals/random/README.md",
+      "ctf-master/2017-12-29-34c3/crypto_lol/README.md"
+     ]
+    },
+    "crypto_lattice": {
+     "files": 16,
+     "examples": [
+      "ctf-master/2015-10-10-asisfin/crypto_175_bodu/README.md",
+      "ctf-master/2016-01-29-nullcon/crypto_5/all_keys.txt",
+      "ctf-master/2016-03-12-0ctf/trace/README.md"
+     ]
+    },
+    "hash_crack": {
+     "files": 0,
+     "examples": []
+    },
+    "archive_crack": {
+     "files": 0,
+     "examples": []
+    },
+    "stego_img": {
+     "files": 32,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/crypto_50_zer0_day/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_200_airport/README.md"
+     ]
+    },
+    "stego_audio": {
+     "files": 11,
+     "examples": [
+      "ctf-master/2016-02-05-sharif/misc_200_hacksound/README.md",
+      "ctf-master/2016-03-06-bkpctf/misc_2_lily_flac/README.md",
+      "ctf-master/2016-06-04-backdoor-ctf/misc_dtune/README.md"
+     ]
+    },
+    "pcap": {
+     "files": 34,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_transfer/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_150_pcapin/README.md"
+     ]
+    },
+    "forensics_fs": {
+     "files": 9,
+     "examples": [
+      "ctf-master/2015-10-02-dctf/misc_200_try_harder/README.md",
+      "ctf-master/2016-12-10-seccon-2016-quals/memory/README.md",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock_orig.txt"
+     ]
+    },
+    "encoding": {
+     "files": 353,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/crypto_50_wh1ter0se/README.md",
+      "ctf-master/2015-09-16-csaw/crypto_50_zer0_day/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_100_keep_calm_and_ctf/README.md"
+     ]
+    },
+    "osint": {
+     "files": 8,
+     "examples": [
+      "ctf-master/2015-10-10-asisfin/misc_75_flaghunter/README.md",
+      "ctf-master/2018-07-21-ctfzone-quals/ppc_help_mars/README.md",
+      "ctf-master/2018-07-28-real-world-quals/for_ccls/README.md"
+     ]
+    },
+    "net_scan": {
+     "files": 1,
+     "examples": [
+      "ctf-master/2018-06-23-google-ctf/apt42-part1/README.md"
+     ]
+    },
+    "pwn_env": {
+     "files": 7,
+     "examples": [
+      "ctf-master/2015-10-20 hacklu/ppc150_guess_the_number/README.md",
+      "ctf-master/2016-03-06-bkpctf/re_3_Jit_in_my_pants/README.md",
+      "ctf-master/2016-04-01-nuitduhack-quals/matryoshka/README.md"
+     ]
+    },
+    "misc_game": {
+     "files": 6,
+     "examples": [
+      "ctf-master/2016-01-29-nullcon/recon_2/TheLastRuler.txt",
+      "ctf-master/2016-07-30-trendmicro/offensive_400/README.md",
+      "ctf-master/2017-02-04-bitsctf/sherlock/sherlock.txt"
+     ]
+    },
+    "misc_python_sandbox": {
+     "files": 5,
+     "examples": [
+      "ctf-master/2017-04-01-nuit-du-hack-quals/markdown/README.md",
+      "ctf-master/2017-04-01-nuit-du-hack-quals/markdown/hack.md",
+      "ctf-master/2017-04-21-plaidctf/sha4/README.md"
+     ]
+    },
+    "misc_shell_sandbox": {
+     "files": 0,
+     "examples": []
+    },
+    "ai_llm_ctf": {
+     "files": 0,
+     "examples": []
+    }
+   }
+  },
   "ctf-wiki__ctf-wiki": {
    "dir": "/root/.cache/ctfctl/corpus/ctf-wiki__ctf-wiki",
    "files": 739,
@@ -550,8 +1241,8 @@
    }
   }
  },
- "files": 796,
- "bytes": 6292629,
+ "files": 2420,
+ "bytes": 25252016,
  "fetched": "2026-10-06",
  "ext": [
   ".md",
@@ -563,41 +1254,53 @@
  ],
  "counts": {
   "sqli": {
-   "files": 8,
+   "files": 76,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 37,
+    "p4-team__ctf": 31,
     "ctf-wiki__ctf-wiki": 8
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/sqli.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md"
+    "CTFs-master/2018_35C3_Junior/DB_Secret.md",
+    "CTFs-master/2018_CheckPoint_CSA/README.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Media-DB.md"
    ]
   },
   "ssti": {
-   "files": 0,
+   "files": 17,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 10,
+    "p4-team__ctf": 7,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2018_picoCTF/Flaskcards.md",
+    "CTFs-master/2019_SunshineCTF/Portfolio.md",
+    "CTFs-master/2019_TAMUctf/Science.md"
+   ]
   },
   "lfi": {
-   "files": 28,
+   "files": 94,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 42,
+    "p4-team__ctf": 24,
     "ctf-wiki__ctf-wiki": 28
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/blockchain/publicblockchain/weaknesses.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
-    "ctf-wiki-master/docs/zh-tw/docs/executable/pe/pe-export-table.md"
+    "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Admin_UI.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md"
    ]
   },
   "rce": {
-   "files": 154,
+   "files": 697,
    "per_source": {
     "sajjadium__ctf-writeups": 8,
+    "Dvd848__CTFs": 272,
+    "p4-team__ctf": 271,
     "ctf-wiki__ctf-wiki": 146
    },
    "examples": [
@@ -607,72 +1310,95 @@
    ]
   },
   "ssrf": {
-   "files": 4,
+   "files": 18,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 7,
+    "p4-team__ctf": 7,
     "ctf-wiki__ctf-wiki": 4
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/ssrf.md",
-    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+    "CTFs-master/2019_BSidesTLV/Translation_As_A_Service.md",
+    "CTFs-master/2020_BSidesTLV/WebProxy.md",
+    "CTFs-master/2020_Matrix/Fly_Me_To_The_Moon.md"
    ]
   },
   "xxe": {
-   "files": 4,
+   "files": 15,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 8,
+    "p4-team__ctf": 3,
     "ctf-wiki__ctf-wiki": 4
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/misc/encode/computer.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md",
-    "ctf-wiki-master/docs/zh/docs/misc/encode/computer.md"
+    "CTFs-master/2018_35C3_Junior/blind.md",
+    "CTFs-master/2019_SunshineCTF/Wrestler_Name_Generator.md",
+    "CTFs-master/2019_picoCTF/la_cifra_de.md"
    ]
   },
   "deser": {
-   "files": 2,
+   "files": 35,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 16,
+    "p4-team__ctf": 17,
     "ctf-wiki__ctf-wiki": 2
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-    "ctf-wiki-master/docs/zh/docs/web/php/php.md"
+    "CTFs-master/2018_Shabak/searchable_text.txt",
+    "CTFs-master/2018_picoCTF/buffer overflow 3.md",
+    "CTFs-master/2019_ArkCon/searchable_text.txt"
    ]
   },
   "jwt": {
-   "files": 0,
+   "files": 21,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 19,
+    "p4-team__ctf": 2,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2019_BSidesTLV/Pacman.md",
+    "CTFs-master/2019_KipodAfterFree/Cookie_Clicker.md",
+    "CTFs-master/2019_picoCTF/JaWT_Scratchpad.md"
+   ]
   },
   "flask_session": {
-   "files": 0,
+   "files": 18,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 15,
+    "p4-team__ctf": 3,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
+    "CTFs-master/2018_picoCTF/Flaskcards.md",
+    "CTFs-master/2018_picoCTF/Secure Logon.md"
+   ]
   },
   "upload": {
-   "files": 4,
+   "files": 14,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 4,
+    "p4-team__ctf": 6,
     "ctf-wiki__ctf-wiki": 4
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-    "ctf-wiki-master/docs/zh/docs/introduction/content.md",
-    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+    "CTFs-master/2020_BSidesTLV/Bugler.md",
+    "CTFs-master/2020_BSidesTLV/WebProxy.md",
+    "CTFs-master/2024_BSidesTLV/SafeStore.md"
    ]
   },
   "php_magic": {
-   "files": 49,
+   "files": 133,
    "per_source": {
     "sajjadium__ctf-writeups": 1,
+    "Dvd848__CTFs": 43,
+    "p4-team__ctf": 41,
     "ctf-wiki__ctf-wiki": 48
    },
    "examples": [
@@ -680,117 +1406,150 @@
    ]
   },
   "php_filter": {
-   "files": 4,
+   "files": 15,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 4,
+    "p4-team__ctf": 7,
     "ctf-wiki__ctf-wiki": 4
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/complex.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-    "ctf-wiki-master/docs/zh/docs/crypto/hash/complex.md"
+    "CTFs-master/2018_35C3_Junior/blind.md",
+    "CTFs-master/2019_SunshineCTF/Wrestler_Name_Generator.md",
+    "CTFs-master/2019_picoCTF/cereal_hacker_2.md"
    ]
   },
   "audit": {
-   "files": 5,
+   "files": 19,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 10,
+    "p4-team__ctf": 4,
     "ctf-wiki__ctf-wiki": 5
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-    "ctf-wiki-master/docs/zh/docs/introduction/content.md",
-    "ctf-wiki-master/docs/zh/docs/web/introduction.md"
+    "CTFs-master/2018_35C3_Junior/McDonald.md",
+    "CTFs-master/2018_35C3_Junior/blind.md",
+    "CTFs-master/2018_35C3_Junior/flags.md"
    ]
   },
   "authbypass": {
-   "files": 10,
+   "files": 19,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 7,
+    "p4-team__ctf": 2,
     "ctf-wiki__ctf-wiki": 10
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/learn.md"
+    "CTFs-master/2018_GoogleCTF_BQ/Holey_Beep.md",
+    "CTFs-master/2019_picoCTF/Open-to-admins.md",
+    "CTFs-master/2020_Hoshen/Challenge3.md"
    ]
   },
   "xss": {
-   "files": 17,
+   "files": 64,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 20,
+    "p4-team__ctf": 27,
     "ctf-wiki__ctf-wiki": 17
    },
    "examples": [
-    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md"
+    "CTFs-master/2018_35C3_Junior/Logged_In.md",
+    "CTFs-master/2018_OWASP-IL/README.md",
+    "CTFs-master/2018_picoCTF/Artisinal Handcrafted HTTP 3.md"
    ]
   },
   "csrf": {
-   "files": 8,
+   "files": 23,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 6,
+    "p4-team__ctf": 9,
     "ctf-wiki__ctf-wiki": 8
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/introduction/content.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/csrf.md",
-    "ctf-wiki-master/docs/zh-tw/docs/web/introduction.md"
+    "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
+    "CTFs-master/2019_picoCTF/Empire1.md",
+    "CTFs-master/2019_picoCTF/Empire2.md"
    ]
   },
   "race": {
-   "files": 8,
+   "files": 16,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 0,
+    "p4-team__ctf": 8,
     "ctf-wiki__ctf-wiki": 8
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/exploitation/race/userfaultfd.md",
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/race-condition/introduction.md",
-    "ctf-wiki-master/docs/zh/docs/pwn/linux/kernel-mode/exploitation/heap/slub/uaf.md"
+    "ctf-master/2015-09-16-csaw/trivia_trivia_4/README.md",
+    "ctf-master/2016-08-21-bioterra-ctf/orgone_market/README.md",
+    "ctf-master/2017-04-21-plaidctf/sha4/README.md"
    ]
   },
   "prototype": {
-   "files": 0,
+   "files": 4,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 4,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2020_Deloitte_CyberTank/Whack-a-window.md",
+    "CTFs-master/2020_GoogleCTF/Log-Me-In.md",
+    "CTFs-master/2024_GoogleCTF_BQ/Prototypes_Fall.md"
+   ]
   },
   "web3": {
-   "files": 38,
+   "files": 40,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 2,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 38
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/blockchain/challenges.md",
-    "ctf-wiki-master/docs/zh-tw/docs/blockchain/introduction.md",
-    "ctf-wiki-master/docs/zh-tw/docs/blockchain/ethereum/basics.md"
+    "CTFs-master/2019_TAMUctf/Science.md",
+    "CTFs-master/2020_Deloitte_CyberTank/CyberTank_Telework.md"
    ]
   },
   "graphql": {
-   "files": 0,
+   "files": 6,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 6,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2019_36C3_Junior/querying.md",
+    "CTFs-master/2020_AppSec-IL/Graphene.md",
+    "CTFs-master/2021_Technion/Find_my_intro.md"
+   ]
   },
   "log4shell": {
-   "files": 0,
+   "files": 26,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 14,
+    "p4-team__ctf": 12,
     "ctf-wiki__ctf-wiki": 0
    },
-   "examples": []
+   "examples": [
+    "CTFs-master/2018_picoCTF/A Simple Question.md",
+    "CTFs-master/2019_SunshineCTF/CB1.md",
+    "CTFs-master/2019_picoCTF/Flags.md"
+   ]
   },
   "format_string": {
-   "files": 60,
+   "files": 112,
    "per_source": {
     "sajjadium__ctf-writeups": 3,
+    "Dvd848__CTFs": 40,
+    "p4-team__ctf": 12,
     "ctf-wiki__ctf-wiki": 57
    },
    "examples": [
@@ -800,9 +1559,11 @@
    ]
   },
   "buffer_overflow": {
-   "files": 117,
+   "files": 221,
    "per_source": {
     "sajjadium__ctf-writeups": 31,
+    "Dvd848__CTFs": 89,
+    "p4-team__ctf": 15,
     "ctf-wiki__ctf-wiki": 86
    },
    "examples": [
@@ -812,9 +1573,11 @@
    ]
   },
   "heap": {
-   "files": 131,
+   "files": 175,
    "per_source": {
     "sajjadium__ctf-writeups": 24,
+    "Dvd848__CTFs": 31,
+    "p4-team__ctf": 13,
     "ctf-wiki__ctf-wiki": 107
    },
    "examples": [
@@ -824,116 +1587,137 @@
    ]
   },
   "rev_java": {
-   "files": 49,
+   "files": 78,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 14,
+    "p4-team__ctf": 15,
     "ctf-wiki__ctf-wiki": 49
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_develop/basic_develop.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/readme.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/dex/dex.md"
+    "CTFs-master/2018_CheckPoint_CSA/README.md",
+    "CTFs-master/2019_Mossad/Challenge1.md",
+    "CTFs-master/2019_TAMUctf/Secrets.md"
    ]
   },
   "rev_ghidra": {
-   "files": 22,
+   "files": 183,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 127,
+    "p4-team__ctf": 34,
     "ctf-wiki__ctf-wiki": 22
    },
    "examples": [
-    "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/dynamic_debug.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/ida_native_debug.md"
+    "CTFs-master/2018_35C3_Junior/poet.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_3.md"
    ]
   },
   "crypto_rsa": {
-   "files": 50,
+   "files": 252,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 93,
+    "p4-team__ctf": 109,
     "ctf-wiki__ctf-wiki": 50
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/introduction.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/introduction.md"
+    "CTFs-master/2018_35C3_Junior/Decrypted.md",
+    "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+    "CTFs-master/2018_35C3_Junior/flags.md"
    ]
   },
   "crypto_aes": {
-   "files": 67,
+   "files": 225,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 85,
+    "p4-team__ctf": 73,
     "ctf-wiki__ctf-wiki": 67
    },
    "examples": [
-    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
-    "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md"
+    "CTFs-master/2018_35C3_Junior/1996.md",
+    "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+    "CTFs-master/2018_35C3_Junior/stringmaster2.md"
    ]
   },
   "crypto_classic": {
-   "files": 13,
+   "files": 66,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 24,
+    "p4-team__ctf": 29,
     "ctf-wiki__ctf-wiki": 13
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/monoalphabetic.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/others.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/classical/polyalphabetic.md"
+    "CTFs-master/2019_TAMUctf/-.-.md",
+    "CTFs-master/2019_picoCTF/Tapping.md",
+    "CTFs-master/2019_picoCTF/la_cifra_de.md"
    ]
   },
   "crypto_prng": {
-   "files": 15,
+   "files": 28,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 7,
+    "p4-team__ctf": 6,
     "ctf-wiki__ctf-wiki": 15
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_complex.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/lcg/challenge.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/streamcipher/prng/csprng.md"
+    "CTFs-master/2019_CheckPoint_CSA/searchable_text.txt",
+    "CTFs-master/2021_CheckPoint_CSA/Slot_Machine_Reloaded.md",
+    "CTFs-master/2021_GoogleCTF_BQ/5_Istanbul_-_Bazaar.md"
    ]
   },
   "crypto_lattice": {
-   "files": 20,
+   "files": 47,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 11,
+    "p4-team__ctf": 16,
     "ctf-wiki__ctf-wiki": 20
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/knapsack/knapsack.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/lattice-reduction.md"
+    "CTFs-master/2019_ArkCon/searchable_text-onsite.txt",
+    "CTFs-master/2019_noxtis/README.md",
+    "CTFs-master/2019_picoCTF/cereal_hacker_2.md"
    ]
   },
   "hash_crack": {
-   "files": 2,
+   "files": 10,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 8,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 2
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/hash/attack.md",
-    "ctf-wiki-master/docs/zh/docs/crypto/hash/attack.md"
+    "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+    "CTFs-master/2018_Shabak/searchable_text.txt",
+    "CTFs-master/2018_picoCTF/HEEEEEEERE'S Johnny!.md"
    ]
   },
   "archive_crack": {
-   "files": 3,
+   "files": 6,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 3,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 3
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/misc/archive/zip.md",
-    "ctf-wiki-master/docs/zh/docs/misc/archive/rar.md",
-    "ctf-wiki-master/docs/zh/docs/misc/archive/zip.md"
+    "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+    "CTFs-master/2018_Shabak/searchable_text.txt",
+    "CTFs-master/2024_GoogleCTF_BQ/CorruptedZipFile.md"
    ]
   },
   "stego_img": {
-   "files": 44,
+   "files": 133,
    "per_source": {
     "sajjadium__ctf-writeups": 1,
+    "Dvd848__CTFs": 57,
+    "p4-team__ctf": 32,
     "ctf-wiki__ctf-wiki": 43
    },
    "examples": [
@@ -941,44 +1725,53 @@
    ]
   },
   "stego_audio": {
-   "files": 2,
+   "files": 27,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 14,
+    "p4-team__ctf": 11,
     "ctf-wiki__ctf-wiki": 2
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/misc/audio/introduction.md",
-    "ctf-wiki-master/docs/zh/docs/misc/audio/introduction.md"
+    "CTFs-master/2019_Lahav433/README.md",
+    "CTFs-master/2019_noxtis/README.md",
+    "CTFs-master/2020_CheckPoint_CSA/Can_You_See_It.md"
    ]
   },
   "pcap": {
-   "files": 32,
+   "files": 109,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 43,
+    "p4-team__ctf": 34,
     "ctf-wiki__ctf-wiki": 32
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md"
+    "CTFs-master/2018_CheckPoint_CSA/README.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+    "CTFs-master/2018_OWASP-IL/README.md"
    ]
   },
   "forensics_fs": {
-   "files": 23,
+   "files": 53,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 21,
+    "p4-team__ctf": 9,
     "ctf-wiki__ctf-wiki": 23
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
-    "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
-    "ctf-wiki-master/docs/zh-tw/docs/misc/prefix.md"
+    "CTFs-master/2018_35C3_Junior/epic_mount.md",
+    "CTFs-master/2018_35C3_Junior/rare_mount.md",
+    "CTFs-master/2018_GoogleCTF_BQ/Floppy.md"
    ]
   },
   "encoding": {
-   "files": 161,
+   "files": 970,
    "per_source": {
     "sajjadium__ctf-writeups": 16,
+    "Dvd848__CTFs": 456,
+    "p4-team__ctf": 353,
     "ctf-wiki__ctf-wiki": 145
    },
    "examples": [
@@ -988,32 +1781,39 @@
    ]
   },
   "osint": {
-   "files": 2,
+   "files": 17,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 7,
+    "p4-team__ctf": 8,
     "ctf-wiki__ctf-wiki": 2
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/misc/recon.md",
-    "ctf-wiki-master/docs/zh/docs/misc/recon.md"
+    "CTFs-master/2019_BSidesTLV/Redis_in_the_wild.md",
+    "CTFs-master/2020_Technion/The_Great_Journey.md",
+    "CTFs-master/2021_Technion/Finding_Ducky_-_Part_1.md"
    ]
   },
   "net_scan": {
-   "files": 12,
+   "files": 27,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 14,
+    "p4-team__ctf": 1,
     "ctf-wiki__ctf-wiki": 12
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/ics/discover.md",
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-overview.md",
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/heap-structure.md"
+    "CTFs-master/2018_picoCTF/Help Me Reset 2.md",
+    "CTFs-master/2019_CheckPoint_CSA/searchable_text.txt",
+    "CTFs-master/2019_KipodAfterFree/KipodStab.md"
    ]
   },
   "pwn_env": {
-   "files": 119,
+   "files": 147,
    "per_source": {
     "sajjadium__ctf-writeups": 7,
+    "Dvd848__CTFs": 21,
+    "p4-team__ctf": 7,
     "ctf-wiki__ctf-wiki": 112
    },
    "examples": [
@@ -1023,46 +1823,53 @@
    ]
   },
   "misc_game": {
-   "files": 10,
+   "files": 29,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 13,
+    "p4-team__ctf": 6,
     "ctf-wiki__ctf-wiki": 10
    },
    "examples": [
-    "ctf-wiki-master/docs/en/docs/index.md",
-    "ctf-wiki-master/docs/en/docs/introduction/resources.md",
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/kernel-mode/defense/readme.md"
+    "CTFs-master/2018_picoCTF/buffer overflow 0.md",
+    "CTFs-master/2019_SunshineCTF/Return_To_Mania.md",
+    "CTFs-master/2019_SunshineCTF/Smash.md"
    ]
   },
   "misc_python_sandbox": {
-   "files": 4,
+   "files": 20,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 11,
+    "p4-team__ctf": 5,
     "ctf-wiki__ctf-wiki": 4
    },
    "examples": [
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md",
-    "ctf-wiki-master/docs/zh-tw/docs/pwn/sandbox/python/python-sandbox-escape.md",
-    "ctf-wiki-master/docs/zh/docs/pwn/linux/user-mode/heap/ptmalloc2/off-by-one.md"
+    "CTFs-master/2018_CheckPoint_CSA/README.md",
+    "CTFs-master/2018_OWASP-IL/README.md",
+    "CTFs-master/2018_picoCTF/Flaskcards and Freedom.md"
    ]
   },
   "misc_shell_sandbox": {
    "files": 0,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 0,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 0
    },
    "examples": []
   },
   "ai_llm_ctf": {
-   "files": 2,
+   "files": 3,
    "per_source": {
     "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 1,
+    "p4-team__ctf": 0,
     "ctf-wiki__ctf-wiki": 2
    },
    "examples": [
-    "ctf-wiki-master/docs/zh/docs/ai/ai-for-security/agent/introduction.md",
-    "ctf-wiki-master/docs/zh/docs/ai/security-for-ai/attacks/llm/prompt-injection.md"
+    "CTFs-master/2024_GoogleCTF_BQ/Prompt_Infiltration_Tooling_Takeover.md"
    ]
   }
  }

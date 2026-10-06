@@ -4,41 +4,69 @@
   {
    "name": "sajjadium/ctf-writeups",
    "url": "https://github.com/sajjadium/ctf-writeups",
-   "license": "见仓库（各题作者各自保留，仅作本地统计/学习用）",
+   "license": "见仓库（各题作者保留，仅本地统计/学习用）",
    "fetched": "2026-10-06",
    "files": 57,
    "bytes": 23042,
-   "repos": 1,
-   "scope": "选手 writeup 合集，按 ctfs/<赛事>/<年份>/<题>/README.md 组织；pwn 偏重（堆/ROP 为主），web 少",
+   "scope": "选手 writeup 合集，按 ctfs/<赛事>/<年>/<题>/README.md 组织；pwn 偏重",
    "stages": {
     "buffer_overflow": "31 文件",
     "heap": "24 文件",
     "encoding": "16 文件",
     "rce": "8 文件",
     "pwn_env": "7 文件",
-    "format_string": "3 文件",
-    "php_magic": "1 文件",
-    "stego_img": "1 文件"
+    "format_string": "3 文件"
+   }
+  },
+  {
+   "name": "Dvd848/CTFs",
+   "url": "https://github.com/Dvd848/CTFs",
+   "license": "见仓库",
+   "fetched": "2026-10-06",
+   "files": 760,
+   "bytes": 7746683,
+   "scope": "个人 CTF 题解合集（web/pwn/rev/crypto/misc 都有，覆盖面最均衡的一份）",
+   "stages": {
+    "encoding": "456 文件",
+    "rce": "272 文件",
+    "rev_ghidra": "127 文件",
+    "crypto_rsa": "93 文件",
+    "buffer_overflow": "89 文件",
+    "crypto_aes": "85 文件"
+   }
+  },
+  {
+   "name": "p4-team/ctf",
+   "url": "https://github.com/p4-team/ctf",
+   "license": "见仓库",
+   "fetched": "2026-10-06",
+   "files": 864,
+   "bytes": 11212704,
+   "scope": "战队 writeup 合集（事件/year/challenge 组织，pwn/rev 多）",
+   "stages": {
+    "encoding": "353 文件",
+    "rce": "271 文件",
+    "crypto_rsa": "109 文件",
+    "crypto_aes": "73 文件",
+    "php_magic": "41 文件",
+    "rev_ghidra": "34 文件"
    }
   },
   {
    "name": "ctf-wiki/ctf-wiki",
    "url": "https://github.com/ctf-wiki/ctf-wiki",
-   "license": "CC BY-NC-SA 4.0（ctf-wiki 项目声明）",
+   "license": "CC BY-NC-SA 4.0",
    "fetched": "2026-10-06",
    "files": 739,
    "bytes": 6269587,
-   "repos": 1,
-   "scope": "技法百科（不是 writeup）：按方向分章，讲机制与套路；用它的词频说明「这个手法在资料里有多常见」",
+   "scope": "技法百科（不是 writeup）：讲机制与套路，用它的词频说明「这个手法在资料里有多常见」",
    "stages": {
     "rce": "146 文件",
     "encoding": "145 文件",
     "pwn_env": "112 文件",
     "heap": "107 文件",
     "buffer_overflow": "86 文件",
-    "crypto_aes": "67 文件",
-    "format_string": "57 文件",
-    "crypto_rsa": "50 文件"
+    "crypto_aes": "67 文件"
    }
   }
  ],
@@ -115,12 +143,17 @@
    ],
    "corpus": {
     "technique": "flask_session",
-    "files": 0,
+    "files": 18,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 15,
+     "p4-team__ctf": 3,
      "ctf-wiki__ctf-wiki": 0
     },
-    "examples": [],
+    "examples": [
+     "CTFs-master/2018_picoCTF/Flaskcards Skeleton Key.md",
+     "CTFs-master/2018_picoCTF/Flaskcards.md"
+    ],
     "note": "命中文件数（不是题数）"
    },
    "refs": [
@@ -164,12 +197,17 @@
    ],
    "corpus": {
     "technique": "jwt",
-    "files": 0,
+    "files": 21,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 19,
+     "p4-team__ctf": 2,
      "ctf-wiki__ctf-wiki": 0
     },
-    "examples": [],
+    "examples": [
+     "CTFs-master/2019_BSidesTLV/Pacman.md",
+     "CTFs-master/2019_KipodAfterFree/Cookie_Clicker.md"
+    ],
     "note": "命中文件数（不是题数）"
    },
    "refs": [
@@ -214,14 +252,16 @@
    ],
    "corpus": {
     "technique": "sqli",
-    "files": 8,
+    "files": 76,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 37,
+     "p4-team__ctf": 31,
      "ctf-wiki__ctf-wiki": 8
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/java-example.md",
-     "ctf-wiki-master/docs/zh-tw/docs/web/sqli.md"
+     "CTFs-master/2018_35C3_Junior/DB_Secret.md",
+     "CTFs-master/2018_CheckPoint_CSA/README.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -265,12 +305,17 @@
    ],
    "corpus": {
     "technique": "ssti",
-    "files": 0,
+    "files": 17,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 10,
+     "p4-team__ctf": 7,
      "ctf-wiki__ctf-wiki": 0
     },
-    "examples": [],
+    "examples": [
+     "CTFs-master/2018_picoCTF/Flaskcards.md",
+     "CTFs-master/2019_SunshineCTF/Portfolio.md"
+    ],
     "note": "命中文件数（不是题数）"
    },
    "refs": [
@@ -313,9 +358,11 @@
    ],
    "corpus": {
     "technique": "php_magic",
-    "files": 49,
+    "files": 133,
     "per_source": {
      "sajjadium__ctf-writeups": 1,
+     "Dvd848__CTFs": 43,
+     "p4-team__ctf": 41,
      "ctf-wiki__ctf-wiki": 48
     },
     "examples": [
@@ -365,14 +412,16 @@
    ],
    "corpus": {
     "technique": "lfi",
-    "files": 28,
+    "files": 94,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 42,
+     "p4-team__ctf": 24,
      "ctf-wiki__ctf-wiki": 28
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/blockchain/publicblockchain/weaknesses.md",
-     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/lattice/cvp.md"
+     "CTFs-master/2018_35C3_Junior/Note_accessible.md",
+     "CTFs-master/2018_GoogleCTF_BQ/Admin_UI.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -416,9 +465,11 @@
    ],
    "corpus": {
     "technique": "rce",
-    "files": 154,
+    "files": 697,
     "per_source": {
      "sajjadium__ctf-writeups": 8,
+     "Dvd848__CTFs": 272,
+     "p4-team__ctf": 271,
      "ctf-wiki__ctf-wiki": 146
     },
     "examples": [
@@ -472,14 +523,16 @@
    ],
    "corpus": {
     "technique": "audit",
-    "files": 5,
+    "files": 19,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 10,
+     "p4-team__ctf": 4,
      "ctf-wiki__ctf-wiki": 5
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-     "ctf-wiki-master/docs/zh/docs/introduction/content.md"
+     "CTFs-master/2018_35C3_Junior/McDonald.md",
+     "CTFs-master/2018_35C3_Junior/blind.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -519,14 +572,16 @@
    ],
    "corpus": {
     "technique": "authbypass",
-    "files": 10,
+    "files": 19,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 7,
+     "p4-team__ctf": 2,
      "ctf-wiki__ctf-wiki": 10
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md",
-     "ctf-wiki-master/docs/zh-tw/docs/ics/exploit.md"
+     "CTFs-master/2018_GoogleCTF_BQ/Holey_Beep.md",
+     "CTFs-master/2019_picoCTF/Open-to-admins.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -601,14 +656,16 @@
    ],
    "corpus": {
     "technique": "upload",
-    "files": 4,
+    "files": 14,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 4,
+     "p4-team__ctf": 6,
      "ctf-wiki__ctf-wiki": 4
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-     "ctf-wiki-master/docs/zh/docs/introduction/content.md"
+     "CTFs-master/2020_BSidesTLV/Bugler.md",
+     "CTFs-master/2020_BSidesTLV/WebProxy.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -652,14 +709,16 @@
    ],
    "corpus": {
     "technique": "deser",
-    "files": 2,
+    "files": 35,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 16,
+     "p4-team__ctf": 17,
      "ctf-wiki__ctf-wiki": 2
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/web/php/php.md",
-     "ctf-wiki-master/docs/zh/docs/web/php/php.md"
+     "CTFs-master/2018_Shabak/searchable_text.txt",
+     "CTFs-master/2018_picoCTF/buffer overflow 3.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -703,14 +762,16 @@
    "related_rules": [],
    "corpus": {
     "technique": "archive_crack",
-    "files": 3,
+    "files": 6,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 3,
+     "p4-team__ctf": 0,
      "ctf-wiki__ctf-wiki": 3
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/misc/archive/zip.md",
-     "ctf-wiki-master/docs/zh/docs/misc/archive/rar.md"
+     "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md",
+     "CTFs-master/2018_Shabak/searchable_text.txt"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -755,9 +816,11 @@
    "related_rules": [],
    "corpus": {
     "technique": "stego_img",
-    "files": 44,
+    "files": 133,
     "per_source": {
      "sajjadium__ctf-writeups": 1,
+     "Dvd848__CTFs": 57,
+     "p4-team__ctf": 32,
      "ctf-wiki__ctf-wiki": 43
     },
     "examples": [
@@ -805,14 +868,16 @@
    "related_rules": [],
    "corpus": {
     "technique": "crypto_rsa",
-    "files": 50,
+    "files": 252,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 93,
+     "p4-team__ctf": 109,
      "ctf-wiki__ctf-wiki": 50
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/static/complex-example.md",
-     "ctf-wiki-master/docs/zh-tw/docs/crypto/introduction.md"
+     "CTFs-master/2018_35C3_Junior/Decrypted.md",
+     "CTFs-master/2018_35C3_Junior/Note_accessible.md"
     ],
     "note": "命中文件数（不是题数）"
    },
@@ -855,9 +920,11 @@
    "related_rules": [],
    "corpus": {
     "technique": "encoding",
-    "files": 161,
+    "files": 970,
     "per_source": {
      "sajjadium__ctf-writeups": 16,
+     "Dvd848__CTFs": 456,
+     "p4-team__ctf": 353,
      "ctf-wiki__ctf-wiki": 145
     },
     "examples": [
@@ -939,16 +1006,18 @@
    "related_rules": [],
    "corpus": {
     "technique": "buffer_overflow",
-    "note": "命中文件数（不是题数）",
-    "files": 117,
+    "files": 221,
     "per_source": {
      "sajjadium__ctf-writeups": 31,
+     "Dvd848__CTFs": 89,
+     "p4-team__ctf": 15,
      "ctf-wiki__ctf-wiki": 86
     },
     "examples": [
      "ctf-writeups-master/ctfs/0CTF/2017/Quals/babyheap/README.md",
      "ctf-writeups-master/ctfs/0CTF/2018/Finals/freenote2018/README.md"
-    ]
+    ],
+    "note": "命中文件数（不是题数）"
    },
    "refs": [
     {
@@ -995,16 +1064,18 @@
    "related_rules": [],
    "corpus": {
     "technique": "rev_ghidra",
-    "note": "命中文件数（不是题数）",
-    "files": 22,
+    "files": 183,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 127,
+     "p4-team__ctf": 34,
      "ctf-wiki__ctf-wiki": 22
     },
     "examples": [
-     "ctf-wiki-master/docs/en/docs/pwn/linux/user-mode/environment.md",
-     "ctf-wiki-master/docs/zh-tw/docs/android/basic_reverse/dynamic/dynamic_debug.md"
-    ]
+     "CTFs-master/2018_35C3_Junior/poet.md",
+     "CTFs-master/2018_GoogleCTF_BQ/Admin_UI_2.md"
+    ],
+    "note": "命中文件数（不是题数）"
    },
    "refs": [
     {
@@ -1048,16 +1119,18 @@
    "related_rules": [],
    "corpus": {
     "technique": "pcap",
-    "note": "命中文件数（不是题数）",
-    "files": 32,
+    "files": 109,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 43,
+     "p4-team__ctf": 34,
      "ctf-wiki__ctf-wiki": 32
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_coppersmith_attack.md",
-     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md"
-    ]
+     "CTFs-master/2018_CheckPoint_CSA/README.md",
+     "CTFs-master/2018_GoogleCTF_BQ/Security_by_Obscurity.md"
+    ],
+    "note": "命中文件数（不是题数）"
    },
    "refs": [
     {
@@ -1099,16 +1172,18 @@
    "related_rules": [],
    "corpus": {
     "technique": "forensics_fs",
-    "note": "命中文件数（不是题数）",
-    "files": 23,
+    "files": 53,
     "per_source": {
      "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 21,
+     "p4-team__ctf": 9,
      "ctf-wiki__ctf-wiki": 23
     },
     "examples": [
-     "ctf-wiki-master/docs/zh-tw/docs/crypto/asymmetric/rsa/rsa_module_attack.md",
-     "ctf-wiki-master/docs/zh-tw/docs/ics/ctfs.md"
-    ]
+     "CTFs-master/2018_35C3_Junior/epic_mount.md",
+     "CTFs-master/2018_35C3_Junior/rare_mount.md"
+    ],
+    "note": "命中文件数（不是题数）"
    },
    "refs": [
     {
@@ -1119,10 +1194,10 @@
   }
  ],
  "_evidence": {
-  "_comment": "kb 卡片 corpus.files 的来源：scripts/harvest_writeups.py 在这批语料上的实测命中。口径：文件计数（一个文件命中多次算 1）、大小写不敏感子串、每来源内按内容 sha1 去重、跳过语料根目录的索引文件。",
-  "files_total": 796,
-  "bytes_total": 6292629,
+  "_comment": "kb 卡片 corpus 的来源：scripts/harvest_writeups.py 在这批语料上的实测命中。口径：文件计数（同一文件命中多次算 1）、大小写不敏感子串/正则、每来源内部按内容 sha1 去重、跳过语料根/一层的索引文件名。",
+  "files_total": 2420,
+  "bytes_total": 25252016,
   "fetched": "2026-10-06",
-  "generated_by": "python3 scripts/harvest_writeups.py count --corpus ... --json research/kb-evidence.json"
+  "generated_by": "python3 scripts/harvest_writeups.py count --corpus <4 套语料> --json research/kb-evidence.json"
  }
 }
