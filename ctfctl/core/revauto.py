@@ -392,7 +392,7 @@ def _rc4(key: bytes, data: bytes) -> bytes:
     return bytes(out)
 
 
-def verify_by_running(path: str, candidate: bytes, timeout: float = 8.0) -> tuple[bool, str]:
+def verify_by_running(path: str, candidate: bytes, timeout: float = 8.0) -> tuple[str, str]:
     """把候选当输入真的跑一遍程序，看它自己的成功提示 —— 这是最硬的判定器（比启发式可靠）。
 
     PE 用 wine（主机有）；ELF 直接跑。判据：退出码 0 且输出里出现 correct/success/flag 之类锚点。
@@ -401,21 +401,30 @@ def verify_by_running(path: str, candidate: bytes, timeout: float = 8.0) -> tupl
     if open(path, "rb").read(2) == b"MZ":
         wine = _have("wine")
         if not wine:
-            return False, "PE 且没装 wine，无法运行验证"
+            return "unknown", "PE 且没装 wine，无法运行验证"
         runner = [wine, path]
+    if not os.access(path, os.X_OK):
+        try:
+            os.chmod(path, 0o755)
+        except OSError:
+            return "unknown", "文件不可执行"
     try:
         p = subprocess.run(runner, input=candidate + b"\n", capture_output=True, timeout=timeout)
     except (OSError, subprocess.TimeoutExpired) as e:
-        return False, f"运行失败：{type(e).__name__}"
+        return "unknown", f"运行失败：{type(e).__name__}"
     out = (p.stdout + p.stderr).decode("utf-8", "replace")
     # 成功必须**显式**：出现 correct/congrat/success/well done 之类，且**没有** wrong/fail 之类。
     # （曾经把提示语 "Input your flag:" 里的 "flag" 当成功锚点 → 程序打印 Wrong 也报"验证通过"）
     ok_re = re.compile(r"(correct|congrat|success|well done|you win|accepted|nice\b)", re.I)
     bad_re = re.compile(r"(wrong|incorrect|invalid|fail|nope|try again|denied)", re.I)
-    ok = bool(ok_re.search(out)) and not bad_re.search(out)
-    if not ok and O.flags_in(out) and not bad_re.search(out):
-        ok = True                                   # 程序自己回显了 flag 也算过
-    return ok, out.strip()[:160]
+    # 三态：pass（显式成功）/ fail（程序活着但给出否定或无输出）/ unknown（跑不起来）
+    if bad_re.search(out):
+        return "fail", out.strip()[:160]
+    if ok_re.search(out) or (O.flags_in(out) and not bad_re.search(out)):
+        return "pass", out.strip()[:160]
+    if p.returncode != 0 or not out.strip():
+        return "fail", (out.strip()[:160] or f"无输出且 rc={p.returncode}")
+    return "unknown", out.strip()[:160]
 
 
 def rev_crypto(path: str, budget_s: float = 60.0) -> list[dict]:
@@ -598,16 +607,22 @@ def rev_crypto(path: str, budget_s: float = 60.0) -> list[dict]:
     if best:
         pt = best["pt"].decode("utf-8", "replace").rstrip("\x00")
         # 程序自己跑一遍 = 最硬验证（跑不动/跑失败要如实反映，不能假装通过）
-        ok, detail = verify_by_running(path, pt.encode("utf-8", "replace"))
-        ran_and_failed = bool(detail) and bool(re.search(r"(wrong|incorrect|invalid|fail|nope)", detail, re.I))
-        if ran_and_failed:
+        verdict, detail = verify_by_running(path, pt.encode("utf-8", "replace"))
+        # 只认**跑通**的成功；程序给了否定 = MISS；跑不起来时要额外的"内容紧凑"证据才敢判（见下）
+        tight = False
+        for f in O.flags_in(pt):
+            body = f[f.find("{") + 1:-1]
+            if len(body) >= 8 and sum(1 for ch in body if ch.isalnum() or ch in "_-") / len(body) >= 0.9:
+                tight = True
+        if verdict == "fail":
             steps.append(_step("rev-crypto", f"候选被程序否掉（{best['algo']}，试了 {best['tried']} 组）",
-                               "MISS", 1, f"真跑一遍得到否定输出：{detail}"))
-        else:
-            steps.append(_step("rev-crypto",
-                               f"{best['algo']} 解出明文（试了 {best['tried']} 组）"
-                               + ("，运行验证通过 ✔" if ok else "（没能运行验证）"),
-                               "HIT", 3 if ok else 2,
+                               "MISS", 1, f"真跑一遍得到否定/无输出：{detail}"))
+            return steps
+        ok = verdict == "pass"
+        steps.append(_step("rev-crypto",
+                           f"{best['algo']} 解出明文（试了 {best['tried']} 组）"
+                           + ("，运行验证通过 ✔" if ok else "（没能运行验证）"),
+                           "HIT" if (ok or tight) else "UNKNOWN", 3 if ok else 2,
                                f"key={best['key'][:24]!r}（{len(best['key'])}B） + {best['algo']} 解密"
                                + ("（大端）" if best["big"] else "（小端）")
                                + (f"；真跑一遍：{detail}" if detail else "；没跑起来，未验证"),
@@ -642,7 +657,7 @@ def _rodata_blobs(info: dict, min_len: int = 12, max_blobs: int = 40, path: str 
     secs = [s for s in info.get("_sections", [])
             if s.get("name") in (".rodata", ".data", ".data.rel.ro", ".rdata")]
     if not secs and path:                              # PE：节区表另一套解析
-        secs = [{"name": x["name"], "off": x["off"], "size": x["size"]}
+        secs = [{"name": x["name"], "off": x["off"], "size": x["size"], "vsize": x.get("vsize", 0)}
                 for x in pe_sections(path) if not x["exec"]]
     cands: list[bytes] = []
     for s in secs:
@@ -985,6 +1000,137 @@ def rev_asm_source(path: str, budget_s: float = 30.0) -> list[dict]:
     return steps
 
 
+# ---------------------------------------------------------------- ③.8 网格迷宫（WASD）自动求解
+
+MOVE_IMMS = {"W": 0x57, "A": 0x41, "S": 0x53, "D": 0x44}
+
+
+def _int_grid_candidates(path: str, info: dict) -> list[tuple[str, int, int, list[int]]]:
+    """找"二维整型网格"：长度是完全平方、值域很小、恰好两个值只出现一次（起点/终点）。"""
+    import struct
+    data = info.get("_data") or (open(path, "rb").read() if path else b"")   # PE 走 elf_info 时没有 _data
+    out = []
+    secs = [s for s in info.get("_sections", []) if s.get("name") in (".rodata", ".data", ".data.rel.ro", ".rdata")]
+    if not secs and path:
+        secs = [{"name": x["name"], "off": x["off"], "size": x["size"]} for x in pe_sections(path) if not x["exec"]]
+    for sec in secs:
+        # 按**虚拟大小**取（PE 里 vsize 常大于 raw size；只按 raw size 会截掉网格）
+        span = max(sec.get("size", 0), sec.get("vsize", 0) or 0)
+        blob = data[sec["off"]:sec["off"] + max(span, sec.get("size", 0))]
+        for width, byte_size in ((4, "i"), (1, "b")):
+            step = width
+            n_items = len(blob) // step
+            for side in (5, 6, 7, 8, 9, 10, 12, 15, 16, 20, 24, 25, 30, 32, 40, 50, 64):
+                need = side * side
+                if need > n_items:
+                    continue
+                for start_i in range(0, min(4096, n_items - need + 1)):
+                    vals = list(struct.unpack_from("<%d%s" % (need, byte_size), blob, start_i * step))
+                    if any(v < 0 or v > 16 for v in vals):     # 迷宫值都很小；值域大 = 噪声
+                        continue
+                    from collections import Counter
+                    cnt = Counter(vals)
+                    once = [v for v, c in cnt.items() if c == 1]
+                    if len(once) < 2 or 0 not in cnt:
+                        continue
+                    out.append((f"{side}x{side}（{'i32' if width == 4 else 'i8'}，起始偏移 {hex(sec['off'] + start_i * step)}）",
+                                side, once[0], vals, width))
+                    break
+    # i32 网格优先（i8 在任意数据上都容易"凑出"假网格），其次边长大的
+    out.sort(key=lambda x: (-(1 if x[4] == 4 else 0), -x[1]))
+    return [(d, side, v0, vals) for d, side, v0, vals, _w in out[:6]]
+
+
+def maze_auto(path: str, budget_s: float = 60.0) -> list[dict]:
+    """WASD 网格迷宫：找网格 → BFS（多种规则集）→ **用程序自己跑一遍验证**。
+
+    规则集不写死：迷宫的"可走格"约定各出题人不同（0 可走 / 0 是空洞；3/4/5 是滑行格……），
+    所以对同一个网格试几种规则集，谁能被程序接受就是谁 —— 程序就是判定器。
+    """
+    from collections import Counter, deque
+    t0 = time.time()
+    text = ""
+    try:
+        text = open(path, "rb").read().decode("latin-1", "replace")
+    except OSError:
+        return []
+    if not all(chr(v) in text for v in MOVE_IMMS.values()):
+        return []
+    info = elf_info(path)
+    cands = _int_grid_candidates(path, info)
+    if not cands:
+        return [_step("rev-maze", "网格迷宫：检测到 WASD 输入，但没找到二维网格", "UNKNOWN", 2,
+                      "需要人工看网格数据与移动规则")]
+    steps = [_step("rev-maze", f"检测到 WASD 移动 + {len(cands)} 个候选网格（{cands[0][0]}）", "UNKNOWN", 2,
+                   "按候选网格做 BFS，再用程序自身验证路径")]
+    for desc, side, v_start, vals in cands:
+        if time.time() - t0 > budget_s:
+            break
+        cnt = Counter(vals)
+        singletons = [v for v, c in cnt.items() if c == 1]
+        start_v = singletons[0]
+        goal_v = singletons[1] if len(singletons) > 1 else singletons[0]
+        sx, sy = next((i % side, i // side) for i, v in enumerate(vals) if v == start_v)
+        gx, gy = next((i % side, i // side) for i, v in enumerate(vals) if v == goal_v)
+        if (sx, sy) == (gx, gy):
+            continue
+        DIRS = {"W": (0, -1), "S": (0, 1), "A": (-1, 0), "D": (1, 0)}
+
+        def make_rule(passable_zero: bool, slides: set):
+            def landing(x, y, d):
+                dx, dy = DIRS[d]
+                nx, ny = x + dx, y + dy
+                for _ in range(64):
+                    if not (0 <= nx < side and 0 <= ny < side):
+                        return None
+                    v = vals[ny * side + nx]
+                    ok = (v == 0) if passable_zero else (v != 0)
+                    if not ok:
+                        return None
+                    if v in slides:
+                        nx, ny = nx + dx, ny + dy        # 滑行格：同方向继续
+                        continue
+                    return nx, ny
+                return None
+            return landing
+
+        rules = [("非0可走", make_rule(False, set())), ("非0可走+滑行(3/4/5)", make_rule(False, {3, 4, 5})),
+                 ("0可走", make_rule(True, set()))]
+        for rule_name, landing in rules:
+            seen = {(sx, sy): ""}
+            q = deque([(sx, sy)])
+            found = None
+            while q and time.time() - t0 < budget_s:
+                x, y = q.popleft()
+                pth = seen[(x, y)]
+                if len(pth) >= 55:
+                    continue
+                for d in "WSAD":
+                    r = landing(x, y, d)
+                    if r is None or r in seen:
+                        continue
+                    seen[r] = pth + d
+                    if r == (gx, gy):
+                        found = seen[r]
+                        q.clear()
+                        break
+                    q.append(r)
+                if found:
+                    break
+            if not found:
+                continue
+            verdict, detail = verify_by_running(path, found.encode())
+            if verdict == "pass":
+                return steps + [_step("rev-maze", f"路径求解成功（{desc}，规则：{rule_name}，{len(found)} 步，运行验证通过 ✔）",
+                                      "HIT", 3, f"程序确认：{detail}", found,
+                                      [f"{path}  <<< '{found}'"])]
+            steps.append(_step("rev-maze", f"候选路径被程序否掉（{desc} / {rule_name}）", "MISS", 1,
+                               f"{detail}", found[:80]))
+    steps.append(_step("rev-maze", "网格迷宫", "UNKNOWN", 1,
+                       "BFS 出的路径都没被程序接受：规则可能更复杂（传送/收集/限步），需人工读代码"))
+    return steps
+
+
 # ---------------------------------------------------------------- ④ 反汇编级提取
 
 def rev_disasm(path: str, budget_s: float = 40.0) -> list[dict]:
@@ -1074,6 +1220,15 @@ def rev_auto(path: str, budget_s: float = 120.0, brute: bool = True) -> list[dic
     if anchors:
         steps.append(_step("rev-strings", f"提示串锚点（{len(anchors)} 条）", "UNKNOWN", 2,
                            "这些是判定分岔点（谁打印 correct/wrong 谁就是校验函数）", "\n".join(anchors)[:400]))
+    # WASD 网格迷宫（先试，命中即返回）
+    if path.lower().endswith((".exe", ".elf")) or open(path, "rb").read(4)[:2] in (b"MZ", b"\x7fE"):
+        try:                                        # 迷宫层是启发式的，出错不能拖垮整条 rev 流程
+            maze_steps = maze_auto(path, budget_s=min(45.0, budget_s))
+        except Exception as e:
+            maze_steps = [_step("rev-maze", "网格迷宫层异常（已跳过）", "ERROR", 1, f"{type(e).__name__}: {e}")]
+        steps += maze_steps
+        if any(x["verdict"] == "HIT" for x in maze_steps):
+            return steps + maze_steps
     steps += rev_crypto(path, budget_s=min(45.0, budget_s))
     if O.flags_in("\n".join(x.get("result", "") for x in steps)):
         return steps

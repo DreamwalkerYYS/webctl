@@ -39,8 +39,11 @@ def _flag_prefix_ok(prefix: str, content: str, text: str) -> tuple[bool, str]:
     """前缀是否可信：常见前缀 > 命中常用词 > 同文本可读。返回 (可信, 理由)。"""
     low = prefix.lower()
     # 内容门槛对**所有**前缀都适用：`key{as#}` 这种 4 字内容即使前缀眼熟也不算（实测假阳性）
-    if len(content) < 6 or sum(1 for ch in content if ch.isalnum() or ch in "_-!@#") / len(content) < 0.7:
-        return False, f"内容太短/太杂（{len(content)} 字符）"
+    tight = sum(1 for ch in content if ch.isalnum() or ch in "_-!@") / len(content)
+    if len(content) < 6 or tight < 0.85:
+        return False, f"内容太短/太杂（{len(content)} 字符，紧凑度 {tight:.2f}）"
+    if any(ch in content for ch in "[]{}<>`~^|\\"):        # 这些字符几乎不出现在真 flag 里
+        return False, "内容含非常见字符"
     if low in KNOWN_FLAG_PREFIXES or prefix in KNOWN_FLAG_PREFIXES:
         return True, "前缀在常见清单里"
     if low in COMMON_WORDS or low.rstrip("_") in COMMON_WORDS:
