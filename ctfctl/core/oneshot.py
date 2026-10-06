@@ -20,24 +20,70 @@ from .config import CACHE
 from .revauto import _step
 
 #: 一把梭题型 → 工具 / 装法（工具不在位时把装法原样报出来）
+#: 「一把梭」工具注册表（2026-10 调研，按"本地文件→输出"无交互可调用性取舍）
+#: 字段：tool=可执行名 / install=装法 / how=无交互调用式 / net=是否需要联网 / ai=是否依赖模型
+#: 说明：GPL 一律**子进程调用**，不链接不嵌入（避免传染）；带 ai=True 的默认不自动跑。
 TOOLKIT = {
-    "qr":        {"tool": "zbarimg", "install": "pacman -S zbar", "how": "zbarimg -q --raw <图片>"},
-    "stego_png": {"tool": "zsteg", "install": "paru -S zsteg  # 或 gem install zsteg",
-                  "how": "zsteg -a <图片>"},
-    "stego_jpg": {"tool": "stegseek", "install": "paru -S stegseek",
-                  "how": "stegseek <图片> <字典>"},
-    "stego_any": {"tool": "steghide", "install": "pacman -S steghide", "how": "steghide extract -sf <文件>"},
-    "zip_crack": {"tool": "zip2john", "install": "pacman -S john", "how": "zip2john a.zip > h; john --wordlist=… h"},
-    "zip_fast":  {"tool": "fcrackzip", "install": "pacman -S fcrackzip", "how": "fcrackzip -u -D -p 字典 a.zip"},
-    "pyc":       {"tool": "pycdc", "install": "paru -S pycdc-git  # 或 pip install decompyle3",
-                  "how": "pycdc a.pyc  # 反编译出源码直接看逻辑"},
-    "git":       {"tool": "git-dumper", "install": "pacman -S git-dumper", "how": "git-dumper <站点/.git> 目录"},
-    "pcap":      {"tool": "tshark", "install": "pacman -S wireshark-cli", "how": "tshark -r a.pcap -Y http"},
-    "sqlcipher": {"tool": "sqlcipher", "install": "pacman -S sqlcipher",
-                  "how": "sqlcipher db 'PRAGMA key=\"…\"; .dump'"},
-    "audio":     {"tool": "sox", "install": "pacman -S sox multimon-ng", "how": "sox a.wav -n spectrogram"},
-    "rsa":       {"tool": "RsaCtfTool", "install": "pipx install RsaCtfTool",
-                  "how": "RsaCtfTool --publickey k.pub --private"},
+    # —— 图片/音频隐写 ——
+    "png_lsb":   {"tool": "zsteg", "install": "paru -S zsteg  # 或 gem install zsteg", "net": False, "ai": False,
+                  "how": "zsteg -a <图.png>"},
+    "jpg_stego": {"tool": "stegseek", "install": "paru -S stegseek", "net": False, "ai": False,
+                  "how": "stegseek --seed <图.jpg>   # 免字典检测；有词表则 stegseek <图.jpg> 词表"},
+    "audio":     {"tool": "minimodem", "install": "pacman -S minimodem", "net": False, "ai": False,
+                  "how": "minimodem -f a.wav --rx 1200 -a   # FSK/DTMF 自适应"},
+    # —— 编码/密码 ——
+    "basecrack": {"tool": "basecrack", "install": "pipx install basecrack", "net": False, "ai": False,
+                  "how": "basecrack --magic -t '<串>'   # base 家族多层自动"},
+    "hash_id":   {"tool": "nth", "install": "pipx install name-that-hash", "net": False, "ai": False,
+                  "how": "nth -t '<hash>' --json"},
+    "zip_known": {"tool": "bkcrack", "install": "paru -S bkcrack  # 或 cmake 构建", "net": False, "ai": False,
+                  "how": "bkcrack -C enc.zip -c 条目 -P 明文.zip -p 条目   # 需 ≥12B 已知明文"},
+    "ciphey":    {"tool": "ciphey", "install": "cargo install ciphey  # Rust 版", "net": False, "ai": True,
+                  "how": "⚠️ 新版明文判定用 BERT（gibberish-or-not）→ 按「不带 AI」约束默认不自动跑；"
+                         "要接入须把判定器换成我们自己的 oracles"},
+    # —— 反编译 ——
+    "java":      {"tool": "jadx", "install": "pacman -S jadx", "net": False, "ai": False,
+                  "how": "jadx -d 输出目录 app.apk"},
+    "dotnet":    {"tool": "ilspycmd", "install": "pacman -S ilspycmd  # 或 dotnet tool install ilspycmd",
+                  "net": False, "ai": False, "how": "ilspycmd -o 输出目录 a.dll   # 混淆样本先过 de4dot"},
+    "pyc":       {"tool": "pycdc", "install": "paru -S pycdc-git", "net": False, "ai": False,
+                  "how": "pycdc a.pyc"},
+    "pyinst":    {"tool": "pyinstxtractor", "install": "pipx install pyinstxtractor", "net": False, "ai": False,
+                  "how": "python pyinstxtractor.py a.exe   # 拆出 pyc 再喂 pycdc"},
+    # —— 文档 / 流量 / 取证 ——
+    "pdf":       {"tool": "pdf-parser.py", "install": "git clone DidierStevensSuite（或单下 pdfid.py/pdf-parser.py）",
+                  "net": False, "ai": False, "how": "python pdf-parser.py f.pdf   # 纯 stdlib"},
+    "office":    {"tool": "olevba", "install": "pipx install oletools", "net": False, "ai": False,
+                  "how": "olevba f.doc   # 提取 VBA 宏"},
+    "pcap_cred": {"tool": "Pcredz", "install": "git clone lgandx/PCredz", "net": False, "ai": False,
+                  "how": "Pcredz -f f.pcap"},
+    "browser":   {"tool": "hindsight.py", "install": "pipx install pyhindsight", "net": False, "ai": False,
+                  "how": "hindsight.py -i profile目录 -o out -f jsonl"},
+    "mem":       {"tool": "vol", "install": "pipx install volatility3", "net": True, "ai": False,
+                  "how": "vol -f dump.raw windows.info   # ⚠️ Windows 符号表默认联网，离线需预置"},
+    # —— pwn / rev ——
+    "onegadget": {"tool": "one_gadget", "install": "gem install one_gadget", "net": True, "ai": False,
+                  "how": "one_gadget -f libc.so.6   # -f 强制本地，避免按 BuildID 联网"},
+    "libc_match":{"tool": "libc-database", "install": "git clone niklasb/libc-database && ./get all",
+                  "net": True, "ai": False, "how": "./find <符号> <地址>   # 建库需联网，匹配离线"},
+    "rsa":       {"tool": "RsaCtfTool", "install": "pipx install RsaCtfTool", "net": True, "ai": False,
+                  "how": "RsaCtfTool --publickey k.pub --private   # 在线攻击可用 --attack 指定，离线只走本地算法"},
+    "angr":      {"tool": "python3", "install": "pipx install angr", "net": False, "ai": False,
+                  "how": "⚠️ 无 CLI：需自写 find/avoid 模板；本机 py3.14 下 angr 装不起来（CLexer 报错）"},
+    "qr":        {"tool": "zbarimg", "install": "pacman -S zbar", "net": False, "ai": False,
+                  "how": "zbarimg -q --raw <图片>"},
+    "steghide": {"tool": "steghide", "install": "pacman -S steghide", "net": False, "ai": False,
+                  "how": "steghide extract -sf <文件>   # 无口令时回车空密码试一次"},
+    "zip_crack": {"tool": "zip2john", "install": "pacman -S john", "net": False, "ai": False,
+                  "how": "zip2john a.zip > h; john --wordlist=… h"},
+    "zip_fast":  {"tool": "fcrackzip", "install": "pacman -S fcrackzip", "net": False, "ai": False,
+                  "how": "fcrackzip -u -D -p 字典 a.zip"},
+    "git":       {"tool": "git-dumper", "install": "pacman -S git-dumper", "net": True, "ai": False,
+                  "how": "git-dumper <站点>/.git 目录"},
+    "pcap":      {"tool": "tshark", "install": "pacman -S wireshark-cli", "net": False, "ai": False,
+                  "how": "tshark -r a.pcap -Y http"},
+    "sqlcipher": {"tool": "sqlcipher", "install": "pacman -S sqlcipher", "net": False, "ai": False,
+                  "how": "sqlcipher db   # PRAGMA key='…'; .dump"},
 }
 
 
@@ -187,6 +233,83 @@ def pyc_decompile(path: str) -> list[dict]:
     return [_step("oneshot-pyc", f"pyc 反编译（{base}）", v, c, reason, res, [f"{base} {path}"])]
 
 
+def zsteg_png(path: str) -> list[dict]:
+    """PNG/BMP 隐写：zsteg -a 一把梭（LSB/位平面/多通道全试）。"""
+    if not _have("zsteg"):
+        return [_missing("png_lsb")]
+    rc, out = _run(["zsteg", "-a", path], timeout=180)
+    v, c, reason, res = _verdict_of(out, "" if rc == 0 else f"zsteg rc={rc}")
+    return [_step("oneshot-zsteg", "PNG/BMP 隐写（zsteg -a）", v, c, reason, res, [f"zsteg -a {path}"])]
+
+
+def stegseek_jpg(path: str) -> list[dict]:
+    """JPEG 隐写：stegseek --seed 免字典检测（有词表时再上词表）。"""
+    if not _have("stegseek"):
+        return [_missing("jpg_stego")]
+    rc, out = _run(["stegseek", "--seed", path], timeout=240)
+    v, c, reason, res = _verdict_of(out, "")
+    steps = [_step("oneshot-stegseek", "JPEG 隐写（stegseek --seed）", v, c, reason, res,
+                   [f"stegseek --seed {path}", f"stegseek {path} /usr/share/wordlists/rockyou.txt"])]
+    if not _have("steghide") and v != "HIT":
+        return steps
+    if v != "HIT" and _have("steghide"):        # 空口令再试一发（很常见）
+        rc2, out2 = _run(["bash", "-lc", f"printf '\\n' | steghide extract -sf {path!r} -p '' -f 2>&1 | head -20"], timeout=60)
+        v2, c2, reason2, res2 = _verdict_of(out2, "空口令没解出")
+        steps.append(_step("oneshot-steghide", "steghide 空口令", v2, c2, reason2, res2,
+                           [f"steghide extract -sf {path} -p '' -f"]))
+    return steps
+
+
+def jadx_dex(path: str) -> list[dict]:
+    """APK/DEX：jadx 反编译成 Java 源码（一把梭看逻辑与硬编码值）。"""
+    if not _have("jadx"):
+        return [_missing("java")]
+    outdir = os.path.join(CACHE, "oneshot", os.path.basename(path) + ".jadx")
+    os.makedirs(outdir, exist_ok=True)
+    rc, out = _run(["jadx", "-d", outdir, "--quiet", path], timeout=600)
+    flags, hits = [], []
+    for root, _, files in os.walk(outdir):
+        for f in files:
+            if not f.endswith(".java"):
+                continue
+            try:
+                txt = open(os.path.join(root, f), encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            fl = O.flags_in(txt)
+            if fl:
+                flags += fl
+            if "flag" in txt.lower() and len(hits) < 5:
+                hits.append(os.path.join(root, f))
+    if flags:
+        return [_step("oneshot-jadx", f"APK/DEX 反编译（jadx，{len(hits)} 个相关文件）", "HIT", 3,
+                      f"源码里找到 flag：{flags[0]}", "\n".join(flags[:3]), [f"jadx -d {outdir} {path}"])]
+    names = ", ".join(os.path.basename(h) for h in hits[:4])
+    return [_step("oneshot-jadx", f"APK/DEX 反编译（jadx）→ {outdir}", "UNKNOWN", 2,
+                  f"出现 'flag' 的文件（人工看一眼）：{names or '无'}", outdir, [f"grep -rn flag {outdir}"])]
+
+
+def doc_probe(path: str) -> list[dict]:
+    """PDF / Office：pdfid·pdf-parser 或 olevba（在位才跑，纯本地）。"""
+    head = open(path, "rb").read(8)
+    ext = os.path.splitext(path)[1].lower()
+    if head[:5] == b"%PDF":
+        tool = _have("pdf-parser.py") or _have("pdf-parser")
+        if not tool:
+            return [_missing("pdf")]
+        rc, out = _run(["python3", tool, path], timeout=120)
+        v, c, reason, res = _verdict_of(out, "PDF 结构已列出（看 /JS /EmbeddedFile /OpenAction）")
+        return [_step("oneshot-pdf", "PDF 结构（pdf-parser）", v, c, reason, res, [f"pdf-parser.py {path}"])]
+    if ext in (".doc", ".docm", ".xls", ".xlsm", ".ppt", ".pptm"):
+        tool = _have("olevba")
+        if not tool:
+            return [_missing("office")]
+        rc, out = _run([tool, path], timeout=120)
+        v, c, reason, res = _verdict_of(out, "宏源码已提取（看 AutoOpen / Shell / 编码串）")
+        return [_step("oneshot-office", "Office 宏（olevba）", v, c, reason, res, [f"olevba {path}"])]
+    return []
+
+
 def dispatch(path: str) -> list[dict]:
     """按文件特征挑 runner（只跑"认出来的类型"，认不出就返回空）。"""
     steps: list[dict] = []
@@ -199,7 +322,15 @@ def dispatch(path: str) -> list[dict]:
     ext = os.path.splitext(path)[1].lower()
     # 二维码/条码：图片就试（zbarimg 很快）
     if head[:8] == b"\x89PNG\r\n\x1a\n" or head[:3] == b"\xff\xd8\xff" or head[:4] == b"GIF8":
-        steps += qr(path)
+        steps += qr(path)                     # 二维码/条码
+    if head[:8] == b"\x89PNG\r\n\x1a\n" or ext in (".bmp",):
+        steps += zsteg_png(path)              # PNG/BMP 隐写
+    if head[:3] == b"\xff\xd8\xff":
+        steps += stegseek_jpg(path)           # JPEG 隐写（含 steghide 空口令）
+    if ext in (".apk", ".dex") or head[:4] == b"dex\n":
+        steps += jadx_dex(path)               # Android 反编译
+    if head[:5] == b"%PDF" or ext in (".doc", ".docm", ".xls", ".xlsm", ".ppt", ".pptm"):
+        steps += doc_probe(path)              # PDF / Office 宏
     if head[:4] == b"\x7fELF" and b"python" in head.lower():
         steps += pyc_decompile(path)
     if ext in (".pyc", ".pyo") or head[:4] in (b"\x42\x0d\x0d\x0a", b"\x55\x0d\x0d\x0a"):

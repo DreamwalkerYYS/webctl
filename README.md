@@ -332,6 +332,37 @@ ctfctl tui [--target "http://靶机/" ] [--dump [N]]
 - 每个方向都能追到出处：`tools` 指向工具目录条目，`kb` 指向知识卡，卡片里带**实测语料命中数**
 - 想加自己的判断：只改 `~/.config/ctfctl/advice.json`（同 schema、追加），不动代码
 
+### 一把梭层（oneshot）—— 认得出题型就直接调现成工具
+
+`auto` 内部按类型分派，本层只做「认类型 → 调工具 → 判定器裁决」，不重写工具：
+
+| 题型 | 工具 | 状态 | 无交互调用 |
+|---|---|---|---|
+| 二维码/条码 | `zbarimg` | 主机已装 | `zbarimg -q --raw <图>` |
+| PNG/BMP 隐写 | `zsteg` | 需装（`paru -S zsteg` / `gem install zsteg`） | `zsteg -a <图>` |
+| JPEG 隐写 | `stegseek` / `steghide` | 需装 / 已装 | `stegseek --seed <图>`、`steghide extract -sf x -p '' -f` |
+| Android 反编译 | `jadx` | 主机已装 | `jadx -d out app.apk` |
+| PDF 结构 | `pdf-parser.py`（DidierStevens，纯 stdlib） | 需装 | `python pdf-parser.py f.pdf` |
+| Office 宏 | `olevba`（oletools） | 需装 | `olevba f.doc` |
+| 流量包 | `tshark`（会话重组 + 导出 http 对象） | 主机已装 | `tshark -r a.pcap -z follow,tcp,ascii` |
+| SQLite/SQLCipher | `sqlite3` / `sqlcipher`（候选密钥 + WAL 检查） | 主机已装 | `sqlcipher db` |
+| `.git` 泄露 | `git log --all/stash/fsck`，站点用 `git-dumper` | 主机已装 | — |
+| pyc/pyinstaller | `pycdc` / `pyinstxtractor` | 需装 | `pycdc a.pyc` |
+| base 家族多层 | `basecrack --magic` | 需装 | 有自带编码链，作为旁路校验 |
+| 哈希类型识别 | `nth`（Name-That-Hash） | 需装 | 有自带长度识别，作为补充 |
+| zip 已知明文攻击 | `bkcrack` | 需装 | 需 ≥12B 已知明文（人工给） |
+| 内存转储 | `volatility3` | 需装 | ⚠️ Windows 符号表默认联网 |
+| RSA 多攻击 | `RsaCtfTool` | 需装 | ⚠️ 部分攻击联网（factordb） |
+| libc/one-gadget | `one_gadget` / `libc-database` | 需装 | ⚠️ 建库联网；`one_gadget -f` 可强制本地 |
+| 音频 FSK/DTMF | `minimodem` | 需装 | `minimodem -f a.wav --rx 1200 -a` |
+
+**三条纪律**：
+1. **工具不在位不假装能解** —— 直接报出可复制的安装命令，判定给 UNKNOWN。
+2. **带模型的工具默认不自动跑** —— 目前只有 Ciphey 命中这条：新版（Rust）明文判定用 BERT（`gibberish-or-not`），与「不带 AI」约束冲突，故只登记不调用；要接必须把判定器换成我们自己的 oracles。
+3. **GPL 一律子进程调用**，不链接不嵌入（stegseek/pycdc/pyinstxtractor/nth/PCredz/bkcrack 等）；需要联网的一律标注（`net=True`），不自动发起。
+
+**判定纪律（这轮踩出来的）**：外部工具的输出**本身就是可读文本**，所以「可读」绝不能当证据 —— binwalk 打一行 `0 signatures`、exiftool 列字段、`zsteg` 打印位平面统计，全都不算命中；只有**硬证据**（flag 样式 / 结构自洽的容器 / 解出可读明文且来自一次真实变换）才允许闭合。
+
 ### tools —— 工具目录（分类体系 + 装没装 + 装什么命令）
 ```
 ctfctl tools                        # 分类概览（每类几个、本机装了几个）
@@ -573,6 +604,8 @@ ctf-tool/
 ---
 
 ## 12. 变更日志
+
+- **1.6** — 新增**一把梭层**（`core/oneshot.py`）：按类型分派到现成工具（二维码 zbarimg、PNG/BMP 隐写 zsteg、JPEG 隐写 stegseek/steghide、Android jadx、PDF pdf-parser、Office olevba、pcap tshark、SQLite/SQLCipher、`.git` 泄露、pyc/pyinstxtractor），27 条工具注册表含**安装命令 / 无交互调用式 / 是否联网 / 是否带模型**；工具不在位时报装法不硬猜。**判定纪律加固**：外部工具输出只认硬证据（新增 `judge_tool_output`，修掉 binwalk/exiftool 输出可读即闭合的假阳性）、解包动作不再单独闭合；修 `codec.atbash` 遇 CJK 崩溃（`isalpha()` 对中文也 True）与 `codec.bacon` 越界崩溃。练手回归（vault Week1 附件）：`attachment.7z` 口令自动命中、`ctf-writeup.zip` 内层真 flag，其余 5 个如实报未闭合
 
 - **1.5** — 新增 **判定器层**（`core/oracles.py`：三态 HIT/MISS/UNKNOWN/ERROR + 置信三档 + 裁决规则，全部确定性、无模型）与 **`ctfctl auto` 自动闭环**（`core/autosolve.py`）：编码链 DFS（深度≤4、有预算）、古典密码全候选（凯撒/阿特巴什/仿射/栅栏/培根/波利比奥斯）、单字节 XOR（256 键按判定器排序）、压缩包口令（zip 走 stdlib，弱口令+文件名+数字，成功后递归分析内层）、图片 LSB（Pillow 在位）、元数据/夹带（exiftool/binwalk/foremost 在位）、哈希识别与 RSA 常见族（小 e 整数根 / Fermat）；新增 **rev 自动推进**（`core/revauto.py`）：结构/字符串/明文捷径、常量数组扫描、**算法指纹 + 按反汇编交叉引用精确取密文 + TEA/XTEA/XXTEA/RC4 自动解密**、**黑盒逐字符信号爆破**（先探长度）、反汇编立即数与提示串锚点；**解出候选后真跑一遍程序验证**（ELF 直跑、PE 走 wine）。`solve`/`shell` 入口对文件类目标把 auto 放在清单首位。实测：`tests/fixtures/B`、真实题 `meow.exe`（TEA）与 `Hello_Assemb1y.asm`（汇编变换链）均自动解出并验证；`intro`（内联字节比较 + 65B 数组）工具报未闭合，由人工用 crib-drag 读出 —— 已作为已知边界写在上方。新增测试（共 **170 项**）
 
