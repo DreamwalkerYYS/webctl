@@ -92,11 +92,12 @@ def _bare_first(ap: argparse.ArgumentParser, argv: list[str]) -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     _alias_notice()
-    # 裸跑 ctfctl 直接进 WebUI 工作台（他要的：不用记命令；TUI 仍在 `ctfctl tui`）
+    # 裸跑 ctfctl 进**交互式终端**（默认入口）：无渲染层、无端口，SSH/管道下都能用。
+    # 面板类入口改为显式：`ctfctl web`（浏览器）/ `ctfctl tui`（curses）。
     if argv is None:
         argv = sys.argv[1:]
     if not argv:
-        argv = ["web"]
+        argv = ["shell"]
     ap = build_parser()
     noise = io.StringIO()
     try:

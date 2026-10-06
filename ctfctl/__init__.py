@@ -8,4 +8,4 @@
   · 查资料：tools（工具目录）/ kb（writeup 归纳的手法卡片）/ rules（看到 X → 想 Y）
   · 看全局：tui（只读面板）
 """
-__version__ = "1.3.0"
+__version__ = "1.4.0"

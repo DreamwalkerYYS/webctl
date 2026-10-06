@@ -43,12 +43,13 @@ pipx install git+https://github.com/Phirisyyds/ctfctl     # 或直接从仓库�
 ## 2. 30 秒上手（一次完整流程）
 
 ```bash
-ctfctl                                  # ① 裸跑 = WebUI 工作台：填目标 → 回车分析 → 数字键跑建议
+ctfctl                                  # ① 裸跑 = 交互式终端：t 设目标 → 回车推进 → 数字选动作 → q 退出
+                                        #    里面一切照旧：任意一行都当子命令用（codec/req/fuzz…）
 
 # 想让它自己往前推（跑一步→抠证据→重算下一步，拿到 flag 候选就停）
 ctfctl solve "$U" --auto 5
 
-# 或者纯命令行（不想开面板时）
+# 或者纯命令行（不进交互界面时）
 U=http://靶机:端口
 ctfctl go "$U"                          # ② 一条命令：判类型 → 侦察 → 给方向与可执行动作
 ctfctl req get "$U/?file=file:///etc/passwd"        # ③ 照建议打
@@ -232,7 +233,32 @@ ctfctl file ./chal.zip [--strings 12] [--limit 3] [--no-advice] [--json F]
 发现会变成**标签**（`appended`/`embedded`/`zip:pseudo-encrypt`/`elf:nx-off`/`entropy-high`/`text:rsa`…），
 标签喂给建议引擎 → 输出带打分的下一步动作（对应 `data/advice.json`）。
 
-### web —— WebUI 工作台（默认入口）
+### shell —— 交互式终端（默认入口，推荐）
+
+```bash
+ctfctl                                  # 进交互式终端
+ctfctl shell "$U"                        # 带目标直接进，并自动做一轮分析
+```
+
+一个提示符干完全部，**不用记命令、也不碰鼠标**：
+
+| 输入 | 作用 |
+|---|---|
+| `Enter`（空行） | **推进一步**：跑一步 → 抠新证据 → 重算下一步 |
+| `1`–`9` | 跑清单里的第 N 条动作（含只读探针） |
+| `t <URL或附件>` | 设目标并自动分析（之后每步的输出都变成证据，不用手抄） |
+| `r` / `o` | 重新分析 / 状态总览（阶段·证据·已试·下一步） |
+| `s [N]` / `a [N]` | 推进 N 步 / 自动推进 N 步（默认 1 / 3） |
+| `k` `tools` `rules` `hist` `cheat` | 知识库 / 工具目录 / 规则 / 历史 / 速查 |
+| `!<命令>` | 直接跑系统命令（结果同样进证据） |
+| 其它任何一行 | 当成 ctfctl 子命令（`req get …`、`codec b64d …`、`fuzz …`、`jwt decode …`） |
+| `q` / `Ctrl-D` | 退出（打印简报，状态自动存盘，下次接着走） |
+
+为什么是它：没有渲染层（不碰 curses 的绘制/按键坑）、没有端口和 token、SSH/mosh 下一样用，
+还能被管道驱动（`printf 't $U\n1\nq\n' | ctfctl shell`）——所以它也是**自动化测试的入口**。
+有 readline 时带历史（`~/.cache/ctfctl/shell_history`）与 Tab 补全。
+
+### web —— WebUI 工作台（可选）
 ```
 ctfctl                                   # 起服务（默认 127.0.0.1:8778）+ 自动开浏览器
 ctfctl web --port 8899 --no-open          # 只起服务，自己开地址
@@ -252,7 +278,7 @@ ctfctl web --host 0.0.0.0                 # 给别的设备看（Tailscale 等�
 **安全默认**：只监听回环地址；一旦 `--host` 不是回环就**强制 token 校验**（没给就自动生成并打进 URL），
 没 token 的请求一律 403。它是"本地工作台"，不是给公网用的服务。
 
-### tui —— 终端版工作台（备用）
+### tui —— curses 工作台（可选，不推荐）
 ```
 ctfctl tui [--target "http://靶机/" ] [--dump [N]]
 ```
@@ -513,6 +539,8 @@ ctf-tool/
 ---
 
 ## 12. 变更日志
+
+- **1.4** — 默认入口改成 **`shell` 交互式终端**（`ctfctl/commands/shell.py`）：回车＝推进一步、`1-9` 选动作、`t` 设目标即分析、`s/a/o/r` 快捷、任意一行当子命令、`!` 跑系统命令，**所有输出自动喂进解题状态**（手动命令也变成证据）；带 readline 历史与补全，能被管道驱动（测试用同一入口）。理由：curses 与 WebUI 都要维护渲染层（前者崩过多次：常量名、写满角落、按键被抢；后者要端口+浏览器+token），交互式终端无渲染层、无端口、SSH/mosh 可用。`ctfctl web` / `ctfctl tui` 保留为可选面板。新增测试 11 项（共 **155 项**）
 
 - **1.3** — 新增 **`solve` 解题状态机**（`core/solve.py` + `commands/solve.py`）：把「一轮探测」变成**持续推进**，证据累积（flag 候选/参数/路径/真实文件/令牌/报错/状态变化）、已试动作去重（含负结果）、阶段推进（recon→probe→session→flag）、状态存盘且**命令行/WebUI/TUI 共用**；**只读探针**表（参数 5 个常见值 + 新路径 GET + 身份 cookie，全部 URL 编码、不写不改）；`--auto N --budget S` 自动滚步，拿到 flag 候选/无新证据/无新动作即停；WebUI 加「解题模式 / 推进一步(s) / 自动推进」工具栏与阶段显示，TUI 加 `s` 键；`recon` 新增**外链 JS 面挖掘**（接口路径/调用点/敏感变量 `名字=值`/调试痕迹），`file` 新增**多编码回退**（UTF-8→GB18030→BIG5→latin-1，GBK 附件里的 flag 也能捞出来）；`kb` 扩到 **42 张卡**（古典密码家族/哈希识别/分组与流/XOR 爆破/flag 收割/HTTP 报文/多编码/字节地址编解码/Linux·Windows 提权查表），人工工具条目 114 条（补 SecLists/nuclei-templates/fuzzdb/GTFOBins/LOLBAS/WADComs/ToolsFx/arsenal/atomic-red-team）；修 `go` 传给 `recon` 的 Namespace 缺字段、`actions_flat` 只替换 render 不替换 argv（导致 req 收到字面量 `{url}`）、`run_argv` 把字符串退出码硬转 int；测试 **144 项**
 

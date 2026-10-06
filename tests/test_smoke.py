@@ -473,6 +473,30 @@ def main() -> int:
         check("solve：再看一次状态不重复跑（已试过会去重）",
               "解题状态" in (r2.stdout + r2.stderr), (r2.stdout + r2.stderr)[-600:])
 
+        print("\n[23] shell：交互式终端（回车推进/数字选动作/任意行当子命令/明确报错）")
+        sh_cache = "/tmp/ctfctl-shell-cache"
+        _sh.rmtree(sh_cache, ignore_errors=True)
+        os.makedirs(sh_cache, exist_ok=True)
+        senv2 = {**os.environ, "CTFCTL_CACHE": sh_cache, "PYTHONPATH": ROOT}
+        script = ("t " + BASE + "\n" + "1\n" + "codec b64d aGVsbG8=\n" + "!echo shell-ok\n"
+                  + "xyzzy\n" + "o\n" + "q\n")
+        r = subprocess.run([sys.executable, "-m", "ctfctl", "shell"], input=script, cwd=ROOT,
+                           env=senv2, capture_output=True, text=True, timeout=420)
+        out = r.stdout + r.stderr
+        check("shell：能起来并退出", r.returncode == 0, out[-600:])
+        check("shell：t 设目标即自动分析", "[分析]" in out and "阶段" in out, out[:800])
+        check("shell：给出编号动作清单", "下一步" in out and "$ ctfctl" in out, out[-1500:])
+        check("shell：数字能跑第 N 条", "第 1 步" in out or "req get" in out, out[-2500:])
+        check("shell：任意行当子命令（codec 直通）", "hello" in out, out[-1200:])
+        check("shell：! 能跑系统命令", "shell-ok" in out, out[-1200:])
+        check("shell：不认识的输入给明确提示（不静默）", "不是子命令" in out, out[-900:])
+        check("shell：o 出状态总览", "解题状态" in out, out[-2500:])
+        check("shell：退出时给简报与状态落盘", "本次" in out and "状态已存" in out, out[-400:])
+        check("shell：状态文件真的写了", os.path.exists(os.path.join(sh_cache, "solve")), sh_cache)
+        r2 = subprocess.run([sys.executable, "-m", "ctfctl"], input="q\n", cwd=ROOT, env=senv2,
+                            capture_output=True, text=True, timeout=120)
+        check("shell：裸跑 ctfctl 进的就是交互式终端", "会话结束" in (r2.stdout + r2.stderr), r2.stdout[-300:])
+
     finally:
         srv.terminate()
         try:
