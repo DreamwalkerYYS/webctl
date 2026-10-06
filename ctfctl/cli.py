@@ -54,11 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     _alias_notice()
-    # 裸跑 ctfctl 直接进工作台（他要的：不用记命令）
+    # 裸跑 ctfctl 直接进 WebUI 工作台（他要的：不用记命令；TUI 仍在 `ctfctl tui`）
     if argv is None:
         argv = sys.argv[1:]
     if not argv:
-        argv = ["tui"]
+        argv = ["web"]
     ap = build_parser()
     args = ap.parse_args(argv)
     func = getattr(args, "func", None)

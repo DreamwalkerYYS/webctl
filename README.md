@@ -2,7 +2,8 @@
 
 把"做题 SOP"压成命令：**侦察 → 联想下一步 → 打 → 记录 → 导出成 writeup**；
 再把**工具目录**（Kali / BlackArch 官方分类 + 本机装没装 + 安装命令）和
-**知识库**（公开 writeup 归纳出的手法卡片）收进同一个入口，外加一个只读 TUI 面板。
+**知识库**（公开 writeup 归纳出的手法卡片）收进同一个入口。
+**默认界面是浏览器里的工作台（WebUI，键盘驱动）**，终端版（TUI）仍在。
 
 纯标准库、零依赖，Python 3.9+ 直接跑（系统 python 3.14 和容器里的 3.11 都验证过）。
 
@@ -14,8 +15,10 @@
 > - 环境变量同理：`WEBCTL_CACHE` → `CTFCTL_CACHE`
 
 ```
+ctfctl                        # 裸跑 = 起 WebUI 工作台并开浏览器（默认入口）
 ctfctl --help                 # 所有子命令（cli.py 用 pkgutil 自动发现 commands/，加功能不用改入口）
-ctfctl tui                    # 只读面板：知识库 / 工具目录 / 规则 / 历史 / 速查
+ctfctl tui                    # 终端版工作台（没有浏览器/远程 SSH 时用）
+ctfctl go "http://靶机/"       # 纯命令行：一条命令出方向
 ```
 
 ---
@@ -40,7 +43,7 @@ pipx install git+https://github.com/Phirisyyds/ctfctl     # 或直接从仓库�
 ## 2. 30 秒上手（一次完整流程）
 
 ```bash
-ctfctl                                  # ① 裸跑 = 工作台：t 填目标 → r 分析 → 数字键执行建议
+ctfctl                                  # ① 裸跑 = WebUI 工作台：填目标 → 回车分析 → 数字键跑建议
 
 # 或者纯命令行（不想开面板时）
 U=http://靶机:端口
@@ -55,8 +58,8 @@ ctfctl go ./chal.zip                    # 类型 + 结构 + 内嵌/附加数据 
 ctfctl file ./pwn_chal --strings 30     # 只想看事实就行
 ```
 
-**只记三条**：`ctfctl`（开面板）· `ctfctl go <URL或文件>`（一条命令出方向）· `ctfctl kb signals`（看到 X 想 Y 的总表）。
-其余子命令都能在面板里按 `i` 直接敲，或从 `ctfctl --help` 找。
+**只记三条**：`ctfctl`（开工作台）· `ctfctl go <URL或文件>`（一条命令出方向）· `ctfctl kb signals`（看到 X 想 Y 的总表）。
+其余子命令都能在工作台里直接敲（WebUI 按 `i`），或从 `ctfctl --help` 找。
 
 ---
 
@@ -177,23 +180,33 @@ ctfctl file ./chal.zip [--strings 12] [--limit 3] [--no-advice] [--json F]
 发现会变成**标签**（`appended`/`embedded`/`zip:pseudo-encrypt`/`elf:nx-off`/`entropy-high`/`text:rsa`…），
 标签喂给建议引擎 → 输出带打分的下一步动作（对应 `data/advice.json`）。
 
-### tui —— 工作台（键盘驱动，不用记命令）
+### web —— WebUI 工作台（默认入口）
 ```
-ctfctl            # 裸跑就是它
-ctfctl tui [--target "http://靶机/" ] [--dump [N]]
+ctfctl                                   # 起服务（默认 127.0.0.1:8778）+ 自动开浏览器
+ctfctl web --port 8899 --no-open          # 只起服务，自己开地址
+ctfctl web --host 0.0.0.0                 # 给别的设备看（Tailscale 等）：强制 token，会打印带 token 的地址
 ```
+一屏三块：**目标框** → **输出**（左）→ **可执行动作**（右，带 why/命令预览）。键盘全包：
+
 | 键 | 作用 |
 |---|---|
-| `t` | 填/换目标（URL 或附件路径） |
-| `r` | 分析：URL → 侦察；文件 → 初筛（真发请求/真读文件） |
-| `1-9` / `回车` | 执行右栏第 N 条建议（`@` 是全部执行） |
-| `i` | 直接敲一条 ctfctl 子命令（面板里也能用会话/历史） |
-| `k` `o` `u` `h` `c` | 知识库 / 工具目录 / 规则 / 历史 / 速查（`Tab`/`1-5` 换栏，`/` 过滤） |
-| `↑↓` `PgUp/PgDn` | 滚动输出与详情 |
-| `q` | 退出 |
+| （输目标后）`Enter` | 分析：URL → 侦察；文件 → 初筛 |
+| `1-9` | 跑右栏第 N 条动作（鼠标点也行） |
+| `a` | 回到目标框 |
+| `r` | 再分析一次 |
+| `i` | 敲一条任意 ctfctl 子命令 |
+| `k` `o` `u` `h` `c` | 知识库 / 工具目录 / 规则 / 历史 / 速查；左栏列表 + 右栏详情，`/` 过滤，`Esc` 回动作栏 |
 
-右栏每条动作都先把**要执行的命令行**打出来（`cmd` 类走 ctfctl 子命令，`shell` 类是真在你机器上跑外部工具），
-不会出现「按了键不知道它干了什么」。
+**安全默认**：只监听回环地址；一旦 `--host` 不是回环就**强制 token 校验**（没给就自动生成并打进 URL），
+没 token 的请求一律 403。它是"本地工作台"，不是给公网用的服务。
+
+### tui —— 终端版工作台（备用）
+```
+ctfctl tui [--target "http://靶机/" ] [--dump [N]]
+```
+同一套引擎（`core/workbench.py`）、同样的按键：`t` 目标 / `r` 分析 / `1-9` 执行 / `i` 敲命令 /
+`k o u h c` 栏目 / `↑↓` 滚动 / `q` 退出。**没有图形界面或 SSH 远程时用它**（`--dump` 不开界面，只打内容）。
+两个界面共用一个引擎是刻意的：行为不会两边漂移。
 
 ### 智能从哪来（可核对，不是玄学）
 三层数据 + 一个评分：
@@ -332,7 +345,7 @@ def register(sub) -> None:
 ## 7. 测试
 
 ```bash
-cd ~/项目/ctf-tool && python3 tests/test_smoke.py        # 87 项断言（含 tools/kb/tui/file/go）
+cd ~/项目/ctf-tool && python3 tests/test_smoke.py        # 99 项断言（含 tools/kb/tui/file/go/web 接口）
 ```
 
 自带一个本地 demo 靶机（`tests/demo_server.py`），刻意复刻踩过的坑：
@@ -365,11 +378,14 @@ ctf-tool/
 │   │   ├── detect.py           # 真假 200 判定（recon 与 fuzz 共用）
 │   │   ├── history.py          # 请求历史的读写
 │   │   ├── rules.py            # 规则加载/匹配/打分/命令渲染
+│   │   ├── advise.py           # 建议引擎（证据→why→可执行动作，带打分）
+│   │   ├── workbench.py        # 工作台引擎：analyze / run_action / run_argv（TUI 与 WebUI 共用）
+│   │   ├── browse.py           # 浏览栏目数据（kb/tools/rules/history/cheat，两个界面共用）
 │   │   └── cdp.py              # 极简 CDP 客户端（手写 WebSocket 帧，零依赖）
 │   ├── commands/               # ← 加功能只动这里
 │   │   ├── req.py  recon.py  fuzz.py  replay.py  diff.py  browser.py
 │   │   ├── export.py  cookie.py  jwt.py  codec.py  note.py  rules.py
-│   │   └── tools.py  kb.py  tui.py        # 工具目录 / 知识库 / 全屏面板
+│   │   └── tools.py  kb.py  web.py  tui.py  file.py  go.py   # 目录/知识库/WebUI/终端面板/初筛/统一入口
 │   ├── data/
 │   │   ├── rules.json          # 「看到 X → 想 Y」规则表
 │   │   ├── files.json          # 泄露文件 / 常见路径清单
@@ -416,6 +432,7 @@ ctf-tool/
 
 ## 11. 变更日志
 
+- **1.1** — 默认界面改成 **WebUI 工作台**（`ctfctl web`，纯标准库 http.server + 单页应用）：键盘驱动（回车分析 / 1-9 跑建议 / i 敲命令 / k o u h c 看栏目）、动作带 why 与命令预览、只监听回环且非回环强制 token；把分析引擎抽成 `core/workbench.py`、栏目数据抽成 `core/browse.py`（TUI 与 WebUI 共用，行为不漂移）；新增 WebUI 接口测试（共 99 项断言）
 - **1.0** — 改名 `webctl` → **`ctfctl`**（旧名留作别名；cache/config 自动迁移）；裸跑进**工作台 TUI**（键盘驱动、按键执行建议）；新增 **`go`**（URL/文件一条命令出方向）、**`file`**（文件初筛：结构/内嵌/附加数据/伪加密/ELF 保护/熵/字符串 + 建议）、**`tools`**（2923 条工具目录：BlackArch 48 类 + Kali 官方分类元包 + 人工中文条目，含装没装与安装命令）、**`kb`**（21 张手法卡，带实测语料命中数）、**`advise` 建议引擎**（证据→why→可执行动作，带打分）、`data/techniques.json`、`scripts/harvest_writeups.py`（语料抓取+分来源词频统计）、`scripts/build_catalog.py`（工具目录生成）
 - **0.5** — 开源发布（https://github.com/Phirisyyds/ctfctl，MIT；镜像 DreamwalkerYYS/ctfctl）；`fuzz --safe`（并发≤5 / 间隔≥0.2s / 字典超上限拦下）；README 增加"比赛时怎么用（合规）"一节
 - **0.4.1** — 历史记录加 `tag` 来源；`export --tag/--no-probes`；md 导出命令加 shell 引号、脱敏打掉全部 cookie 值；测试改用独立 cache

@@ -306,6 +306,72 @@ def main() -> int:
         r = cli("go", "/tmp")
         check("go：目录 → 列表提示", "是目录" in r.stdout, r.stdout[:300])
 
+        print("\n[18] WebUI：接口与 token 校验")
+        import urllib.error as _ue, json as _json
+        WEB_PORT = 8877
+        WEB_TOKEN = "smoke-token"
+        wproc = subprocess.Popen([sys.executable, "-m", "ctfctl", "web", "--port", str(WEB_PORT),
+                                  "--no-open", "--token", WEB_TOKEN],
+                                 cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        WBASE = f"http://127.0.0.1:{WEB_PORT}"
+
+        def wget(path, token=WEB_TOKEN, data=None):
+            req = urllib.request.Request(WBASE + path)
+            if token:
+                req.add_header("X-Token", token)
+            body = None
+            if data is not None:
+                body = _json.dumps(data).encode()
+                req.add_header("Content-Type", "application/json")
+            try:
+                with urllib.request.urlopen(req, data=body, timeout=20) as r:
+                    return r.status, r.read().decode("utf-8", "replace")
+            except _ue.HTTPError as e:
+                return e.code, e.read().decode("utf-8", "replace")
+
+        up = False
+        for _ in range(40):
+            try:
+                st, _ = wget("/api/state")
+                up = st == 200
+                if up:
+                    break
+            except Exception:
+                time.sleep(0.25)
+        check("web：服务起得来", up, "server did not come up")
+        if up:
+            st, _ = wget("/api/state", token=None)
+            check("web：没 token 一律 403", st == 403, str(st))
+            st, _ = wget("/api/state", token="wrong")
+            check("web：token 错也 403", st == 403, str(st))
+            st, html = wget("/")
+            check("web：首页是工作台", st == 200 and "ctfctl 工作台" in html, html[:200])
+            check("web：页面里有键盘提示", "1-9" in html and "知识库" in html, html[:400])
+            st, out = wget("/api/analyze", data={"target": f_png})
+            d = _json.loads(out)
+            check("web：analyze 返回 kind 与动作", d.get("kind") and len(d.get("actions", [])) > 0, out[:300])
+            check("web：analyze 输出里有初筛事实", "附加数据" in d.get("output", ""), d.get("output", "")[:300])
+            st, out = wget("/api/action", data={"index": 0})
+            d = _json.loads(out)
+            check("web：action 能执行并回 rc", isinstance(d.get("rc"), int) and d.get("output") is not None, out[:300])
+            st, out = wget("/api/action", data={"index": 99})
+            check("web：越界 action 给 400", st == 400, f"{st} {out[:120]}")
+            st, out = wget("/api/browse?section=kb")
+            d = _json.loads(out)
+            check("web：kb 栏目有条目", len(d.get("items", [])) >= 10, out[:200])
+            st, out = wget("/api/browse?section=kb&key=sqli-manual")
+            d = _json.loads(out)
+            check("web：kb 详情能取到", d.get("title") and len(d.get("body", [])) > 3, out[:200])
+            st, out = wget("/api/browse?section=tools")
+            check("web：tools 栏目有分类", len(_json.loads(out).get("items", [])) >= 10, out[:200])
+            st, out = wget("/api/run", data={"argv": ["tools", "search", "ffuf"]})
+            check("web：能跑任意子命令", _json.loads(out).get("rc") == 0 and "ffuf" in out, out[:200])
+        wproc.terminate()
+        try:
+            wproc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            wproc.kill()
+
     finally:
         srv.terminate()
         try:
