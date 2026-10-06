@@ -155,13 +155,22 @@ def render_text(ranked: list[tuple[int, dict]], ev: dict, subs: dict | None = No
 
 
 def actions_flat(ranked: list[tuple[int, dict]], subs: dict | None = None) -> list[dict]:
-    """摊平成「一条动作一行」，给 TUI 当可按键执行的清单。"""
+    """摊平成「一条动作一行」，给 TUI/WebUI/solve 当可按键执行的清单。
+
+    注意：argv 与 cmd 也要做占位符替换（曾只替换 render，于是 req 收到字面量 "{url}" 报
+    "需要完整 URL"）。
+    """
+    subs = subs or {}
     out = []
     for sc, r in ranked:
         for n in r.get("next", []):
+            argv = [subs.get(str(x), str(x)) for x in n.get("argv", [])]
+            cmd = n.get("cmd", "")
+            for k, v in subs.items():
+                cmd = cmd.replace(k, v)
             out.append({"score": sc, "rule": r.get("id"), "rule_name": r.get("name", ""),
                         "label": n.get("label", ""), "kind": n.get("kind", "cmd"),
-                        "argv": n.get("argv", []), "cmd": n.get("cmd", ""), "id": n.get("id", ""),
+                        "argv": argv, "cmd": cmd, "id": n.get("id", ""),
                         "name": n.get("name", ""), "why": n.get("why", ""),
                         "render": render_next(n, subs), "kb": r.get("kb", []), "tools": r.get("tools", [])})
     return out

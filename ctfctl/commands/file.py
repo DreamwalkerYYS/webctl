@@ -285,6 +285,22 @@ def strings_report(data: bytes, want: int) -> dict:
     return {"total": len(all_s), "interesting": interesting[:want], "flags": flags[:10]}
 
 
+def decode_text(data: bytes) -> dict:
+    """按 UTF-8 → GB18030(GBK) → BIG5 → latin-1 依次试，选第一个能干净解码的。
+
+    中文题（尤其中文 CTF 附件）常是 GBK/GB2312，直接按 UTF-8 解会满屏替换符，
+    之后所有正则都失效 —— 这一步是「先看清事实」的前置。
+    """
+    for enc in ("utf-8", "gb18030", "big5", "latin-1"):
+        try:
+            text = data.decode(enc)
+        except UnicodeDecodeError:
+            continue
+        return {"encoding": enc, "text": text, "bad": text.count("\ufffd"),
+                "lossy": enc == "latin-1"}
+    return {"encoding": "unknown", "text": data.decode("utf-8", "replace"), "bad": -1, "lossy": True}
+
+
 def text_report(text: str) -> dict:
     out: dict = {"rsa_vars": {}, "hashes": [], "b64_lines": 0, "lines": text.count("\n") + 1}
     for var in ("n", "e", "c", "p", "q", "d", "phi"):
@@ -364,7 +380,18 @@ def triage(path: str, want_strings: int = 12) -> dict:
     if sr["flags"]:
         t["findings"].append("strings:flag")
     if _looks_text(data[:8192]):
-        t["text"] = text_report(data.decode("utf-8", "replace")[:200000])
+        dec = decode_text(data[:2_000_000])
+        t["encoding"] = dec["encoding"]
+        if dec["encoding"] not in ("utf-8", "ascii"):
+            t["findings"].append(f"text:encoding={dec['encoding']}")
+        t["text"] = text_report(dec["text"][:200000])
+        t["text"]["encoding"] = dec["encoding"]
+        # 解码后的文本再扫一遍 flag：GBK/BIG5 的高字节会把 strings 的可打印串切断
+        for m in FLAG_IN_STR.finditer(dec["text"]):
+            if m.group(1) not in t["strings"]["flags"]:
+                t["strings"]["flags"].append(m.group(1))
+        if t["strings"]["flags"] and "strings:flag" not in t["findings"]:
+            t["findings"].append("strings:flag")
         if t["text"]["rsa_vars"]:
             t["findings"].append("text:rsa")
         if t["text"]["b64_lines"] > 3:
@@ -415,7 +442,7 @@ def render(t: dict, want_strings: int = 12) -> str:
             L.append(f"         嵌套压缩包：{', '.join(z['nested'])}（解完还有一层）")
     if t.get("text"):
         tx = t["text"]
-        L.append(f"  文本   {tx['lines']} 行" + (f"，疑似 RSA 变量：{'/'.join(tx['rsa_vars'])}" if tx["rsa_vars"] else "")
+        L.append(f"  文本   {tx['lines']} 行（编码 {tx.get('encoding', 'utf-8')}）" + (f"，疑似 RSA 变量：{'/'.join(tx['rsa_vars'])}" if tx["rsa_vars"] else "")
                  + (f"，{tx['b64_lines']} 行像 base64" if tx["b64_lines"] else "")
                  + (f"，{len(tx['hashes'])} 个长哈希串" if tx["hashes"] else ""))
     if t.get("embedded"):

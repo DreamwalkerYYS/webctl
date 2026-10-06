@@ -35,7 +35,11 @@ def run_argv(argv: list[str]) -> tuple[int, str]:
             else:
                 rc = int(args.func(args) or 0)
         except SystemExit as e:
-            rc = int(e.code or 0)
+            try:
+                rc = int(e.code or 0)
+            except (TypeError, ValueError):          # SystemExit("消息") 这种，退出码按 2
+                print(str(e.code))
+                rc = 2
         except Exception as e:                      # 子命令炸了也别把工作台带崩
             print(f"[!] {type(e).__name__}: {e}")
             rc = 1

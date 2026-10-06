@@ -1932,6 +1932,157 @@
    "ctf_use": "需要「一堆目标批量粗筛 + 附件文本抽取」时值得一看；**仓库没写 LICENSE，只能参考思路**",
    "note": "它的多编码解码（UTF-8/GBK/BIG5）与「外链 JS 里挖 API 路径」我们已吸收进 file/recon",
    "url": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+  },
+  {
+   "name": "SecLists",
+   "cats": [
+    "web",
+    "recon",
+    "hash"
+   ],
+   "desc": "安全测试词表总集（目录/密码/用户名/payload 分类）",
+   "install": {
+    "pacman": "seclists",
+    "git": "https://github.com/danielmiessler/SecLists"
+   },
+   "usage": [
+    "ls /usr/share/seclists/Discovery/Web-Content/",
+    "ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -u \"$U/FUZZ\""
+   ],
+   "ctf_use": "爆破字典的默认来源；先用中等字典（raft-medium），别一上来 4 万条",
+   "url": "https://github.com/danielmiessler/SecLists"
+  },
+  {
+   "name": "nuclei-templates",
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "desc": "漏洞检测模板库（1 万+ YAML，带 CVE/CWE 分类）",
+   "install": {
+    "git": "https://github.com/projectdiscovery/nuclei-templates"
+   },
+   "usage": [
+    "nuclei -u \"$U\" -t ~/nuclei-templates/http/exposures/ -stats"
+   ],
+   "ctf_use": "先跑 exposures/misconfiguration 类模板，常有白捡",
+   "url": "https://github.com/projectdiscovery/nuclei-templates"
+  },
+  {
+   "name": "fuzzdb",
+   "cats": [
+    "web",
+    "misc"
+   ],
+   "desc": "黑盒 fuzz 字典（攻击模式 + 可预测文件路径 + 响应正则）",
+   "install": {
+    "git": "https://github.com/fuzzdb-project/fuzzdb"
+   },
+   "usage": [
+    "ls attack/ discovery/predictable-filepaths/"
+   ],
+   "ctf_use": "找备份文件/敏感路径时的补充字典（注意它要求引用作者）",
+   "url": "https://github.com/fuzzdb-project/fuzzdb"
+  },
+  {
+   "name": "GTFOBins",
+   "cats": [
+    "post"
+   ],
+   "desc": "Unix 二进制提权索引（每个程序能做什么：file-read/shell/sudo…）",
+   "install": {
+    "git": "https://github.com/GTFOBins/GTFOBins.github.io"
+   },
+   "usage": [
+    "ls _gtfobins/ | head",
+    "grep -l 'sudo' _gtfobins/*.md | head"
+   ],
+   "ctf_use": "拿到 SUID/sudo 列表后逐个查它",
+   "note": "GPL-3.0（数据有传染性）：本仓库只放指针，不拷它的数据",
+   "url": "https://gtfobins.github.io/"
+  },
+  {
+   "name": "LOLBAS",
+   "cats": [
+    "post"
+   ],
+   "desc": "Windows 白利用二进制/脚本库（带 ATT&CK 映射）",
+   "install": {
+    "git": "https://github.com/LOLBAS-Project/LOLBAS"
+   },
+   "usage": [
+    "ls yml/OSBinaries | head",
+    "grep -rn 'Download' yml/ | head"
+   ],
+   "ctf_use": "只能用系统自带程序时查这套",
+   "note": "GPL-3.0：只放指针不拷数据",
+   "url": "https://lolbas-project.github.io/"
+  },
+  {
+   "name": "WADComs",
+   "cats": [
+    "post"
+   ],
+   "desc": "Windows/AD 命令速查（条目带 command/attack_types/OS 分类）",
+   "install": {
+    "git": "https://github.com/WADComs/WADComs.github.io"
+   },
+   "usage": [
+    "ls _wadcoms/*.md | head"
+   ],
+   "ctf_use": "AD 题的命令卡",
+   "note": "GPL-3.0：只放指针",
+   "url": "https://wadcoms.github.io/"
+  },
+  {
+   "name": "ToolsFx",
+   "cats": [
+    "crypto",
+    "misc"
+   ],
+   "desc": "跨平台密码学工具箱（含 base16/32/36/45/58/62/85/91/92/100 与国密 SM3，带测试向量）",
+   "install": {
+    "git": "https://github.com/Leon406/ToolsFx"
+   },
+   "usage": [
+    "# 下载 release 运行；testdata/ 里有 ctf/encode/classical/rsa 测试向量"
+   ],
+   "ctf_use": "要 base58/62/85/92 这类冷门编码或国密时的 GUI 兜底",
+   "note": "ISC 许可（宽松，测试向量可参考）",
+   "url": "https://github.com/Leon406/ToolsFx"
+  },
+  {
+   "name": "arsenal",
+   "cats": [
+    "recon",
+    "post"
+   ],
+   "desc": "渗透命令速查与启动器（Markdown cheatsheet 分类）",
+   "install": {
+    "git": "https://github.com/Orange-Cyberdefense/arsenal"
+   },
+   "usage": [
+    "python3 arsenal.py -y"
+   ],
+   "ctf_use": "命令记不住的场景查它",
+   "note": "GPL-3.0：只放指针",
+   "url": "https://github.com/Orange-Cyberdefense/arsenal"
+  },
+  {
+   "name": "atomic-red-team",
+   "cats": [
+    "post",
+    "forensics"
+   ],
+   "desc": "ATT&CK 映射的测试集（每条技术一组可执行测试，MIT）",
+   "install": {
+    "git": "https://github.com/redcanaryco/atomic-red-team"
+   },
+   "usage": [
+    "ls atomics/T1059*"
+   ],
+   "ctf_use": "蓝队/取证方向题查「这条技术长什么样」",
+   "url": "https://github.com/redcanaryco/atomic-red-team"
   }
  ]
 }

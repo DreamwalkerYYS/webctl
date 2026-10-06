@@ -72,6 +72,43 @@ def source_surface(body: str) -> dict:
     }
 
 
+#: 外链 JS 里值得挖的东西（来自 CTF-WEB-TOOLS 的思路：前端代码常泄露后端接口与敏感变量名）
+JS_API_RE = re.compile(r"""[\"'](/(?:[A-Za-z0-9_\-.]*/)*(?:api|v[0-9]+|graphql|admin|debug|secret|upload|auth|login|logout|token|flag)[A-Za-z0-9_\-/.]*)[\"']""", re.I)
+JS_CALL_RE = re.compile(r"""(?:fetch|\.post|\.get|\.ajax|\.put|\$.\w+)\(\s*[\"']([^\"']{2,120})[\"']""", re.I)
+JS_VAR_RE = re.compile(r"""\b(token|secret|api[_-]?key|access[_-]?key|password|passwd|is_?admin|role|debug|flag|uid|user[_-]?id)\b\s*[:=]\s*[\"']?([^\s\"';,]{0,90})""", re.I)
+JS_DEBUG_RE = re.compile(r"(console\.log|debugger|sourceMap|//\s*TODO|//\s*FIXME|//\s*temp)", re.I)
+
+
+def js_surface(sess: Session, scripts: list[str], limit: int = 6) -> dict:
+    """拉同源外链 JS，挖 API 路径 / 接口调用 / 敏感变量名（前端不做权限校验是常态）。"""
+    out = {"fetched": [], "failed": [], "api": [], "calls": [], "vars": [], "hints": []}
+    for src in scripts:
+        if len(out["fetched"]) >= limit:
+            break
+        if not re.match(r"^(/|\.\.?/|https?://)", src):
+            continue
+        if src.startswith("http"):                    # 只跟同源脚本（别去抓第三方 CDN）
+            from urllib.parse import urlparse
+            if urlparse(src).netloc != urlparse(getattr(sess, "base", "") or "").netloc:
+                out["failed"].append(f"{src}（跨域，跳过）")
+                continue
+        resp = sess.request("GET", src)
+        if resp.status != 200 or resp.size == 0:
+            out["failed"].append(f"{src} ({resp.status})")
+            continue
+        out["fetched"].append(f"{src} ({resp.size}B)")
+        txt = resp.text
+        out["api"] += JS_API_RE.findall(txt)
+        out["calls"] += JS_CALL_RE.findall(txt)
+        for name, val in JS_VAR_RE.findall(txt):        # 记成 名字=值，好读也好判断
+            out["vars"].append(f"{name}={val or '(空)'}")
+        if JS_DEBUG_RE.search(txt):
+            out["hints"].append(f"{src}: 有调试/待办痕迹（console.log / debugger / TODO）")
+    for k in ("api", "calls", "vars"):
+        out[k] = sorted(set(x for x in out[k] if x))[:40]
+    return out
+
+
 def run(args) -> int:
     ensure_dirs()
     files = _load("files")
@@ -124,12 +161,36 @@ def run(args) -> int:
         if cls not in ("404", "FAKE"):
             print(f"   {cls:14s} {size:>8}B {ctype or '?':28s} {path}")
 
+    # ---- 外链 JS 面：挖 API 路径与敏感变量（前端代码常把后端接口写在明面上）----
+    js = {"fetched": [], "failed": [], "api": [], "calls": [], "vars": [], "hints": []}
+    if surf.get("scripts"):
+        print(f"\n[JS 面] 抓 {len(surf['scripts'])} 个外链脚本（最多 6 个）")
+        js = js_surface(sess, surf["scripts"])
+        for f in js["fetched"]:
+            print(f"   200 {f}")
+        for f in js["failed"][:4]:
+            print(f"   --  {f}")
+        if js["api"]:
+            print("   接口路径：" + "、".join(js["api"][:12]))
+        if js["calls"]:
+            print("   调用点：" + "、".join(js["calls"][:8]))
+        if js["vars"]:
+            print("   敏感变量：" + "、".join(js["vars"][:12]))
+        for h in js["hints"]:
+            print(f"   [注] {h}")
+        if not (js["api"] or js["calls"] or js["vars"]):
+            print("   （没挖到接口/变量：JS 可能是打包压缩的，或本来就没有）")
+
     # ---- 规则匹配：给下一步 ----
     ctx = {
         "headers": "\n".join(f"{k}: {v}" for k, v in home.raw_headers.items()),
         "body": body,
-        "params": surf["params"] + surf["param_links"],
+        "params": surf["params"] + surf["param_links"] + [p.strip("/").split("/")[-1]
+                                                          for p in js.get("api", [])][:20],
         "files": found + (["FAKE"] if fake_n else []),
+        # JS 里挖到的接口路径/变量名并进 body 供规则匹配（authz/jwt 等规则靠文本特征命中）
+        "body": body + ("\n[JS] " + " ".join(js.get("api", []) + js.get("vars", []))
+                        + " " + " ".join(js.get("calls", [])) if js else ""),
     }
     hits = rules_mod.match(ctx)
     if home.status in (403, 401) and home.size == 0:
@@ -181,6 +242,11 @@ def run(args) -> int:
             lines.append("")
     lines += ["## 全部命中规则"] + [f"- **{r['name']}**（{sc}分）：{r['hint']}" for sc, r in ranked] or ["- （无）"]
     lines += ["", "## 真实存在的文件/路径"] + ([f"- {p}" for p in found] or ["- （无）"])
+    if js.get("api") or js.get("vars"):
+        lines += ["", "## 外链 JS 面（前端泄露的接口/变量）",
+                  "- 接口路径：" + ("、".join(js["api"]) or "（无）"),
+                  "- 调用点：" + ("、".join(js["calls"]) or "（无）"),
+                  "- 敏感变量：" + ("、".join(js["vars"]) or "（无）")]
     lines += ["", "## 源码面"]
     for key, label in (("comments", "注释"), ("hidden_inputs", "隐藏字段"), ("data_attrs", "data-*"),
                        ("scripts", "脚本"), ("params", "参数")):
@@ -201,7 +267,7 @@ def run(args) -> int:
                           "params": surf["params"]}, ensure_ascii=False, indent=1))
     global LAST
     LAST = {"ctx": ctx, "ranked": ranked, "base": base, "subs": subs,
-            "found": found, "status": home.status, "params": surf["params"]}
+            "found": found, "status": home.status, "params": surf["params"], "js": js}
     return 0
 
 

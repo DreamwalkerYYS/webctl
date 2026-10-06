@@ -483,253 +483,14 @@
       "Des-CTF-Knowledge-main/文件上传漏洞.md",
       "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2021西湖论剑IOT_RW-WriteUp.full.md"
      ]
-    }
-   }
-  },
-  "r3kapig__writeup": {
-   "dir": "/root/.cache/ctfctl/corpus/r3kapig__writeup",
-   "files": 0,
-   "bytes": 0,
-   "counts": {
-    "sqli": {
-     "files": 0,
-     "examples": []
     },
-    "ssti": {
-     "files": 0,
-     "examples": []
-    },
-    "lfi": {
-     "files": 0,
-     "examples": []
-    },
-    "rce": {
-     "files": 0,
-     "examples": []
-    },
-    "ssrf": {
-     "files": 0,
-     "examples": []
-    },
-    "xxe": {
-     "files": 0,
-     "examples": []
-    },
-    "deser": {
-     "files": 0,
-     "examples": []
-    },
-    "jwt": {
-     "files": 0,
-     "examples": []
-    },
-    "flask_session": {
-     "files": 0,
-     "examples": []
-    },
-    "upload": {
-     "files": 0,
-     "examples": []
-    },
-    "php_magic": {
-     "files": 0,
-     "examples": []
-    },
-    "php_filter": {
-     "files": 0,
-     "examples": []
-    },
-    "audit": {
-     "files": 0,
-     "examples": []
-    },
-    "authbypass": {
-     "files": 0,
-     "examples": []
-    },
-    "xss": {
-     "files": 0,
-     "examples": []
-    },
-    "csrf": {
-     "files": 0,
-     "examples": []
-    },
-    "race": {
-     "files": 0,
-     "examples": []
-    },
-    "prototype": {
-     "files": 0,
-     "examples": []
-    },
-    "web3": {
-     "files": 0,
-     "examples": []
-    },
-    "graphql": {
-     "files": 0,
-     "examples": []
-    },
-    "log4shell": {
-     "files": 0,
-     "examples": []
-    },
-    "format_string": {
-     "files": 0,
-     "examples": []
-    },
-    "buffer_overflow": {
-     "files": 0,
-     "examples": []
-    },
-    "heap": {
-     "files": 0,
-     "examples": []
-    },
-    "rev_java": {
-     "files": 0,
-     "examples": []
-    },
-    "rev_ghidra": {
-     "files": 0,
-     "examples": []
-    },
-    "crypto_rsa": {
-     "files": 0,
-     "examples": []
-    },
-    "crypto_aes": {
-     "files": 0,
-     "examples": []
-    },
-    "crypto_classic": {
-     "files": 0,
-     "examples": []
-    },
-    "crypto_prng": {
-     "files": 0,
-     "examples": []
-    },
-    "crypto_lattice": {
-     "files": 0,
-     "examples": []
-    },
-    "hash_crack": {
-     "files": 0,
-     "examples": []
-    },
-    "archive_crack": {
-     "files": 0,
-     "examples": []
-    },
-    "stego_img": {
-     "files": 0,
-     "examples": []
-    },
-    "stego_audio": {
-     "files": 0,
-     "examples": []
-    },
-    "pcap": {
-     "files": 0,
-     "examples": []
-    },
-    "forensics_fs": {
-     "files": 0,
-     "examples": []
-    },
-    "encoding": {
-     "files": 0,
-     "examples": []
-    },
-    "osint": {
-     "files": 0,
-     "examples": []
-    },
-    "net_scan": {
-     "files": 0,
-     "examples": []
-    },
-    "pwn_env": {
-     "files": 0,
-     "examples": []
-    },
-    "misc_game": {
-     "files": 0,
-     "examples": []
-    },
-    "misc_python_sandbox": {
-     "files": 0,
-     "examples": []
-    },
-    "misc_shell_sandbox": {
-     "files": 0,
-     "examples": []
-    },
-    "ai_llm_ctf": {
-     "files": 0,
-     "examples": []
-    },
-    "java_deser": {
-     "files": 0,
-     "examples": []
-    },
-    "jndi_expr": {
-     "files": 0,
-     "examples": []
-    },
-    "python_pickle": {
-     "files": 0,
-     "examples": []
-    },
-    "node_proto": {
-     "files": 0,
-     "examples": []
-    },
-    "php_phar": {
-     "files": 0,
-     "examples": []
-    },
-    "rce_noalnum": {
-     "files": 0,
-     "examples": []
-    },
-    "disable_functions": {
-     "files": 0,
-     "examples": []
-    },
-    "prng": {
-     "files": 0,
-     "examples": []
-    },
-    "length_ext": {
-     "files": 0,
-     "examples": []
-    },
-    "priv_esc": {
-     "files": 0,
-     "examples": []
-    },
-    "sandbox_escape": {
-     "files": 0,
-     "examples": []
-    },
-    "usb_traffic": {
-     "files": 0,
-     "examples": []
-    },
-    "memory_forensics": {
-     "files": 0,
-     "examples": []
-    },
-    "stego_archive": {
-     "files": 0,
-     "examples": []
-    },
-    "web_logic": {
-     "files": 0,
-     "examples": []
+    "xor_cipher": {
+     "files": 413,
+     "examples": [
+      "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+      "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+      "Des-CTF-Knowledge-main/SQL.md"
+     ]
     }
    }
   },
@@ -1179,6 +940,14 @@
       "ctf_writeup-master/20180914-trendmicroctf/README.md",
       "ctf_writeup-master/20180914-trendmicroctf/index.html"
      ]
+    },
+    "xor_cipher": {
+     "files": 66,
+     "examples": [
+      "ctf_writeup-master/20180317-backdoorctf/README.md",
+      "ctf_writeup-master/20180317-backdoorctf/index.html",
+      "ctf_writeup-master/20180411-hitbxctfqual/README.md"
+     ]
     }
    }
   },
@@ -1618,6 +1387,14 @@
       "practical-ctf-main/other/business-logic-errors.md",
       "practical-ctf-main/web/server-side/graphql.md"
      ]
+    },
+    "xor_cipher": {
+     "files": 11,
+     "examples": [
+      "practical-ctf-main/binary-exploitation/shellcode.md",
+      "practical-ctf-main/binary-exploitation/stack-canaries.md",
+      "practical-ctf-main/binary-exploitation/return-oriented-programming-rop/README.md"
+     ]
     }
    }
   },
@@ -1895,6 +1672,10 @@
      "examples": []
     },
     "web_logic": {
+     "files": 0,
+     "examples": []
+    },
+    "xor_cipher": {
      "files": 0,
      "examples": []
     }
@@ -2354,6 +2135,14 @@
       "CTFs-master/2021_GoogleCTF_BQ/17_Unknown_-_Inside_Secret_Base.md",
       "CTFs-master/2022_H4CK1NG_G00GL3/e03c02.md"
      ]
+    },
+    "xor_cipher": {
+     "files": 90,
+     "examples": [
+      "CTFs-master/2018_35C3_Junior/arraymaster2.md",
+      "CTFs-master/2018_35C3_Junior/stringmaster2.md",
+      "CTFs-master/2018_35C3_Junior/sum.md"
+     ]
     }
    }
   },
@@ -2794,6 +2583,14 @@
      "examples": [
       "ctf-master/2017-02-04-bitsctf/sherlock/sherlock.txt",
       "ctf-master/2017-02-04-bitsctf/sherlock/sherlock_orig.txt"
+     ]
+    },
+    "xor_cipher": {
+     "files": 109,
+     "examples": [
+      "ctf-master/2015-09-16-csaw/README.md",
+      "ctf-master/2015-09-16-csaw/forensics_150_pcapin/README.md",
+      "ctf-master/2015-09-16-csaw/pwn_500_rhinoxorus/README.md"
      ]
     }
    }
@@ -3239,6 +3036,14 @@
       "ctf-wiki-master/docs/zh/docs/ai/ai-for-security/agent/introduction.md",
       "ctf-wiki-master/docs/zh/docs/web/introduction.md"
      ]
+    },
+    "xor_cipher": {
+     "files": 75,
+     "examples": [
+      "ctf-wiki-master/docs/zh-tw/docs/android/basic_operating_mechanism/java_layer/smali/smali.md",
+      "ctf-wiki-master/docs/zh-tw/docs/assembly/mips/readme.md",
+      "ctf-wiki-master/docs/zh-tw/docs/assembly/risc-v/readme.md"
+     ]
     }
    }
   }
@@ -3259,7 +3064,6 @@
    "files": 275,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 144,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 43,
     "JorianWoltjer__practical-ctf": 11,
     "sajjadium__ctf-writeups": 0,
@@ -3277,7 +3081,6 @@
    "files": 142,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 114,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 8,
     "JorianWoltjer__practical-ctf": 3,
     "sajjadium__ctf-writeups": 0,
@@ -3295,7 +3098,6 @@
    "files": 451,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 231,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 53,
     "JorianWoltjer__practical-ctf": 47,
     "sajjadium__ctf-writeups": 0,
@@ -3313,7 +3115,6 @@
    "files": 1498,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 581,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 120,
     "JorianWoltjer__practical-ctf": 100,
     "sajjadium__ctf-writeups": 8,
@@ -3331,7 +3132,6 @@
    "files": 161,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 95,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 38,
     "JorianWoltjer__practical-ctf": 6,
     "sajjadium__ctf-writeups": 0,
@@ -3349,7 +3149,6 @@
    "files": 332,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 126,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 96,
     "JorianWoltjer__practical-ctf": 9,
     "sajjadium__ctf-writeups": 0,
@@ -3367,7 +3166,6 @@
    "files": 282,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 211,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 26,
     "JorianWoltjer__practical-ctf": 10,
     "sajjadium__ctf-writeups": 0,
@@ -3385,7 +3183,6 @@
    "files": 107,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 84,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3403,7 +3200,6 @@
    "files": 89,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 57,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 8,
     "JorianWoltjer__practical-ctf": 6,
     "sajjadium__ctf-writeups": 0,
@@ -3421,7 +3217,6 @@
    "files": 163,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 121,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 20,
     "JorianWoltjer__practical-ctf": 8,
     "sajjadium__ctf-writeups": 0,
@@ -3439,7 +3234,6 @@
    "files": 401,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 227,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 36,
     "JorianWoltjer__practical-ctf": 5,
     "sajjadium__ctf-writeups": 1,
@@ -3457,7 +3251,6 @@
    "files": 89,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 60,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 12,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3475,7 +3268,6 @@
    "files": 126,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 86,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 20,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3493,7 +3285,6 @@
    "files": 142,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 98,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 8,
     "JorianWoltjer__practical-ctf": 17,
     "sajjadium__ctf-writeups": 0,
@@ -3511,7 +3302,6 @@
    "files": 200,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 67,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 40,
     "JorianWoltjer__practical-ctf": 29,
     "sajjadium__ctf-writeups": 0,
@@ -3529,7 +3319,6 @@
    "files": 71,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 23,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 10,
     "JorianWoltjer__practical-ctf": 15,
     "sajjadium__ctf-writeups": 0,
@@ -3547,7 +3336,6 @@
    "files": 73,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 31,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 18,
     "JorianWoltjer__practical-ctf": 8,
     "sajjadium__ctf-writeups": 0,
@@ -3565,7 +3353,6 @@
    "files": 52,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 38,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 8,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3583,7 +3370,6 @@
    "files": 93,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 48,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 4,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3601,7 +3387,6 @@
    "files": 9,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 2,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3618,7 +3403,6 @@
    "files": 59,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 26,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 6,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3636,7 +3420,6 @@
    "files": 369,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 212,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 40,
     "JorianWoltjer__practical-ctf": 5,
     "sajjadium__ctf-writeups": 3,
@@ -3654,7 +3437,6 @@
    "files": 667,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 340,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 60,
     "JorianWoltjer__practical-ctf": 12,
     "sajjadium__ctf-writeups": 31,
@@ -3672,7 +3454,6 @@
    "files": 518,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 271,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 60,
     "JorianWoltjer__practical-ctf": 7,
     "sajjadium__ctf-writeups": 26,
@@ -3690,7 +3471,6 @@
    "files": 331,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 235,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 14,
     "JorianWoltjer__practical-ctf": 4,
     "sajjadium__ctf-writeups": 0,
@@ -3708,7 +3488,6 @@
    "files": 638,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 364,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 48,
     "JorianWoltjer__practical-ctf": 13,
     "sajjadium__ctf-writeups": 0,
@@ -3726,7 +3505,6 @@
    "files": 698,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 356,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 61,
     "JorianWoltjer__practical-ctf": 26,
     "sajjadium__ctf-writeups": 0,
@@ -3744,7 +3522,6 @@
    "files": 610,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 314,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 60,
     "JorianWoltjer__practical-ctf": 11,
     "sajjadium__ctf-writeups": 0,
@@ -3762,7 +3539,6 @@
    "files": 177,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 87,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 16,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3780,7 +3556,6 @@
    "files": 128,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 88,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 10,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3798,7 +3573,6 @@
    "files": 241,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 164,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 28,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3816,7 +3590,6 @@
    "files": 48,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 26,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 2,
     "JorianWoltjer__practical-ctf": 10,
     "sajjadium__ctf-writeups": 0,
@@ -3834,7 +3607,6 @@
    "files": 129,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 109,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3852,7 +3624,6 @@
    "files": 338,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 157,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 26,
     "JorianWoltjer__practical-ctf": 4,
     "sajjadium__ctf-writeups": 1,
@@ -3870,7 +3641,6 @@
    "files": 77,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 37,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 6,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -3888,7 +3658,6 @@
    "files": 262,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 124,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 24,
     "JorianWoltjer__practical-ctf": 5,
     "sajjadium__ctf-writeups": 0,
@@ -3906,7 +3675,6 @@
    "files": 133,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 61,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 16,
     "JorianWoltjer__practical-ctf": 3,
     "sajjadium__ctf-writeups": 0,
@@ -3924,7 +3692,6 @@
    "files": 1886,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 664,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 133,
     "JorianWoltjer__practical-ctf": 114,
     "sajjadium__ctf-writeups": 16,
@@ -3942,7 +3709,6 @@
    "files": 36,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 17,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -3960,7 +3726,6 @@
    "files": 119,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 72,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 10,
     "JorianWoltjer__practical-ctf": 10,
     "sajjadium__ctf-writeups": 0,
@@ -3978,7 +3743,6 @@
    "files": 395,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 217,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 26,
     "JorianWoltjer__practical-ctf": 5,
     "sajjadium__ctf-writeups": 7,
@@ -3996,7 +3760,6 @@
    "files": 72,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 28,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 10,
     "JorianWoltjer__practical-ctf": 5,
     "sajjadium__ctf-writeups": 0,
@@ -4014,7 +3777,6 @@
    "files": 142,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 100,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 16,
     "JorianWoltjer__practical-ctf": 6,
     "sajjadium__ctf-writeups": 0,
@@ -4032,7 +3794,6 @@
    "files": 10,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 10,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 0,
     "sajjadium__ctf-writeups": 0,
@@ -4050,7 +3811,6 @@
    "files": 13,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 10,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 0,
     "sajjadium__ctf-writeups": 0,
@@ -4068,7 +3828,6 @@
    "files": 440,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 239,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 50,
     "JorianWoltjer__practical-ctf": 21,
     "sajjadium__ctf-writeups": 21,
@@ -4086,7 +3845,6 @@
    "files": 77,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 38,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 8,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -4104,7 +3862,6 @@
    "files": 88,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 55,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 12,
     "JorianWoltjer__practical-ctf": 3,
     "sajjadium__ctf-writeups": 0,
@@ -4122,7 +3879,6 @@
    "files": 206,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 116,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 23,
     "JorianWoltjer__practical-ctf": 15,
     "sajjadium__ctf-writeups": 0,
@@ -4140,7 +3896,6 @@
    "files": 33,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 29,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 4,
     "JorianWoltjer__practical-ctf": 0,
     "sajjadium__ctf-writeups": 0,
@@ -4158,7 +3913,6 @@
    "files": 236,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 214,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 0,
     "sajjadium__ctf-writeups": 0,
@@ -4176,7 +3930,6 @@
    "files": 109,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 66,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 24,
     "JorianWoltjer__practical-ctf": 4,
     "sajjadium__ctf-writeups": 0,
@@ -4194,7 +3947,6 @@
    "files": 240,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 164,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 22,
     "JorianWoltjer__practical-ctf": 3,
     "sajjadium__ctf-writeups": 0,
@@ -4212,7 +3964,6 @@
    "files": 21,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 9,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 6,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -4230,7 +3981,6 @@
    "files": 350,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 204,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 22,
     "JorianWoltjer__practical-ctf": 29,
     "sajjadium__ctf-writeups": 0,
@@ -4248,7 +3998,6 @@
    "files": 185,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 123,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 16,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -4266,7 +4015,6 @@
    "files": 517,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 174,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 30,
     "JorianWoltjer__practical-ctf": 31,
     "sajjadium__ctf-writeups": 0,
@@ -4284,7 +4032,6 @@
    "files": 43,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 28,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 1,
     "sajjadium__ctf-writeups": 0,
@@ -4302,7 +4049,6 @@
    "files": 42,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 36,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 0,
     "JorianWoltjer__practical-ctf": 0,
     "sajjadium__ctf-writeups": 0,
@@ -4320,7 +4066,6 @@
    "files": 65,
    "per_source": {
     "Dest1ny-Sec__Des-CTF-Knowledge": 53,
-    "r3kapig__writeup": 0,
     "balsn__ctf_writeup": 2,
     "JorianWoltjer__practical-ctf": 2,
     "sajjadium__ctf-writeups": 0,
@@ -4332,6 +4077,23 @@
     "Des-CTF-Knowledge-main/SSRF漏洞.md",
     "Des-CTF-Knowledge-main/文件上传漏洞.md",
     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2021西湖论剑IOT_RW-WriteUp.full.md"
+   ]
+  },
+  "xor_cipher": {
+   "files": 764,
+   "per_source": {
+    "Dest1ny-Sec__Des-CTF-Knowledge": 413,
+    "balsn__ctf_writeup": 66,
+    "JorianWoltjer__practical-ctf": 11,
+    "sajjadium__ctf-writeups": 0,
+    "Dvd848__CTFs": 90,
+    "p4-team__ctf": 109,
+    "ctf-wiki__ctf-wiki": 75
+   },
+   "examples": [
+    "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+    "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+    "Des-CTF-Knowledge-main/SQL.md"
    ]
   }
  }

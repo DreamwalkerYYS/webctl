@@ -365,6 +365,12 @@ def main() -> int:
             check("web：kb 详情能取到", d.get("title") and len(d.get("body", [])) > 3, out[:200])
             st, out = wget("/api/browse?section=tools")
             check("web：tools 栏目有分类", len(_json.loads(out).get("items", [])) >= 10, out[:200])
+            st, out = wget("/api/solve", data={"target": f_png, "mode": "state"})
+            d = _json.loads(out)
+            check("web：解题模式能拿到状态与清单", st == 200 and "解题状态" in d.get("report", ""), out[:300])
+            st, out = wget("/api/solve", data={"target": f_png, "mode": "step"})
+            d = _json.loads(out)
+            check("web：解题推进一步（界面上的「推进一步」）", st == 200 and d.get("steps", 0) >= 1, out[:300])
             st, out = wget("/api/run", data={"argv": ["tools", "search", "ffuf"]})
             check("web：能跑任意子命令", _json.loads(out).get("rc") == 0 and "ffuf" in out, out[:200])
         wproc.terminate()
@@ -423,6 +429,49 @@ def main() -> int:
                 "flag{a_b} see https://x.io/p mail a@b.com")
         check("codec extract 捞 flag/URL/邮箱", "flag{a_b}" in r.stdout and "https://x.io/p" in r.stdout
               and "a@b.com" in r.stdout, r.stdout[:300])
+
+        print("\n[20] recon：外链 JS 面（挖接口路径/敏感变量/调试痕迹）")
+        r = cli("recon", BASE, "--threads", "2")
+        out = r.stdout
+        check("JS 面：抓到了外链脚本", "JS 面" in out and "app.js" in out, out[-1800:])
+        check("JS 面：列出调用点", "/api/v1/notes" in out, out[-1800:])
+        check("JS 面：列出接口路径", "/api/v1/save" in out, out[-1800:])
+        check("JS 面：敏感变量带 名字=值", "isAdmin=false" in out, out[-1800:])
+        check("JS 面：识别调试痕迹", "调试" in out, out[-1800:])
+        rp = ""                                        # 报告路径从输出里取（测试用独立 cache，不能猜路径）
+        for line in out.splitlines():
+            if line.startswith("[报告] "):
+                rp = line[len("[报告] "):].strip()
+        check("JS 面：报告里也写了这一节",
+              bool(rp) and os.path.exists(rp) and "外链 JS 面" in open(rp, encoding="utf-8").read(), rp)
+
+        print("\n[21] file：非 UTF-8 文本的编码回退（中文附件常见 GBK）")
+        f_gbk = "/tmp/ctfctl-test-gbk.txt"
+        open(f_gbk, "wb").write("这是中文题目描述，flag{gbk_中文_ok}\n第二行：密码是 test\n".encode("gbk"))
+        r = cli("file", f_gbk)
+        check("file：认出 GB 编码", "编码 gb18030" in r.stdout or "text:encoding=gb18030" in r.stdout, r.stdout[:600])
+        check("file：GBK 文件里的 flag 仍能被抓到", "flag{gbk_中文_ok}" in r.stdout, r.stdout[:900])
+
+        print("\n[22] solve：整题推进（跑一步→抠证据→重算下一步）")
+        import shutil as _sh, json as _j2
+        solve_cache = "/tmp/ctfctl-solve-cache"
+        _sh.rmtree(solve_cache, ignore_errors=True)
+        os.makedirs(solve_cache, exist_ok=True)
+        senv = {**os.environ, "CTFCTL_CACHE": solve_cache, "PYTHONPATH": ROOT}
+        def solve_cli(*a, t=420):
+            return subprocess.run([sys.executable, "-m", "ctfctl", *a], cwd=ROOT, env=senv,
+                                  capture_output=True, text=True, timeout=t)
+        r = solve_cli("solve", BASE, "--auto", "3", "--budget", "120")
+        out = r.stdout + r.stderr
+        check("solve：能跑起来", r.returncode == 0, out[-800:])
+        check("solve：起手先自动分析一轮", "先做一轮分析" in out, out[:1500])
+        check("solve：抠出了证据（参数或真实文件）", "参数（" in out or "真实文件" in out or "探测" in out, out[-2000:])
+        check("solve：给出下一步清单", "下一步可选" in out, out[-1500:])
+        check("solve：留痕（含负结果）", "已试过" in out, out[-1500:])
+        check("solve：状态已存盘", os.path.exists(os.path.join(solve_cache, "solve")), solve_cache)
+        r2 = solve_cli("solve", BASE)
+        check("solve：再看一次状态不重复跑（已试过会去重）",
+              "解题状态" in (r2.stdout + r2.stderr), (r2.stdout + r2.stderr)[-600:])
 
     finally:
         srv.terminate()

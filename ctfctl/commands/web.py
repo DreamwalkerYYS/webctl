@@ -27,6 +27,7 @@ LOOPBACK = ("127.0.0.1", "::1", "localhost")
 LOG: list[str] = []
 LOCK = threading.Lock()
 STATE = {"target": "", "actions": [], "kind": ""}
+SOLVE = {"st": None}          # 解题状态机（同一个进程里复用，命令行与它共享存盘状态）
 
 PAGE = r"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8"><title>ctfctl 工作台</title>
@@ -65,6 +66,11 @@ PAGE = r"""<!doctype html>
   <input id="target" placeholder="目标：http://靶机/ 或 /path/附件.zip  （回车分析）" autocomplete="off">
   <button class="primary" onclick="analyze()">分析 (Enter)</button>
   <label style="color:var(--dim)"><input type="checkbox" id="full"> 完整清单</label>
+  <button onclick="solve('start')">解题模式</button>
+  <button onclick="solve('step')">推进一步 (s)</button>
+  <button onclick="solve('auto')">自动推进</button>
+  <button onclick="solve('reset')">重置</button>
+  <span id="solveinfo" style="color:var(--warn)"></span>
   <span id="status" style="color:var(--dim)"></span>
 </header>
 <main>
@@ -129,6 +135,20 @@ function renderActions(){
      <code>${esc(a.render||"")}</code></div>`).join("");
   box.className="pane";
 }
+async function solve(mode, n){
+  const t=document.getElementById("target").value.trim();
+  if(!t){status("先填目标","bad");document.getElementById("target").focus();return;}
+  const body={mode:mode,target:t};
+  if(mode==="auto"){body.n=5;body.budget=120;}
+  status(mode==="auto"?"自动推进中（最多 5 步，拿到 flag 候选或没新证据就停）…":"解题模式："+mode+"…");
+  try{
+    const d=await api("/api/solve",body);
+    show(d.report||""); STATE.actions=d.actions||[]; SEL=0; renderActions();
+    document.getElementById("solveinfo").textContent=
+      `阶段 ${d.stage} · 已推进 ${d.steps} 步` + (d.flags&&d.flags.length?` · ★ ${d.flags.join(" ")}`:"");
+    status(d.flags&&d.flags.length?("拿到 flag 候选："+d.flags[d.flags.length-1]+"（回平台验证）"):"已更新，按 1-9 跑下一步","tag");
+  }catch(e){status("解题推进失败："+e.message,"bad");}
+}
 async function runAction(i){
   if(i<0||i>=STATE.actions.length)return;
   SEL=i; renderActions();
@@ -136,7 +156,12 @@ async function runAction(i){
   try{
     const d=await api("/api/action",{index:i});
     append("\n$ "+a.render+"\n"+(d.output||"(无输出)")+(d.rc?"\n[rc="+d.rc+"]":""));
-    status("完成 rc="+d.rc, d.rc?"bad":"tag");
+    if(d.new&&d.new.length)append("\n[新证据] "+d.new.join(" / "));
+    if(d.actions){STATE.actions=d.actions;renderActions();}
+    if(d.report){document.getElementById("solveinfo").textContent=
+      `阶段 ${d.stage} · 已推进 ${d.steps} 步`+(d.flags&&d.flags.length?` · ★ ${d.flags.join(" ")}`:"");
+      append("\n"+d.report);}
+    status("完成 rc="+d.rc+(d.new&&d.new.length?`（新证据 ${d.new.length} 条）`:""), d.rc?"bad":"tag");
   }catch(e){status("失败："+e.message,"bad");}
 }
 async function runCmd(v){
@@ -192,6 +217,7 @@ document.addEventListener("keydown",e=>{
   if(e.key>="1"&&e.key<="9"){runAction(parseInt(e.key)-1);e.preventDefault();}
   else if(e.key==="a"){document.getElementById("target").focus();}
   else if(e.key==="r"){analyze();}
+  else if(e.key==="s"){solve("step");}
   else if(e.key==="i"){const v=prompt("ctfctl 子命令（不带 ctfctl）：");if(v)runCmd(v);}
   else if(e.key==="k"){openBrowse("kb");} else if(e.key==="o"){openBrowse("tools");}
   else if(e.key==="u"){openBrowse("rules");} else if(e.key==="h"){openBrowse("history");}
@@ -299,6 +325,40 @@ class Handler(BaseHTTPRequestHandler):
                 STATE["actions"] = res.get("actions", [])
                 STATE["kind"] = res.get("kind", "")
             return self._ok(res)
+        if u.path == "/api/solve":
+            from ..core.solve import SolveState
+            mode = str(body.get("mode") or "state")
+            target = str(body.get("target") or STATE["target"]).strip()
+            if not target:
+                return self._err(400, "先给目标")
+            st = SOLVE["st"]
+            if mode == "reset" or st is None or st.target != target:
+                if mode == "reset":
+                    try:
+                        os.remove(SolveState(target).path())
+                    except OSError:
+                        pass
+                st = SolveState(target, load=(mode != "reset"))
+                SOLVE["st"] = st
+            try:
+                if mode == "step":
+                    st.step()
+                elif mode == "auto":
+                    st.advance(limit=int(body.get("n") or 3), budget_s=float(body.get("budget") or 90))
+                elif mode == "run":
+                    st.refresh_actions()
+                    idx = int(body.get("index") or 0) - 1
+                    if 0 <= idx < len(st.actions):
+                        st.step(st.actions[idx])
+            except Exception as e:
+                return self._err(500, f"{type(e).__name__}: {e}")
+            with LOCK:
+                STATE["target"] = target
+                STATE["actions"] = st.refresh_actions()
+                STATE["kind"] = st.kind
+            return self._ok({"report": st.report(), "actions": STATE["actions"], "stage": st.stage,
+                             "steps": st.steps, "flags": st.flags, "log": st.log[-400:],
+                             "tried": st.tried[-10:]})
         if u.path == "/api/action":
             idx = int(body.get("index", -1))
             with LOCK:
@@ -306,6 +366,15 @@ class Handler(BaseHTTPRequestHandler):
             if not (0 <= idx < len(acts)):
                 return self._err(400, "动作下标越界（先分析）")
             try:
+                st = SOLVE["st"]
+                if st is not None and st.target == STATE["target"]:
+                    r = st.step(acts[idx])                  # 解题模式：跑一步并摄取新证据
+                    with LOCK:
+                        STATE["actions"] = st.refresh_actions()
+                    return self._ok({"rc": r.get("rc", 0), "output": r.get("output", ""),
+                                     "new": r.get("new", []), "label": acts[idx].get("label", ""),
+                                     "render": acts[idx].get("render", ""),
+                                     "report": st.report(), "flags": st.flags, "stage": st.stage})
                 rc, out = wb.run_action(acts[idx])
             except Exception as e:
                 return self._err(500, f"{type(e).__name__}: {e}")

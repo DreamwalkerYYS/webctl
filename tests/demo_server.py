@@ -39,8 +39,17 @@ system($_GET['cmd']);
 """
 
 APP_JS = """// /static/js/app.js
+// temp: 上线前删掉这行调试代码
 fetch('/api/v1/user?id=1');
 const debug = '/admin/debug?cmd=ls';
+const authToken = 'debug-token-1234';
+const isAdmin = false;
+async function load() {
+  const r = await fetch('/api/v1/notes?uid=1');
+  return r.json();
+}
+$.post('/api/v1/save', {});
+console.log('debug build');
 """
 
 ROBOTS = "User-agent: *\nDisallow: /admin\n"

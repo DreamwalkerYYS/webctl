@@ -45,6 +45,9 @@ pipx install git+https://github.com/Phirisyyds/ctfctl     # 或直接从仓库�
 ```bash
 ctfctl                                  # ① 裸跑 = WebUI 工作台：填目标 → 回车分析 → 数字键跑建议
 
+# 想让它自己往前推（跑一步→抠证据→重算下一步，拿到 flag 候选就停）
+ctfctl solve "$U" --auto 5
+
 # 或者纯命令行（不想开面板时）
 U=http://靶机:端口
 ctfctl go "$U"                          # ② 一条命令：判类型 → 侦察 → 给方向与可执行动作
@@ -188,6 +191,30 @@ ctfctl go ./附件.zip            # 文件 → 初筛（类型/结构/内嵌/字
 ctfctl go ./pwn --strings 30    # 文件：多看些字符串
 ```
 判类型自己来：`http(s)://` 走 Web 流程，存在的路径走文件流程，两者都不是就告诉你用法。
+
+### solve —— 交互式整题推进（不是一轮探测就完事）
+
+一条命令起步，之后**一步一证据**地往前推：跑一步 → 从输出里抠新证据（flag 候选、参数、路径、真实文件、令牌、报错）→ 重算下一步 → 去掉已经试过的。干到「拿到 flag 候选」「没有新证据」「没有新动作」「超你给的预算」就停，然后你可以接着推。
+
+```bash
+ctfctl solve "$U"                   # 只看状态 + 下一步清单（不跑任何东西）
+ctfctl solve "$U" --step            # 推一步（默认 1，--step 3 就三步）
+ctfctl solve "$U" --auto 5          # 自动滚 5 步（--budget 90 限时；拿到 flag 候选即停）
+ctfctl solve "$U" --run 3           # 跑清单里的第 3 条（想自己挑的时候）
+ctfctl solve "$U" --reset           # 清掉这个目标的状态重来
+ctfctl solve ./chal.zip             # 文件类题同理（起手自动做一轮 file 初筛）
+```
+
+状态存 `~/.cache/ctfctl/solve/<目标>.json`，**命令行 / WebUI / TUI 共用一份** —— 界面里点过的步骤，命令行不会重复跑（已试过的会去重，包括负结果）。
+
+**自动推进只跑两类动作**（红线在这里）：
+
+- `ctfctl` 自己的子命令（recon / req / file / codec / jwt / kb …）；
+- **只读探针**：对已发现的参数试 `1`、`'`、`1'-- -`、`../../../../etc/passwd`、`{{7*7}}`，对新发现的路径 GET 一次，换两三个身份 cookie 看看 —— 全部 URL 编码、全部不改服务端状态。
+
+外部利用工具（sqlmap 之类，`kind=shell`）**永远要你自己按一下才跑**，工具只把它列在清单里。判断权仍在你手上。
+
+WebUI 里对应三个按钮：`解题模式`（拿状态）、`推进一步 (s)`、`自动推进`（最多 5 步），右上角一直显示「阶段 / 已推进步数 / ★ flag 候选」。
 
 ### file —— 文件/二进制初筛（misc · rev · pwn · crypto 的第一步）
 ```
@@ -459,6 +486,10 @@ ctf-tool/
 | [CTFCrackTools](https://github.com/0Chencc/CTFCrackTools) | **算法清单的覆盖面**（Base 家族、古典密码、RC4 等该有哪些）→ 据此补齐 `codec` | GPL-3.0：**只看功能面，未复制任何代码** |
 | [CTF-WEB-TOOLS](https://github.com/ChenFu0604/CTF-WEB-TOOLS) | 两个思路：附件**多编码解码**、外链 **JS 里挖 API 路径/可疑变量** | 仓库无 LICENSE：只借思路 |
 | [ctf-wiki](https://github.com/ctf-wiki/ctf-wiki)、[Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)、[JorianWoltjer/practical-ctf](https://github.com/JorianWoltjer/practical-ctf) 等 writeup 语料 | **知识库的机制与手法词频**（`kb` 的 corpus 数字、`techniques.json` 的关键词表） | 只做统计与归纳，保留原文链接；不搬运正文 |
+| [SecLists](https://github.com/danielmiessler/SecLists)、[fuzzdb](https://github.com/fuzzdb-project/fuzzdb)、[nuclei-templates](https://github.com/projectdiscovery/nuclei-templates) | **字典/模板的位置与分类**（指向即可，不打包进本仓库） | MIT / 各自许可；`tools` 里给安装命令 |
+| [GTFOBins](https://gtfobins.github.io/)、[LOLBAS](https://lolbas-project.github.io/)、[WADComs](https://wadcoms.github.io/)、[arsenal](https://github.com/Orange-Cyberdefense/arsenal) | 提权/白利用的**分类轴**（functions / Category / attack_types → 映射成 `kb` 的 priv_esc 卡） | GPL-3.0：**只放指针不拷数据**（数据有传染性） |
+| [ToolsFx](https://github.com/Leon406/ToolsFx)、[CTFCrackTools](https://github.com/0Chencc/CTFCrackTools) | 冷门编码（base58/62/85/92 与国密）与测试向量该覆盖到哪 | ISC / GPL-3.0：功能面对齐，未拷代码 |
+| [atomic-red-team](https://github.com/redcanaryco/atomic-red-team)、[sigma](https://github.com/SigmaHQ/sigma)、[mitre/cti](https://github.com/mitre/cti) | ATT&CK 技术编号与分类（蓝队/取证卡片的挂点） | MIT / Apache-2.0：只引用编号 |
 | CyberChef / Ciphey / RsaCtfTool / ysoserial / Volatility3 等 | 直接用（`tools` 里给安装命令），不重写 | 各自许可见 `ctfctl tools show <名字>` |
 
 **边界**：GPL 项目的代码一行没抄；无 LICENSE 的项目只借想法；语料只做本地统计。发现更好的同类项目（或我们重复实现了什么）请提 issue。
@@ -471,13 +502,19 @@ ctf-tool/
 - `browser` 通道目前只覆盖 `ctfctl browser` 自己，`req/recon/fuzz` 还走本机出口
   （想做全局换出口，需要给 `Session` 加一层执行器抽象：`--via browser`）。
 - 历史不自动清理（它就是证据链），要清 `rm -rf ~/.cache/ctfctl/history/<host>`。
+- `solve` 的自动推进**只跑 ctfctl 子命令与只读探针**；`kind=shell` 的外部利用工具（sqlmap/nuclei 等）
+  永远要人工按键（见 `solve` 一节）。自动推进不做上传、不发 POST、不改服务端状态。
 - 路线：请求录制打包分享（导出成单个可复现 HTML/脚本包）、`recon --via browser`、
   规则自动联想再加一层"这条规则在你的靶机上最可能从哪个参数入手"的具体定位、
-  `kb` 卡片与 `rules` 互相反查（recon 命中规则时顺手提示对应卡片）
+  `kb` 卡片与 `rules` 互相反查（recon 命中规则时顺手提示对应卡片）、
+  `solve` 的**假设树**（同一层多个假设并行推进、按证据淘汰）、跨运行的经验累积
+  （同一个平台的题目解过之后，下次同名参数直接优先）
 
 ---
 
 ## 12. 变更日志
+
+- **1.3** — 新增 **`solve` 解题状态机**（`core/solve.py` + `commands/solve.py`）：把「一轮探测」变成**持续推进**，证据累积（flag 候选/参数/路径/真实文件/令牌/报错/状态变化）、已试动作去重（含负结果）、阶段推进（recon→probe→session→flag）、状态存盘且**命令行/WebUI/TUI 共用**；**只读探针**表（参数 5 个常见值 + 新路径 GET + 身份 cookie，全部 URL 编码、不写不改）；`--auto N --budget S` 自动滚步，拿到 flag 候选/无新证据/无新动作即停；WebUI 加「解题模式 / 推进一步(s) / 自动推进」工具栏与阶段显示，TUI 加 `s` 键；`recon` 新增**外链 JS 面挖掘**（接口路径/调用点/敏感变量 `名字=值`/调试痕迹），`file` 新增**多编码回退**（UTF-8→GB18030→BIG5→latin-1，GBK 附件里的 flag 也能捞出来）；`kb` 扩到 **42 张卡**（古典密码家族/哈希识别/分组与流/XOR 爆破/flag 收割/HTTP 报文/多编码/字节地址编解码/Linux·Windows 提权查表），人工工具条目 114 条（补 SecLists/nuclei-templates/fuzzdb/GTFOBins/LOLBAS/WADComs/ToolsFx/arsenal/atomic-red-team）；修 `go` 传给 `recon` 的 Namespace 缺字段、`actions_flat` 只替换 render 不替换 argv（导致 req 收到字面量 `{url}`）、`run_argv` 把字符串退出码硬转 int；测试 **144 项**
 
 - **1.2** — `codec` 大扩充（编码族 20+ 对、古典密码/流密码 11 种含 Playfair/Polybius/Bacon/Affine/Beaufort/Rail fence、哈希与 HMAC/PBKDF2、`extract` 批量捞 flag/URL/邮箱/哈希；全部过标准测试向量，RC4/Beaufort 用教科书向量校准）；`tools` 接入**权威分类数据**（kali-meta 29 个元包的 Depends + blackarch.db 的 `%GROUPS%`），人工条目扩到 105 条并加「同功能二选一」标注；`kb` 扩到 **32 张卡**、语料扩到 **7 套 3791 个文件**（含中文 Des-CTF-Knowledge）；参数顺序兜底与 `| head` 的 BrokenPipeError 修掉；测试 127 项
 - **1.1** — 默认界面改成 **WebUI 工作台**（`ctfctl web`，纯标准库 http.server + 单页应用）：键盘驱动（回车分析 / 1-9 跑建议 / i 敲命令 / k o u h c 看栏目）、动作带 why 与命令预览、只监听回环且非回环强制 token；把分析引擎抽成 `core/workbench.py`、栏目数据抽成 `core/browse.py`（TUI 与 WebUI 共用，行为不漂移）；新增 WebUI 接口测试（共 99 项断言）

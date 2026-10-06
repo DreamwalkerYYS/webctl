@@ -54,19 +54,19 @@
    "id": "curated",
    "name": "人工维护的 CTF 常用工具（中文说明/安装/用法）",
    "file": "ctfctl/data/ctf-tools.json",
-   "tools": 105
+   "tools": 114
   }
  ],
  "categories": [
   {
    "id": "web",
    "name": "Web 应用",
-   "count": 1027
+   "count": 1028
   },
   {
    "id": "recon",
    "name": "信息收集/侦察",
-   "count": 1125
+   "count": 1127
   },
   {
    "id": "osint",
@@ -86,17 +86,17 @@
   {
    "id": "crypto",
    "name": "密码学",
-   "count": 130
+   "count": 131
   },
   {
    "id": "misc",
    "name": "杂项/隐写/编码",
-   "count": 269
+   "count": 271
   },
   {
    "id": "forensics",
    "name": "取证（磁盘·内存·流量）",
-   "count": 277
+   "count": 278
   },
   {
    "id": "hash",
@@ -126,7 +126,7 @@
   {
    "id": "post",
    "name": "后渗透/权限维持",
-   "count": 101
+   "count": 106
   },
   {
    "id": "data",
@@ -341,6 +341,28 @@
    "ctf_use": "格攻击/复杂数论题绕不开；小题目用 python+gmpy2 就够",
    "note": "包很大（几个 G），不常用就先别装",
    "url": "https://www.sagemath.org/",
+   "curated": true,
+   "desc_en": ""
+  },
+  {
+   "name": "ToolsFx",
+   "src": [
+    "curated"
+   ],
+   "cats": [
+    "crypto",
+    "misc"
+   ],
+   "desc": "跨平台密码学工具箱（含 base16/32/36/45/58/62/85/91/92/100 与国密 SM3，带测试向量）",
+   "install": {
+    "git": "https://github.com/Leon406/ToolsFx"
+   },
+   "usage": [
+    "# 下载 release 运行；testdata/ 里有 ctf/encode/classical/rsa 测试向量"
+   ],
+   "ctf_use": "要 base58/62/85/92 这类冷门编码或国密时的 GUI 兜底",
+   "note": "ISC 许可（宽松，测试向量可参考）",
+   "url": "https://github.com/Leon406/ToolsFx",
    "curated": true,
    "desc_en": ""
   },
@@ -1468,6 +1490,99 @@
    ]
   },
   {
+   "name": "atomic-red-team",
+   "src": [
+    "curated"
+   ],
+   "cats": [
+    "post",
+    "forensics"
+   ],
+   "desc": "ATT&CK 映射的测试集（每条技术一组可执行测试，MIT）",
+   "install": {
+    "git": "https://github.com/redcanaryco/atomic-red-team"
+   },
+   "usage": [
+    "ls atomics/T1059*"
+   ],
+   "ctf_use": "蓝队/取证方向题查「这条技术长什么样」",
+   "url": "https://github.com/redcanaryco/atomic-red-team",
+   "curated": true,
+   "desc_en": ""
+  },
+  {
+   "name": "GTFOBins",
+   "src": [
+    "curated"
+   ],
+   "cats": [
+    "post"
+   ],
+   "desc": "Unix 二进制提权索引（每个程序能做什么：file-read/shell/sudo…）",
+   "install": {
+    "git": "https://github.com/GTFOBins/GTFOBins.github.io"
+   },
+   "usage": [
+    "ls _gtfobins/ | head",
+    "grep -l 'sudo' _gtfobins/*.md | head"
+   ],
+   "ctf_use": "拿到 SUID/sudo 列表后逐个查它",
+   "note": "GPL-3.0（数据有传染性）：本仓库只放指针，不拷它的数据",
+   "url": "https://gtfobins.github.io/",
+   "curated": true,
+   "desc_en": ""
+  },
+  {
+   "name": "LOLBAS",
+   "desc_en": "Living Off The Land Binaries And Scripts - (LOLBins and LOLScripts).",
+   "cats": [
+    "post",
+    "rev",
+    "pwn"
+   ],
+   "url": "https://lolbas-project.github.io/",
+   "blackarch": "lolbas",
+   "src": [
+    "blackarch"
+   ],
+   "desc": "Windows 白利用二进制/脚本库（带 ATT&CK 映射）",
+   "install": {
+    "git": "https://github.com/LOLBAS-Project/LOLBAS"
+   },
+   "usage": [
+    "ls yml/OSBinaries | head",
+    "grep -rn 'Download' yml/ | head"
+   ],
+   "ctf_use": "只能用系统自带程序时查这套",
+   "note": "GPL-3.0：只放指针不拷数据",
+   "curated": true,
+   "blackarch_groups": [
+    "blackarch",
+    "blackarch-windows"
+   ]
+  },
+  {
+   "name": "WADComs",
+   "src": [
+    "curated"
+   ],
+   "cats": [
+    "post"
+   ],
+   "desc": "Windows/AD 命令速查（条目带 command/attack_types/OS 分类）",
+   "install": {
+    "git": "https://github.com/WADComs/WADComs.github.io"
+   },
+   "usage": [
+    "ls _wadcoms/*.md | head"
+   ],
+   "ctf_use": "AD 题的命令卡",
+   "note": "GPL-3.0：只放指针",
+   "url": "https://wadcoms.github.io/",
+   "curated": true,
+   "desc_en": ""
+  },
+  {
    "name": "angr",
    "desc_en": "The next-generation binary analysis platform from UC Santa Barbaras Seclab.",
    "cats": [
@@ -1822,6 +1937,28 @@
     "blackarch-debugger",
     "blackarch-automation"
    ]
+  },
+  {
+   "name": "arsenal",
+   "src": [
+    "curated"
+   ],
+   "cats": [
+    "recon",
+    "post"
+   ],
+   "desc": "渗透命令速查与启动器（Markdown cheatsheet 分类）",
+   "install": {
+    "git": "https://github.com/Orange-Cyberdefense/arsenal"
+   },
+   "usage": [
+    "python3 arsenal.py -y"
+   ],
+   "ctf_use": "命令记不住的场景查它",
+   "note": "GPL-3.0：只放指针",
+   "url": "https://github.com/Orange-Cyberdefense/arsenal",
+   "curated": true,
+   "desc_en": ""
   },
   {
    "name": "masscan",
@@ -2460,6 +2597,33 @@
    ]
   },
   {
+   "name": "fuzzdb",
+   "desc_en": "Attack and Discovery Pattern Dictionary for Application Fault Injection Testing.",
+   "cats": [
+    "web",
+    "misc",
+    "recon"
+   ],
+   "url": "https://github.com/fuzzdb-project/fuzzdb",
+   "blackarch": "fuzzdb",
+   "src": [
+    "blackarch"
+   ],
+   "desc": "黑盒 fuzz 字典（攻击模式 + 可预测文件路径 + 响应正则）",
+   "install": {
+    "git": "https://github.com/fuzzdb-project/fuzzdb"
+   },
+   "usage": [
+    "ls attack/ discovery/predictable-filepaths/"
+   ],
+   "ctf_use": "找备份文件/敏感路径时的补充字典（注意它要求引用作者）",
+   "curated": true,
+   "blackarch_groups": [
+    "blackarch",
+    "blackarch-fuzzer"
+   ]
+  },
+  {
    "name": "git-dumper",
    "desc_en": "A tool to dump a git repository from a website.",
    "cats": [
@@ -2711,6 +2875,31 @@
    ]
   },
   {
+   "name": "nuclei-templates",
+   "desc_en": "Community curated list of template files for the nuclei engine.",
+   "cats": [
+    "web",
+    "recon"
+   ],
+   "url": "https://github.com/projectdiscovery/nuclei-templates",
+   "blackarch": "nuclei-templates",
+   "src": [
+    "blackarch"
+   ],
+   "desc": "漏洞检测模板库（1 万+ YAML，带 CVE/CWE 分类）",
+   "install": {
+    "git": "https://github.com/projectdiscovery/nuclei-templates"
+   },
+   "usage": [
+    "nuclei -u \"$U\" -t ~/nuclei-templates/http/exposures/ -stats"
+   ],
+   "ctf_use": "先跑 exposures/misconfiguration 类模板，常有白捡",
+   "curated": true,
+   "blackarch_groups": [
+    "blackarch"
+   ]
+  },
+  {
    "name": "PayloadsAllTheThings",
    "desc_en": "A list of useful payloads and bypass for Web Application Security and Pentest/CTF.",
    "cats": [
@@ -2815,6 +3004,38 @@
    ],
    "ctf_use": "会话/重试/编码都要手写时的首选",
    "curated": true
+  },
+  {
+   "name": "SecLists",
+   "desc_en": "A collection of multiple types of lists used during security assessments.",
+   "cats": [
+    "web",
+    "recon",
+    "hash"
+   ],
+   "url": "https://github.com/danielmiessler/SecLists",
+   "blackarch": "seclists",
+   "src": [
+    "blackarch",
+    "kali"
+   ],
+   "desc": "安全测试词表总集（目录/密码/用户名/payload 分类）",
+   "install": {
+    "pacman": "seclists",
+    "git": "https://github.com/danielmiessler/SecLists"
+   },
+   "usage": [
+    "ls /usr/share/seclists/Discovery/Web-Content/",
+    "ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -u \"$U/FUZZ\""
+   ],
+   "ctf_use": "爆破字典的默认来源；先用中等字典（raft-medium），别一上来 4 万条",
+   "curated": true,
+   "blackarch_groups": [
+    "blackarch-wordlist"
+   ],
+   "kali_cats": [
+    "passwords"
+   ]
   },
   {
    "name": "sqlmap",
@@ -12588,26 +12809,6 @@
     "blackarch-cracker"
    ],
    "desc": "Automatic samdump creation script."
-  },
-  {
-   "name": "seclists",
-   "desc_en": "A collection of multiple types of lists used during security assessments.",
-   "cats": [
-    "hash"
-   ],
-   "url": "https://github.com/danielmiessler/SecLists/",
-   "blackarch": "seclists",
-   "src": [
-    "blackarch",
-    "kali"
-   ],
-   "blackarch_groups": [
-    "blackarch-wordlist"
-   ],
-   "kali_cats": [
-    "passwords"
-   ],
-   "desc": "A collection of multiple types of lists used during security assessments."
   },
   {
    "name": "shreder",
@@ -35345,23 +35546,6 @@
    "desc": "Script to pull addresses from a NTP server using the monlist command. Can also output Maltego resultset."
   },
   {
-   "name": "nuclei-templates",
-   "desc_en": "Community curated list of template files for the nuclei engine.",
-   "cats": [
-    "recon",
-    "web"
-   ],
-   "url": "https://github.com/projectdiscovery/nuclei-templates",
-   "blackarch": "nuclei-templates",
-   "src": [
-    "blackarch"
-   ],
-   "blackarch_groups": [
-    "blackarch"
-   ],
-   "desc": "Community curated list of template files for the nuclei engine."
-  },
-  {
    "name": "nullinux",
    "desc_en": "Tool that can be used to enumerate OS information, domain information, shares, directories, and users through SMB null sessions.",
    "cats": [
@@ -42849,24 +43033,6 @@
    "desc": "Porting Windows Dynamic Link Libraries to Linux."
   },
   {
-   "name": "lolbas",
-   "desc_en": "Living Off The Land Binaries And Scripts - (LOLBins and LOLScripts).",
-   "cats": [
-    "rev",
-    "pwn"
-   ],
-   "url": "https://github.com/api0cradle/LOLBAS",
-   "blackarch": "lolbas",
-   "src": [
-    "blackarch"
-   ],
-   "blackarch_groups": [
-    "blackarch",
-    "blackarch-windows"
-   ],
-   "desc": "Living Off The Land Binaries And Scripts - (LOLBins and LOLScripts)."
-  },
-  {
    "name": "luyten",
    "desc_en": "An Open Source Java Decompiler Gui for Procyon.",
    "cats": [
@@ -48626,24 +48792,6 @@
     "blackarch-fuzzer"
    ],
    "desc": "A fuzzer for TCP and IP protocol options. It sends a bunch of more or less bogus packets to the target."
-  },
-  {
-   "name": "fuzzdb",
-   "desc_en": "Attack and Discovery Pattern Dictionary for Application Fault Injection Testing.",
-   "cats": [
-    "web",
-    "recon"
-   ],
-   "url": "https://github.com/fuzzdb-project/fuzzdb",
-   "blackarch": "fuzzdb",
-   "src": [
-    "blackarch"
-   ],
-   "blackarch_groups": [
-    "blackarch",
-    "blackarch-fuzzer"
-   ],
-   "desc": "Attack and Discovery Pattern Dictionary for Application Fault Injection Testing."
   },
   {
    "name": "fuzzdiff",

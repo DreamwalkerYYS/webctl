@@ -26,8 +26,14 @@ def run(args) -> int:
     t = args.target
     if _is_url(t):
         print(f"[go] 看起来是 URL → 走 Web 侦察（ctfctl recon）\n")
-        rc = recon_cmd.run(argparse.Namespace(**{**vars(args), "url": t, "cmd": "recon", "func": None}))
-        print(f"\n[go] Web 题下一步：ctfctl fuzz \"{t}/FUZZ\" -e php,bak,zip --safe / ctfctl kb signals")
+        # recon 需要的字段显式给全（以前用 **vars(args) 糊过去，go 没有 jar 之类就炸）
+        ns = argparse.Namespace(url=t, cmd="recon", func=None, jar=None, new=False, proxy=None,
+                                ua=None, timeout=15.0, full=bool(getattr(args, "full", False)),
+                                threads=4, delay=0.05, report=None, note=False, no_suggest=False,
+                                json=False, verbose=False)
+        rc = recon_cmd.run(ns)
+        print(f"\n[go] 下一步：ctfctl solve \"{t}\"（交互式推进整题）"
+              f" / ctfctl fuzz \"{t}/FUZZ\" -e php,bak,zip --safe")
         return rc
     if os.path.isdir(t):
         items = sorted(os.listdir(t))
