@@ -6,8 +6,10 @@
 from __future__ import annotations
 
 import json
+import binascii
 import os
 import subprocess
+import base64 as import_b64
 import sys
 import time
 import urllib.request
@@ -496,6 +498,92 @@ def main() -> int:
         r2 = subprocess.run([sys.executable, "-m", "ctfctl"], input="q\n", cwd=ROOT, env=senv2,
                             capture_output=True, text=True, timeout=120)
         check("shell：裸跑 ctfctl 进的就是交互式终端", "会话结束" in (r2.stdout + r2.stderr), r2.stdout[-300:])
+
+        print("\n[24] auto / rev：判定器 + 部分题型自动闭环")
+        auto_cache = "/tmp/ctfctl-auto-cache"
+        _sh.rmtree(auto_cache, ignore_errors=True)
+        os.makedirs(auto_cache, exist_ok=True)
+        aenv = {**os.environ, "CTFCTL_CACHE": auto_cache, "PYTHONPATH": ROOT}
+        fx = os.path.join(ROOT, "tests", "fixtures")
+        work = "/tmp/ctfctl-auto-fx"
+        _sh.rmtree(work, ignore_errors=True)
+        os.makedirs(work, exist_ok=True)
+
+        def auto(*a, t=420):
+            return subprocess.run([sys.executable, "-m", "ctfctl", "auto", *a], cwd=ROOT, env=aenv,
+                                  capture_output=True, text=True, timeout=t)
+
+        # ① 编码套娃（base64(base32(hex(flag))))
+        flag1 = "flag{chain_ok_2026}"
+        open(f"{work}/chain.txt", "w").write(import_b64.b64encode(
+            import_b64.b32encode(binascii.hexlify(flag1.encode()))).decode() + "\n")
+        r = auto(f"{work}/chain.txt", "--quiet")
+        check("auto：编码链能自动解出 flag", r.returncode == 0 and flag1 in r.stdout, r.stdout[-500:])
+
+        # ② 古典密码（凯撒 +7）
+        plain = "THE FLAG IS FLAGCAESAROK"
+        ct = "".join(chr((ord(c) - 65 + 7) % 26 + 65) if c.isupper() else c for c in plain)
+        open(f"{work}/caesar.txt", "w").write(ct + "\n")
+        r = auto(f"{work}/caesar.txt", "--quiet")
+        check("auto：古典密码（凯撒）自动还原明文", r.returncode == 0 and "FLAGCAESAROK" in r.stdout, r.stdout[-600:])
+
+        # ③ 单字节 XOR（hex 给出）
+        flag3 = "flag{xor_key_0x5a}"
+        raw = bytes(b ^ 0x5A for b in flag3.encode())
+        open(f"{work}/xor.txt", "w").write(binascii.hexlify(raw).decode() + "\n")
+        r = auto(f"{work}/xor.txt", "--quiet")
+        check("auto：单字节 XOR 自动解出 flag", r.returncode == 0 and flag3 in r.stdout, r.stdout[-500:])
+
+        # ④ 压缩包口令（内置夹具：口令 123456）
+        zip_b64 = ("UEsDBAoACQAAAFNoRl2ZpRMWJQAAABkAAAAIABwAZmxhZy50eHRVVAkAA+2AxGrtgMRqdXgLAAEE6AMAAATo"
+                   "AwAA8X/MT9kWgBcxJIqA4lGqESdHTtG70RYk10x9qvoKOzmf6jQopFBLBwiZpRMWJQAAABkAAABQSwECHgMKAAkA"
+                   "AABTaEZdmaUTFiUAAAAZAAAACAAYAAAAAAABAAAApIEAAAAAZmxhZy50eHRVVAUAA+2AxGp1eAsAAQToAwAABOgD"
+                   "AABQSwUGAAAAAAEAAQBOAAAAdwAAAAAA")
+        open(f"{work}/p.zip", "wb").write(import_b64.b64decode(zip_b64))
+        r = auto(f"{work}/p.zip", "--quiet")
+        check("auto：压缩包口令自动爆破并递归出内层 flag",
+              r.returncode == 0 and "flag{zip_pwd_works_2026}" in r.stdout, r.stdout[-800:])
+
+        # ⑤ 未闭合样本必须老实报未闭合（rc=3）
+        open(f"{work}/noise.bin", "wb").write(os.urandom(512))
+        r = auto(f"{work}/noise.bin", "--quiet")
+        check("auto：解不出来时 rc=3 且明说未闭合", r.returncode == 3 and "未闭合" in r.stdout, r.stdout[-300:])
+
+        # ⑥ rev：黑盒逐字符信号爆破（夹具 B：退出码 10+i）
+        fxb = os.path.join(fx, "B")
+        if os.path.exists(fxb):
+            r = auto(fxb, "--quiet", t=600)
+            check("rev：黑盒逐字符爆破出 flag 且真跑验证通过",
+                  r.returncode == 0 and "flag{brute_signal_ok}" in r.stdout
+                  and ("真跑一遍" in r.stdout or "Correct" in r.stdout),
+                  r.stdout[-600:])
+
+        # ⑦ rev：汇编源码变换链重放（真题形态：QCTF 那类）
+        fxa = os.path.join(fx, "Hello_Assemb1y.asm")
+        if os.path.exists(fxa):
+            r = auto(fxa, "--quiet")
+            check("rev：汇编源码逆变换 + 正变换回验出 flag",
+                  r.returncode == 0 and "QCTF{We1come_To_Assemb1y_Wor1d!}" in r.stdout, r.stdout[-600:])
+
+        # ⑧ 密码原语标准向量（TEA/XXTEA/RC4）—— 端到端靠真题人工验收，原语用向量钉住
+        from ctfctl.core import revauto as _R, oracles as _O
+        dec = _R._tea_decrypt_block([0x41EA3A0A, 0x94BAA940], b"\x00" * 16)   # 教科书标准向量
+        check("rev：TEA 解密过标准测试向量（key=0、pt=0 → ct=41EA3A0A94BAA940）", dec == [0, 0], str(dec))
+        check("rev：RC4 教科书向量", _R._rc4(b"Key", b"Plaintext").hex() == "bbf316e8d940af0ad3", "")
+
+        print("\n[25] 判定器：假阳性防护（这轮真踩到的三类）")
+        from ctfctl.core import oracles as _OO
+        check("判定器：纯文本源码不会被判成'闭合'（可读≠答案）",
+              not _OO.flags_in("mov al, [si]  ; xor al, key[bx]") , "")
+        check("判定器：2 字节魔数（MZ）单独不算硬证据",
+              _OO.file_magic(b"MZ" + b"\x00" * 80)["conf"] < 3, "")
+        _fi = _OO.file_magic(open(os.path.join(fx, "B"), "rb").read())
+        check("判定器：真 ELF 头 + header 自洽 → 硬证据", _fi["verdict"] == "HIT" and _fi["conf"] == 3, str(_fi))
+        check("判定器：pkcs7 单独成立不算硬证据", _OO.pkcs7_valid(b"abc" + bytes([5]) * 5)["conf"] == 2, "")
+        check("判定器：形似但前缀不可信的 flag 不算硬证据",
+              not _OO.flags_in("suiqzs{|M}"), "")
+        check("判定器：可信 flag 能取到",
+              _OO.flags_in("... flag{chain_ok_2026} ...") == ["flag{chain_ok_2026}"], "")
 
     finally:
         srv.terminate()

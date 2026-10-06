@@ -220,6 +220,7 @@ class Shell:
   r               重新分析当前目标
   s [N] / a [N]   推进 N 步 / 自动推进 N 步（默认 1 / 3）
   o               状态总览（阶段/证据/已试/下一步）
+  auto            对当前目标跑自动闭环（编码链/古典/XOR/压缩包/图片/元数据 → 判定器裁决）
   k [词]          知识库    tools [词]  工具目录    rules  规则    hist  历史    cheat  速查
   !<命令>         直接跑系统命令（结果也会进证据）
   <任意子命令>    当成 ctfctl 子命令跑（req get / codec b64d / fuzz / jwt decode …）

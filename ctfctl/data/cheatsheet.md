@@ -12,6 +12,15 @@ ctfctl                 # 进去以后：t 设目标(N+分析) → 回车推进 �
 printf 't $U\n1\nq\n' | ctfctl shell     # 管道驱动，可写脚本/可测试
 ```
 
+## ①.2 自动闭环（有判定器的题型）
+```
+ctfctl auto ./chal.txt     # 编码链/古典/XOR/哈希/RSA（文本）
+ctfctl auto ./chal.zip     # 口令候选 → 解包 → 内层递归
+ctfctl auto ./a.png        # LSB + 元数据/夹带
+ctfctl auto ./x.exe        # rev：指纹/常量数组解密/黑盒逐字符爆破（出候选后真跑一遍验证）
+```
+退出码 0 = 闭合（拿到 flag/明文/口令），3 = 未闭合（逐条给依据）。
+
 ## ①.5 整题推进（不想手动串步骤时）
 ```
 ctfctl solve "$U" --auto 5      # 跑一步 → 抠新证据 → 重算下一步（拿到 flag 候选就停）

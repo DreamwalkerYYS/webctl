@@ -189,6 +189,13 @@ class SolveState:
         ranked = advise_mod.rank(advise_mod.match(ev), ev)
         acts = [a for a in advise_mod.actions_flat(ranked, {"{url}": self.target, "{path}": self.target})
                 if not a.get("probe")]
+        if self.kind != "web":
+            # 文件类：把「自动闭环」放最前（编码链/古典/XOR/压缩包/图片/元数据，判定器裁决）
+            acts.insert(0, {"label": "自动闭环：类型初筛 + 编码/古典/XOR/压缩包/图片/元数据",
+                            "kind": "cmd", "argv": ["auto", self.target],
+                            "render": f"ctfctl auto \"{self.target}\"",
+                            "why": "这几类有确定性判定器，能自动推到出结果或明确未决项",
+                            "rule_name": "自动闭环"})
         if not (self.evidence["params"] or self.evidence["paths"] or self.evidence["files"]
                 or self.evidence["urls"] or self.flags):
             acts.insert(0, {"label": "先做一轮分析（侦察／初筛）", "kind": "cmd",
