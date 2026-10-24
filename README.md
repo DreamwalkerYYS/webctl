@@ -36,6 +36,13 @@ ctfctl --help
 pipx install -e ~/项目/ctf-tool                  # 本地开发式安装
 pipx install git+https://github.com/Phirisyyds/ctfctl     # 或直接从仓库装
 # （用 pip 的话加 --break-system-packages）
+
+# ④ 字典（爆破/隐写要用；约 134MB，不需要 root）
+mkdir -p ~/.local/share/wordlists
+curl -L -o ~/.local/share/wordlists/rockyou.txt \
+  https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
+# 字典路径统一由 ctfctl/core/wordlists.py 解析：~/.local/share/wordlists → ~/wordlists → seclists → 系统目录
+# （cookie flask-unsign / stegseek / john 等提示里给的就是解析后的真实路径，换机器不用改命令）
 ```
 
 ---
@@ -526,6 +533,7 @@ ctf-tool/
 │   │   ├── response.py         # 响应对象（状态/头/体/落盘/捞 flag）
 │   │   ├── detect.py           # 真假 200 判定（recon 与 fuzz 共用）
 │   │   ├── history.py          # 请求历史的读写
+│   │   ├── wordlists.py        # 字典路径解析（rockyou 等：用户目录优先，换机器不改命令）
 │   │   ├── rules.py            # 规则加载/匹配/打分/命令渲染
 │   │   ├── advise.py           # 建议引擎（证据→why→可执行动作，带打分）
 │   │   ├── workbench.py        # 工作台引擎：analyze / run_action / run_argv（TUI 与 WebUI 共用）
