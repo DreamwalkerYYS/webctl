@@ -30,6 +30,7 @@ import zlib
 
 from . import oracles as O
 from .config import CACHE, ensure_dirs
+from .wordlists import rockyou
 
 MAX_NODES = 400            # 编码链搜索上限
 MAX_TRIALS = 6000          # 各类穷举的总试探上限
@@ -499,8 +500,7 @@ def hash_auto(text: str) -> list[dict]:
     steps = [_step("hash", f"哈希识别：{len(s)} 位 → {'/'.join(kinds)}", "UNKNOWN", 2,
                    "算法已定，下一步查库或爆破", s[:80])]
     john = _have("john")
-    wl = next((w for w in ("/usr/share/wordlists/rockyou.txt", "/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt",
-                           os.path.expanduser("~/wordlists/rockyou.txt")) if os.path.exists(w)), "")
+    wl = rockyou()
     if john and wl:
         hf = os.path.join(CACHE, "auto", "hash.txt")
         os.makedirs(os.path.dirname(hf), exist_ok=True)

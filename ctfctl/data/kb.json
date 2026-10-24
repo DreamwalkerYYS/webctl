@@ -182,7 +182,7 @@
    ],
    "cmds": [
     "ctfctl cookie list --base \"$U\"",
-    "ctfctl cookie flask-crack -w /usr/share/wordlists/rockyou.txt --base \"$U\"",
+    "ctfctl cookie flask-unsign -w ~/.local/share/wordlists/rockyou.txt --base \"$U\"",
     "ctfctl cookie flask-sign --cookie '<session 值>' --secret <爆出的密钥> --set role=admin"
    ],
    "tools": [
@@ -238,7 +238,7 @@
    ],
    "cmds": [
     "ctfctl jwt decode \"$TOKEN\"",
-    "ctfctl jwt crack \"$TOKEN\" -w /usr/share/wordlists/rockyou.txt",
+    "ctfctl jwt crack \"$TOKEN\" -w ~/.local/share/wordlists/rockyou.txt",
     "ctfctl jwt sign \"$TOKEN\" --secret <密钥> --set role=admin"
    ],
    "tools": [
@@ -835,7 +835,7 @@
     "解出一层看是否还有一层（嵌套是常见设计）"
    ],
    "cmds": [
-    "zip2john frist.zip > h.txt && john --wordlist=/usr/share/wordlists/rockyou.txt h.txt",
+    "zip2john frist.zip > h.txt && john --wordlist=~/.local/share/wordlists/rockyou.txt h.txt",
     "bkcrack -C frist.zip -c plain.txt -p known.txt",
     "7z l -slt frist.zip     # 看 Method/Encrypted 列判断真伪加密"
    ],
@@ -2008,7 +2008,7 @@
     "ctfctl codec hash hmac-sha256 \"msg\" --key SECRET",
     "ctfctl codec hash pbkdf2 password --salt S --iters 10000",
     "haiti 098f6bcd4621d373cade4e832627b4f6",
-    "hashcat -m 0 h.txt /usr/share/wordlists/rockyou.txt"
+    "hashcat -m 0 h.txt ~/.local/share/wordlists/rockyou.txt"
    ],
    "tools": [
     "hashcat",

@@ -21,6 +21,7 @@ import urllib.parse
 import zlib
 
 from ..core.session import Session
+from ..core.wordlists import rockyou
 
 SALT = b"cookie-session"
 
@@ -148,13 +149,16 @@ def run_flask_unsign(args) -> int:
         if data is not None:
             print(json.dumps(data, ensure_ascii=False, indent=2))
             return 0
-    if args.wordlist:
-        secret = crack(v, args.wordlist)
+    wl = args.wordlist or rockyou()
+    if wl:
+        if not args.wordlist:
+            print(f"[*] 没给 -w，用默认字典 {wl}", file=sys.stderr)
+        secret = crack(v, wl)
         if not secret:
             return 1
         print(json.dumps(unsign(v, secret), ensure_ascii=False, indent=2))
         return 0
-    print("[!] 给 --secret 或 -w 字典", file=sys.stderr)
+    print("[!] 给 --secret 或 -w 字典（本机也没找到 rockyou）", file=sys.stderr)
     return 2
 
 
@@ -201,13 +205,18 @@ def register(sub) -> None:
     r = v.add_parser("raw", help="输出一行 Cookie: 头（方便粘到别处）")
     base(r); r.set_defaults(func=run_raw)
 
-    fu = v.add_parser("flask-unsign", help="解密 Flask session（给密钥或爆字典）")
-    base(fu)
-    fu.add_argument("--cookie", help="直接给 session 值（不给就从 jar 取）")
-    fu.add_argument("--name", default="session", help="从 jar 取哪个 cookie（默认 session）")
-    fu.add_argument("--secret", action="append", help="试这个密钥（可多次）")
-    fu.add_argument("-w", "--wordlist", help="爆密钥用的字典")
-    fu.set_defaults(func=run_flask_unsign)
+    def unsign_parser(sp):
+        base(sp)
+        sp.add_argument("--cookie", help="直接给 session 值（不给就从 jar 取）")
+        sp.add_argument("--name", default="session", help="从 jar 取哪个 cookie（默认 session）")
+        sp.add_argument("--secret", action="append", help="试这个密钥（可多次）")
+        sp.add_argument("-w", "--wordlist", help="爆密钥用的字典（默认自动找 rockyou）")
+        sp.set_defaults(func=run_flask_unsign)
+
+    fu = v.add_parser("flask-unsign", help="解密 Flask session（给密钥或爆字典；不给 -w 用默认 rockyou）")
+    unsign_parser(fu)
+    fc = v.add_parser("flask-crack", help="flask-unsign 的别名（旧脚本/旧笔记里这么写）")
+    unsign_parser(fc)
 
     fs = v.add_parser("flask-sign", help="伪造 Flask session cookie")
     base(fs)

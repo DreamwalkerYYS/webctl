@@ -249,7 +249,7 @@ def stegseek_jpg(path: str) -> list[dict]:
     rc, out = _run(["stegseek", "--seed", path], timeout=240)
     v, c, reason, res = _verdict_of(out, "")
     steps = [_step("oneshot-stegseek", "JPEG 隐写（stegseek --seed）", v, c, reason, res,
-                   [f"stegseek --seed {path}", f"stegseek {path} /usr/share/wordlists/rockyou.txt"])]
+                   [f"stegseek --seed {path}", f"stegseek {path} ~/.local/share/wordlists/rockyou.txt"])]
     if not _have("steghide") and v != "HIT":
         return steps
     if v != "HIT" and _have("steghide"):        # 空口令再试一发（很常见）

